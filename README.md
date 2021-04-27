@@ -1,0 +1,1 @@
+Gw2_AddonHelper
