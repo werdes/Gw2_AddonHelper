@@ -28,13 +28,12 @@ namespace Gw2_AddonHelper.Services
         private ILogger _log;
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
-        private WebClient _webClient;
 
         private GitHubClient _githubClient = new GitHubClient(new ProductHeaderValue(
             System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
             System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
-        public GithubAddonList AddonList { get; set; }
+        private GithubAddonList _addonList = null;
 
         public GithubAddonListService(ILogger<GithubAddonListService> log, IConfiguration configuration, IUserConfigService userConfigService)
         {
@@ -42,12 +41,7 @@ namespace Gw2_AddonHelper.Services
             _config = configuration;
             _userConfigService = userConfigService;
 
-            _webClient = new WebClient();
-            _webClient.Headers.Add("user-agent",
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " +
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
-
-            AddonList = new GithubAddonList();
+            _addonList = new GithubAddonList();
 
             Load();
         }
@@ -74,7 +68,7 @@ namespace Gw2_AddonHelper.Services
 
                 //Check if a commit was made since last update -> commit sha changed
                 string currentSha = await GetCurrentRepositoryCommitSha();
-                if (currentSha != AddonList.CommitSha)
+                if (currentSha != _addonList.CommitSha)
                 {
                     Uri zipBallUrl = new Uri(_config.GetValue<string>("githubAddonList:repositoryZipBallUrl"));
                     try
@@ -99,7 +93,7 @@ namespace Gw2_AddonHelper.Services
                                                                                 match => match.Value.Replace("\n", "").Replace("\r", ""));
 
                                     Addon addon = yamlDeserializer.Deserialize<Addon>(addonDescriptionYamlContent);
-
+                                    addon.AddonId = addonDescription.FileName.Split('/')[1];
 
                                     addons.Add(addon);
                                 }
@@ -110,10 +104,10 @@ namespace Gw2_AddonHelper.Services
                             }
                         }
 
-                        AddonList.CommitSha = currentSha;
-                        AddonList.RetrievedAt = DateTime.UtcNow;
-                        AddonList.Addons.Clear();
-                        AddonList.Addons.AddRange(addons);
+                        _addonList.CommitSha = currentSha;
+                        _addonList.RetrievedAt = DateTime.UtcNow;
+                        _addonList.Addons.Clear();
+                        _addonList.Addons.AddRange(addons);
                     }
                     catch (Exception ex)
                     {
@@ -122,7 +116,7 @@ namespace Gw2_AddonHelper.Services
                 }
             }
 
-            return AddonList.Addons.ToList();
+            return _addonList.Addons.ToList();
         }
 
         /// <summary>
@@ -171,7 +165,7 @@ namespace Gw2_AddonHelper.Services
                 string json = File.ReadAllText(addonFile, Encoding.UTF8);
                 GithubAddonList tempList = JsonConvert.DeserializeObject<GithubAddonList>(json);
 
-                AddonList = tempList;
+                _addonList = tempList;
             }
             catch (Exception ex)
             {
@@ -188,7 +182,7 @@ namespace Gw2_AddonHelper.Services
 
             try
             {
-                string json = JsonConvert.SerializeObject(AddonList, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(_addonList, Formatting.Indented);
                 File.WriteAllText(addonFile, json, Encoding.UTF8);
             }
             catch (Exception ex)

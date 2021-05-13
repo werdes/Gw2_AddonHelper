@@ -17,6 +17,18 @@ namespace Gw2_AddonHelper.Model.AddonList
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        public Addon()
+        {
+        }
+
+        private string _addonId;
+        [JsonProperty("addon_id")]
+        public string AddonId
+        {
+            get { return _addonId; }
+            set { _addonId = value; }
+        }
+
         private string _developer;
         [YamlMember(Alias = "developer")]
         [JsonProperty("developer")]

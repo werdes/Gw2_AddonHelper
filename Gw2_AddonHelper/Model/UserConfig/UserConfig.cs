@@ -16,7 +16,7 @@ namespace Gw2_AddonHelper.Model.UserConfig
 
         public UserConfig()
         {
-            GameLocation = new Uri(@"C:\Program Files\Guild Wars 2\gw2-64.exe");
+            GameLocation = new Uri(@"C:\Program Files\Guild Wars 2\Gw2-64.exe");
             Language = "en-EN";
             LastGithubCheck = DateTime.MinValue;
         }
