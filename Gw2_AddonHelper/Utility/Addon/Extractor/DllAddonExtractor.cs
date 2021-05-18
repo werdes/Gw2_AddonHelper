@@ -1,25 +1,39 @@
-﻿using System;
+﻿using Gw2_AddonHelper.Model.GameState;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Gw2_AddonHelper.Utility.Addon.Extractor
 {
-    public class DllAddonExtractor : IAddonExtractor
+    public class DllAddonExtractor : BaseAddonExtractor, IAddonExtractor
     {
-        private Model.AddonList.Addon _addon;
-        private byte[] _fileContent;
-
-        public DllAddonExtractor(Model.AddonList.Addon addon, byte[] fileContent)
+        public DllAddonExtractor(Model.AddonList.Addon addon) : base(addon)
         {
-            _addon = addon;
-            _fileContent = fileContent;
         }
 
-        public bool ExtractTo(string path)
+        public async Task<ExtractionResult> Extract(DownloadResult download, string version)
         {
-            throw new NotImplementedException();
+
+            ExtractionResult manifest = new ExtractionResult();
+            manifest.InstallationTime = DateTime.UtcNow;
+            manifest.Version = download.Version;
+            manifest.AddonFiles.Add(new ExtractionResultFile()
+            {
+                FileContent = download.FileContent,
+                FileName = download.FileName,
+                RelativePath = string.Empty
+            });
+
+            string loaderPrefix = _config.GetValue<string>("installation:binary:prefix");
+            if (download.FileName.Contains(loaderPrefix))
+            {
+                manifest.LoaderKey = Path.GetFileNameWithoutExtension(download.FileName).Replace(loaderPrefix, string.Empty);
+            }
+
+            return manifest;
         }
     }
 }

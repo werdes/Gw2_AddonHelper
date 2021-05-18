@@ -17,5 +17,13 @@ namespace Gw2_AddonHelper.Extensions
 
             foreach (var item in items) obsCollection.Add(item);
         }
+
+        public static void ForEach<T>(this IEnumerable<T> obsCollection, Action<T> action)
+        {
+            foreach (var obj in obsCollection)
+            {
+                action(obj);
+            }
+        }
     }
 }

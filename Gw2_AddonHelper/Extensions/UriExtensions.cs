@@ -11,7 +11,7 @@ namespace Gw2_AddonHelper.Extensions
     {
         public static string GetDirectory(this Uri uri)
         {
-            return Path.GetDirectoryName(uri.AbsolutePath);
+            return Path.GetDirectoryName(uri.LocalPath);
         }
     }
 }

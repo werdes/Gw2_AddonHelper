@@ -1,5 +1,5 @@
-﻿using Gw2_AddonHelper.Model.AddonList;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,31 +8,27 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Model.GameState
+namespace Gw2_AddonHelper.Model.AddonList
 {
-    public class AddonInstallation : INotifyPropertyChanged
+    public class AddonContainer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public AddonInstallation(Addon addon)
+
+        private InstallState _installState;
+        private Addon _addon;
+        private string _installationEntrypointFile;
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AddonContainer(Addon addon)
         {
             _addon = addon;
         }
 
-        private string _installationDirectory;
-        [JsonProperty("installation_directory")]
-        public string InstallationDirectory
-        {
-            get => _installationDirectory;
-            set
-            {
-                _installationDirectory = value;
-                Notify();
-            }
-        }
-
-        private Addon _addon;
         [JsonProperty("addon")]
         public Addon Addon
         {
@@ -44,8 +40,19 @@ namespace Gw2_AddonHelper.Model.GameState
             }
         }
 
-        private InstallState _installState;
+        [JsonProperty("installation_entrypoint_file")]
+        public string InstallationEntrypointFile
+        {
+            get => _installationEntrypointFile;
+            set
+            {
+                _installationEntrypointFile = value;
+                Notify();
+            }
+        }
 
+        [JsonProperty("install_state")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public InstallState InstallState
         {
             get => _installState;
@@ -55,7 +62,5 @@ namespace Gw2_AddonHelper.Model.GameState
                 Notify();
             }
         }
-
-
     }
 }

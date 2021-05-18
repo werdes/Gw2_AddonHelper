@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.Model;
+using Gw2_AddonHelper.Model.GameState;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Gw2_AddonHelper.Utility.Addon.Extractor
 {
     public interface IAddonExtractor
     {
-        bool ExtractTo(string path);
+        Task<ExtractionResult> Extract(DownloadResult download, string version);
     }
 }

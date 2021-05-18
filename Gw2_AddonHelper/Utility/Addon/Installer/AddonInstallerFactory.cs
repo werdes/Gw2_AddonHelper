@@ -17,6 +17,8 @@ namespace Gw2_AddonHelper.Utility.Addon.Installer
                     return new ArcAddonInstaller(addon);
                 case InstallMode.Binary:
                     return new BinaryAddonInstaller(addon);
+                case InstallMode.AddonLoader:
+                    return new AddonLoaderAddonInstaller(addon);
                 default:
                     throw new ArgumentException($"No installer for installmode [{addon.InstallMode}, {addon.AddonId}]");
             }

@@ -14,13 +14,13 @@ namespace Gw2_AddonHelper.Utility.Addon.Extractor
             switch (addon.DownloadType)
             {
                 case DownloadType.Archive:
-                    break;
+                    return new ArchiveAddonExtractor(addon);
                 case DownloadType.Dll:
-                    break;
+                    return new DllAddonExtractor(addon);
                 default:
                     break;
             }
-            throw new ArgumentException($"No installer for installmode [{addon.InstallMode}, {addon.AddonId}]");
+            throw new ArgumentException($"No extractor for type [{addon.DownloadType}, {addon.AddonId}]");
         }
     }
 }

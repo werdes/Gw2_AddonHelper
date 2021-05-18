@@ -4,6 +4,7 @@ using Gw2_AddonHelper.Model;
 using Gw2_AddonHelper.Model.AddonList;
 using Gw2_AddonHelper.Model.AddonList.Github;
 using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.Utility.Github;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -29,10 +30,7 @@ namespace Gw2_AddonHelper.Services
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
 
-        private GitHubClient _githubClient = new GitHubClient(new ProductHeaderValue(
-            System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
-            System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
-
+        private GitHubClient _githubClient = null;
         private GithubAddonList _addonList = null;
 
         public GithubAddonListService(ILogger<GithubAddonListService> log, IConfiguration configuration, IUserConfigService userConfigService)
@@ -42,6 +40,9 @@ namespace Gw2_AddonHelper.Services
             _userConfigService = userConfigService;
 
             _addonList = new GithubAddonList();
+            _githubClient = new GitHubClient(new ProductHeaderValue(
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
             Load();
         }
@@ -53,6 +54,7 @@ namespace Gw2_AddonHelper.Services
         public async Task<List<Addon>> GetAddonsAsync()
         {
             List<Addon> addons = new List<Addon>();
+            string storedFile = _config.GetValue<string>("githubAddonList:filePath");
 
             IDeserializer yamlDeserializer = new DeserializerBuilder()
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
@@ -62,8 +64,9 @@ namespace Gw2_AddonHelper.Services
             DateTime lastCheck = _userConfigService.GetConfig().LastGithubCheck;
             DateTime checkThreshold = DateTime.UtcNow.AddMinutes(-1 * _config.GetValue<int>("githubAddonList:refreshCooldown"));
 
-            //Check refresh cooldown
-            if (lastCheck <= checkThreshold)
+            //Check Refresh cooldown, Ratelimit 
+            if ((lastCheck <= checkThreshold || !File.Exists(storedFile)) &&
+                GithubRatelimitService.Instance.CanCall())
             {
 
                 //Check if a commit was made since last update -> commit sha changed
@@ -71,6 +74,7 @@ namespace Gw2_AddonHelper.Services
                 if (currentSha != _addonList.CommitSha)
                 {
                     Uri zipBallUrl = new Uri(_config.GetValue<string>("githubAddonList:repositoryZipBallUrl"));
+                    
                     try
                     {
                         List<YamlAddonDescription> fileContents = await GetAddonDescriptionsFromZipBall(zipBallUrl);
@@ -94,6 +98,8 @@ namespace Gw2_AddonHelper.Services
 
                                     Addon addon = yamlDeserializer.Deserialize<Addon>(addonDescriptionYamlContent);
                                     addon.AddonId = addonDescription.FileName.Split('/')[1];
+                                    addon.VersioningType = GetVersioningType(addon);
+                                    addon.LoaderKey = GetLoaderKey(addon);
 
                                     addons.Add(addon);
                                 }
@@ -108,6 +114,12 @@ namespace Gw2_AddonHelper.Services
                         _addonList.RetrievedAt = DateTime.UtcNow;
                         _addonList.Addons.Clear();
                         _addonList.Addons.AddRange(addons);
+
+                        // Addon Loader
+                        Addon addonLoader = _config.GetSection("addonLoader").Get<Addon>();
+
+                        _addonList.Addons.ForEach(x => x.RequiredAddons.Insert(0, addonLoader.AddonId));
+                        _addonList.Addons.Insert(0, addonLoader);
                     }
                     catch (Exception ex)
                     {
@@ -117,6 +129,42 @@ namespace Gw2_AddonHelper.Services
             }
 
             return _addonList.Addons.ToList();
+        }
+
+        /// <summary>
+        /// Returns the key which the addon loader plugin uses
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <returns></returns>
+        private string GetLoaderKey(Addon addon)
+        {
+            string loaderKey = addon.AddonId;
+            string loaderPrefix = _config.GetValue<string>("installation:binary:prefix");
+            if(!string.IsNullOrWhiteSpace(addon.PluginName))
+            {
+                loaderKey = addon.PluginName.Replace(loaderPrefix, string.Empty);
+            }
+
+            string customConfigKey = $"customLoaderKeys:{addon.AddonId}";
+            string customLoaderKey = _config.GetValue<string>(customConfigKey);
+            if (!string.IsNullOrEmpty(customLoaderKey))
+            {
+                loaderKey = customLoaderKey;
+            }
+            return loaderKey;
+        }
+
+        /// <summary>
+        /// Returns the versioning type of the given addon
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <returns></returns>
+        private VersioningType GetVersioningType(Addon addon)
+        {
+            if (addon.HostType == HostType.Github) return VersioningType.GithubCommitSha;
+            if (addon.HostType == HostType.Standalone && addon.VersionUrl != null) return VersioningType.HostFileMd5;
+            if (addon.HostType == HostType.Standalone && addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating)) return VersioningType.SelfUpdating;
+            return VersioningType.Unknown;
         }
 
         /// <summary>
@@ -187,7 +235,7 @@ namespace Gw2_AddonHelper.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, $"Loading configuration from [{addonFile}] failed");
+                _log.LogError(ex, $"Storing configuration to [{addonFile}] failed");
             }
         }
 
@@ -202,6 +250,7 @@ namespace Gw2_AddonHelper.Services
                 _config.GetValue<string>("githubAddonList:repositoryOwner"),
                 _config.GetValue<string>("githubAddonList:repositoryName"),
                 _config.GetValue<string>("githubAddonList:repositoryBranch"));
+            GithubRatelimitService.Instance.RegisterCall();
 
             _userConfigService.GetConfig().LastGithubCheck = DateTime.UtcNow;
             _userConfigService.Store();

@@ -101,8 +101,8 @@ namespace Gw2_AddonHelper
 
             services.AddSingleton(configuration);
             services.AddSingleton<IAddonListService, GithubAddonListService>();
+            services.AddSingleton<IAddonGameStateService, AddonGameStateService>();
             services.AddSingleton<IUserConfigService, JsonUserConfigService>();
-
 
             services.AddTransient<UI.MainWindow>();
 

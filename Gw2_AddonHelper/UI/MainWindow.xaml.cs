@@ -1,9 +1,12 @@
 ﻿using Gw2_AddonHelper.Model.AddonList;
+using Gw2_AddonHelper.Model.GameState;
 using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.Utility.Addon;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace Gw2_AddonHelper.UI
@@ -22,8 +25,9 @@ namespace Gw2_AddonHelper.UI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             IAddonListService addonListService = App.ServiceProvider.GetService<IAddonListService>();
-            List<Addon> lstAddons = await addonListService.GetAddonsAsync();
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
+            List<Addon> lstAddons = await addonListService.GetAddonsAsync();
             addonListService.Store();
         }
     }

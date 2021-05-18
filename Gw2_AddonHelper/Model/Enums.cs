@@ -30,13 +30,17 @@ namespace Gw2_AddonHelper.Model
         [EnumMember(Value = "arc")]
         Arc,
         [EnumMember(Value = "binary")]
-        Binary
+        Binary,
+        [EnumMember(Value = "loader")]
+        AddonLoader
     }
 
     public enum InstallState
     {
-        [EnumMember(Value = "installed")]
-        Installed,
+        [EnumMember(Value = "installed_enabled")]
+        InstalledEnabled,
+        [EnumMember(Value = "installed_disabled")]
+        InstalledDisabled,
         [EnumMember(Value = "not_installed")]
         NotInstalled,
         [EnumMember(Value = "error")]
@@ -49,5 +53,17 @@ namespace Gw2_AddonHelper.Model
         SelfUpdating,
         [EnumMember(Value = "obscured-filename")]
         ObscuredFilename
+    }
+
+    public enum VersioningType
+    {
+        [EnumMember(Value = "github-commit-sha")]
+        GithubCommitSha,
+        [EnumMember(Value = "host-file-md5")]
+        HostFileMd5,
+        [EnumMember(Value = "self-updating")]
+        SelfUpdating,
+        [EnumMember(Value = "unknown")]
+        Unknown
     }
 }
