@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Resources;
 using System.Windows;
 
 [assembly: ThemeInfo(

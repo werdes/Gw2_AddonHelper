@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Gw2_AddonHelper.UI.Controls.AddonInstallProgressItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Gw2_AddonHelper.UI.Controls"
+             xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:BoolToInvertedVisibilityConverter x:Key="BoolToInvertedVisibilityConverter" />
+        <converters:InstallProgressToDescriptionTextConverter x:Key="InstallProgressToDescriptionTextConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" Margin="7" VerticalAlignment="Center">
+            <Image Width="40" Visibility="{Binding AddonInstallProgress.ShowInstallProgressWaiting, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="0" Source="/UI/Resources/Images/icon-installer-waiting.png" />
+            <Image Width="40" Visibility="{Binding AddonInstallProgress.ShowInstallProgressInProgress, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="0" Source="/UI/Resources/Images/icon-installer-installing.png" />
+            <Image Width="40" Visibility="{Binding AddonInstallProgress.ShowInstallProgressCompleted, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="0" Source="/UI/Resources/Images/icon-installer-completed.png" />
+            <Image Width="40" Visibility="{Binding AddonInstallProgress.ShowInstallProgressError, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="0" Source="/UI/Resources/Images/icon-installer-error.png" />
+            <Label FontFamily="Segoe UI Light" Foreground="White" FontSize="8" Content="{Binding AddonInstallProgress.InstallProgress, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InstallProgressToDescriptionTextConverter}}" HorizontalAlignment="Center" Padding="0"></Label>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Column="1">
+            <local:AddonListItem AddonContainer="{Binding AddonInstallProgress.AddonInstallAction.AddonContainer, RelativeSource={RelativeSource AncestorType=UserControl}}" ShowActions="False" />
+        </StackPanel>
+    </Grid>
+</UserControl>

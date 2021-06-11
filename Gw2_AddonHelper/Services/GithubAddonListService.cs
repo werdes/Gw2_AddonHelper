@@ -1,10 +1,10 @@
-﻿using Gw2_AddonHelper.Custom.YamlDotNet;
-using Gw2_AddonHelper.Extensions;
-using Gw2_AddonHelper.Model;
-using Gw2_AddonHelper.Model.AddonList;
-using Gw2_AddonHelper.Model.AddonList.Github;
-using Gw2_AddonHelper.Services.Interfaces;
-using Gw2_AddonHelper.Utility.Github;
+﻿using Gw2_AddonHelper.AddonLib.Extensions;
+using Gw2_AddonHelper.AddonLib.Model;
+using Gw2_AddonHelper.AddonLib.Model.AddonList;
+using Gw2_AddonHelper.AddonLib.Model.AddonList.Github;
+using Gw2_AddonHelper.AddonLib.Services.Interfaces;
+using Gw2_AddonHelper.AddonLib.Utility.Github;
+using Gw2_AddonHelper.Custom.YamlDotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -217,7 +216,7 @@ namespace Gw2_AddonHelper.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, $"Loading configuration from [{addonFile}] failed");
+                _log.LogError(ex, $"Loading addon list from [{addonFile}] failed");
             }
         }
 
@@ -235,7 +234,7 @@ namespace Gw2_AddonHelper.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, $"Storing configuration to [{addonFile}] failed");
+                _log.LogError(ex, $"Storing addon list to [{addonFile}] failed");
             }
         }
 

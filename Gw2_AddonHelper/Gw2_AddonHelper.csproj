@@ -6,9 +6,33 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
 	<Deterministic>false</Deterministic>
+	<ApplicationIcon>UI\Resources\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="UI\Resources\app.ico" />
+    <None Remove="UI\Resources\Images\app.png" />
+    <None Remove="UI\Resources\Images\icon-checked.png" />
+    <None Remove="UI\Resources\Images\icon-conflict.png" />
+    <None Remove="UI\Resources\Images\icon-disable.png" />
+    <None Remove="UI\Resources\Images\icon-enable.png" />
+    <None Remove="UI\Resources\Images\icon-install.png" />
+    <None Remove="UI\Resources\Images\icon-installer-completed.png" />
+    <None Remove="UI\Resources\Images\icon-installer-error.png" />
+    <None Remove="UI\Resources\Images\icon-installer-installing.png" />
+    <None Remove="UI\Resources\Images\icon-installer-waiting.png" />
+    <None Remove="UI\Resources\Images\icon-open.png" />
+    <None Remove="UI\Resources\Images\icon-plugin.png" />
+    <None Remove="UI\Resources\Images\icon-remove.png" />
+    <None Remove="UI\Resources\Images\icon-settings.png" />
+    <None Remove="UI\Resources\Images\icon-unchecked.png" />
+    <None Remove="UI\Resources\Images\icon-update.png" />
+    <None Remove="UI\Resources\Images\icon-update2.png" />
+    <None Remove="UI\Resources\Images\icon-warning.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentWPF" Version="0.9.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -19,7 +43,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Localization.Designer.cs">
+    <ProjectReference Include="..\Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="UI\Resources\app.ico" />
+    <Resource Include="UI\Resources\Images\app.png" />
+    <Resource Include="UI\Resources\Images\icon-checked.png" />
+    <Resource Include="UI\Resources\Images\icon-conflict.png" />
+    <Resource Include="UI\Resources\Images\icon-disable.png" />
+    <Resource Include="UI\Resources\Images\icon-enable.png" />
+    <Resource Include="UI\Resources\Images\icon-install.png" />
+    <Resource Include="UI\Resources\Images\icon-installer-completed.png" />
+    <Resource Include="UI\Resources\Images\icon-installer-error.png" />
+    <Resource Include="UI\Resources\Images\icon-installer-installing.png" />
+    <Resource Include="UI\Resources\Images\icon-installer-waiting.png" />
+    <Resource Include="UI\Resources\Images\icon-open.png" />
+    <Resource Include="UI\Resources\Images\icon-plugin.png" />
+    <Resource Include="UI\Resources\Images\icon-remove.png" />
+    <Resource Include="UI\Resources\Images\icon-settings.png" />
+    <Resource Include="UI\Resources\Images\icon-unchecked.png" />
+    <Resource Include="UI\Resources\Images\icon-update.png" />
+    <Resource Include="UI\Resources\Images\icon-update2.png" />
+    <Resource Include="UI\Resources\Images\icon-warning.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UI\Localization\Localization.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Localization.resx</DependentUpon>
@@ -27,7 +77,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Localization.resx">
+    <EmbeddedResource Update="UI\Localization\Localization.en.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="UI\Localization\Localization.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Localization.Designer.cs</LastGenOutput>
     </EmbeddedResource>
@@ -40,6 +93,13 @@
     <None Update="log.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Localization\Localization.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

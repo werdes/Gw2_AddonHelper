@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="Gw2_AddonHelper.UI.Controls.AddonListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+             xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" 
+             d:DesignWidth="600">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:InstallStateToBrushConverter x:Key="InstallStateToBrushConverter" />
+        <converters:InstallStateToDescriptionConverter x:Key="InstallStateToDescriptionConverter" />
+        <converters:UpdateAvailabilityConverter x:Key="UpdateAvailabilityConverter" />
+        <converters:BoolToCheckboxBackgroundConverter x:Key="BoolToCheckboxBackgroundConverter" />
+        <converters:BoolToInvertedVisibilityConverter x:Key="BoolToInvertedVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid Background="#FF111111" Margin="0,0,0,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!--Checkbox button-->
+        <Button Cursor="Hand" Grid.RowSpan="3" Style="{StaticResource ButtonRevealStyle}" Background="{Binding AddonContainer.Checked, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToCheckboxBackgroundConverter}}" Visibility="{Binding ShowCheckbox, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Click="OnButtonCheckClick">
+            <Button.Content>
+                <StackPanel>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality"  Visibility="{Binding AddonContainer.Checked, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Width="16" Margin="2" Source="/UI/Resources/Images/icon-checked.png" />
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Visibility="{Binding AddonContainer.Checked, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToInvertedVisibilityConverter}}" Width="16" Margin="2" Source="/UI/Resources/Images/icon-unchecked.png" />
+                </StackPanel>
+            </Button.Content>
+        </Button>
+
+        <Border Grid.Column="1" Grid.RowSpan="3" BorderBrush="{x:Static fluent:AccentColors.ImmersiveSystemAccentDark3Brush}" BorderThickness="1" Opacity=".4" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,3,10,0" Visibility="{Binding AddonContainer.QuickUpdateAvailable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update2.png" Height="16" VerticalAlignment="Top" Margin="0,1,3,0" />
+            <Label TextOptions.TextRenderingMode="Aliased" FontSize="12" Padding="0" Margin="0,0,0,0" FontFamily="Segoe UI Light" Foreground="White"  Content="{Binding AddonContainer.QuickUpdateAvailable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource UpdateAvailabilityConverter}}" Opacity=".65" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Grid.Row="0">
+            <Image Source="/UI/Resources/Images/icon-plugin.png" RenderOptions.BitmapScalingMode="HighQuality" Width="18" Height="18" Margin="8,5,5,5" />
+            <StackPanel Orientation="Vertical">
+                <Label TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" Margin="0" FontSize="16" Foreground="White" Content="{Binding AddonContainer.Addon.AddonName, RelativeSource={RelativeSource AncestorType=UserControl}}" VerticalContentAlignment="Center" Padding="5,5,5,0"></Label>
+                <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="10" Margin="5,0,5,0" Padding="0" Foreground="White" Opacity=".6">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1}">
+                            <Binding Source="{StaticResource Localization}" Path="AddonTitleBy"/>
+                            <Binding Path="AddonContainer.Addon.Developer" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,0,5,5">
+            <TextBlock TextOptions.TextRenderingMode="Aliased" TextWrapping="Wrap" FontFamily="Segoe UI Light" FontSize="12" Foreground="White" Text="{Binding AddonContainer.Addon.Description, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity=".6"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" fluent:PointerTracker.Enabled="True" Visibility="{Binding ShowActions, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Row="2" Margin="0,2,5,5">
+            <Button Visibility="{Binding AddonContainer.UiShowInstall, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" BorderBrush="LimeGreen" HorizontalAlignment="Right" Padding="1" Margin="0,0,4,0" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Click="OnButtonInstallClick">
+                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-install.png" />
+                    <TextBlock VerticalAlignment="Center" Padding="0" Text="{Binding Source={StaticResource Localization}, Path=ButtonInstallText}" Margin="0,0,3,2" />
+                </StackPanel>
+            </Button>
+            <Button Visibility="{Binding AddonContainer.UiShowRemove, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" BorderBrush="Red" HorizontalAlignment="Right" Padding="1" Margin="0,0,4,0" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Click="OnButtonRemoveClick">
+                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-remove.png" />
+                    <TextBlock VerticalAlignment="Center" Padding="0" Text="{Binding Source={StaticResource Localization}, Path=ButtonRemoveText}" Margin="0,0,3,2" />
+                </StackPanel>
+            </Button>
+            <Button Visibility="{Binding AddonContainer.UiShowDisable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" BorderBrush="Red" HorizontalAlignment="Right" Padding="1" Margin="0,0,4,0" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Click="OnButtonDisableClick">
+                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-disable.png" />
+                    <TextBlock VerticalAlignment="Center" Padding="0" Text="{Binding Source={StaticResource Localization}, Path=ButtonDisableText}" Margin="0,0,3,2" />
+                </StackPanel>
+            </Button>
+            <Button Visibility="{Binding AddonContainer.UiShowEnable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" BorderBrush="LimeGreen" HorizontalAlignment="Right" Padding="1" Margin="0,0,4,0" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Click="OnButtonEnableClick">
+                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-enable.png" />
+                    <TextBlock VerticalAlignment="Center" Padding="0" Text="{Binding Source={StaticResource Localization}, Path=ButtonEnableText}" Margin="0,0,3,2" />
+                </StackPanel>
+            </Button>
+            <Button Visibility="{Binding AddonContainer.UiShowOpen, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" BorderBrush="#FFF1C40F" HorizontalAlignment="Right" Padding="1" Margin="0,0,4,0" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Click="OnButtonOpenClick">
+                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-open.png" />
+                    <TextBlock VerticalAlignment="Center" Padding="0" Text="{Binding Source={StaticResource Localization}, Path=ButtonOpenText}" Margin="0,0,3,2" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

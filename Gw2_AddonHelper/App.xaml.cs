@@ -1,9 +1,10 @@
-﻿using Gw2_AddonHelper.Model.UserConfig;
+﻿using Gw2_AddonHelper.AddonLib.Model.UserConfig;
 using Gw2_AddonHelper.Services;
-using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SourceChord.FluentWPF;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,7 +32,11 @@ namespace Gw2_AddonHelper
             ConfigureServices(services);
 
             ServiceProvider = services.BuildServiceProvider();
+            AddonLib.Lib.ServiceProvider = ServiceProvider;
+
             _log = ServiceProvider.GetService<ILogger<App>>();
+
+            ResourceDictionaryEx.GlobalTheme = ElementTheme.Dark;
         }
 
         /// <summary>
@@ -51,8 +56,6 @@ namespace Gw2_AddonHelper
 
 
             InitializeEnvironment(config);
-            Gw2_AddonHelper.Properties.Localization.Culture = new CultureInfo(userConfig.Language);
-
             UI.MainWindow mainWindow = ServiceProvider.GetService<UI.MainWindow>();
             mainWindow.Show();
         }
@@ -65,6 +68,8 @@ namespace Gw2_AddonHelper
             List<string> lstDirs = new List<string>();
             lstDirs.Add(Path.GetDirectoryName(config["addonsFile"]));
             lstDirs.Add(Path.GetDirectoryName(config["userConfig"]));
+            lstDirs.Add(Path.GetDirectoryName(config["githubRatelimitFile"]));
+            lstDirs.Add(Path.GetDirectoryName(config["githubAddonList:filePath"])); 
 
             try
             {
@@ -92,6 +97,7 @@ namespace Gw2_AddonHelper
             services.AddLogging(builder =>
             {
                 builder.AddLog4Net("log.config");
+                builder.SetMinimumLevel(LogLevel.Trace);
             });
 
             IConfiguration configuration = new ConfigurationBuilder()
@@ -105,7 +111,6 @@ namespace Gw2_AddonHelper
             services.AddSingleton<IUserConfigService, JsonUserConfigService>();
 
             services.AddTransient<UI.MainWindow>();
-
         }
     }
 }

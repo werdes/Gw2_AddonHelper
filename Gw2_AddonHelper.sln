@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gw2_AddonHelper", "Gw2_AddonHelper\Gw2_AddonHelper.csproj", "{8A249464-C83B-40D2-B292-B6173632A5A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper", "Gw2_AddonHelper\Gw2_AddonHelper.csproj", "{8A249464-C83B-40D2-B292-B6173632A5A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.UpdateCheck", "Gw2_AddonHelper.UpdateCheck\Gw2_AddonHelper.UpdateCheck.csproj", "{ADEE470E-8B92-437E-8217-E7846B6C9D89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gw2_AddonHelper.AddonLib", "Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj", "{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{8A249464-C83B-40D2-B292-B6173632A5A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A249464-C83B-40D2-B292-B6173632A5A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A249464-C83B-40D2-B292-B6173632A5A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADEE470E-8B92-437E-8217-E7846B6C9D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADEE470E-8B92-437E-8217-E7846B6C9D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADEE470E-8B92-437E-8217-E7846B6C9D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADEE470E-8B92-437E-8217-E7846B6C9D89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

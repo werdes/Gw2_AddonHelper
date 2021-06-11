@@ -1,5 +1,5 @@
-﻿using Gw2_AddonHelper.Model.UserConfig;
-using Gw2_AddonHelper.Services.Interfaces;
+﻿using Gw2_AddonHelper.AddonLib.Model.UserConfig;
+using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,8 +14,8 @@ namespace Gw2_AddonHelper.Services
 {
     public class JsonUserConfigService : IUserConfigService
     {
-        public UserConfig Config { get; set; }
-        public UserConfig GetConfig() => Config;
+        private UserConfig _userConfig;
+        public UserConfig GetConfig() => _userConfig;
 
 
         private IConfiguration _configuration;
@@ -23,10 +23,9 @@ namespace Gw2_AddonHelper.Services
 
         public JsonUserConfigService(ILogger<JsonUserConfigService> log, IConfiguration configuration)
         {
+            _userConfig = new UserConfig();
             _configuration = configuration;
             _log = log;
-
-            Config = new UserConfig();
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace Gw2_AddonHelper.Services
                     string json = File.ReadAllText(configFile, Encoding.UTF8);
                     UserConfig tempConfig = JsonConvert.DeserializeObject<UserConfig>(json);
 
-                    Config = tempConfig;
+                    _userConfig.Load(tempConfig);
                 }
             }
             catch (Exception ex)
@@ -60,9 +59,8 @@ namespace Gw2_AddonHelper.Services
             string configFile = _configuration["userConfig"];
             try
             {
-                string json = JsonConvert.SerializeObject(Config, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(_userConfig, Formatting.Indented);
                 File.WriteAllText(configFile, json, Encoding.UTF8);
-
             }
             catch (Exception ex)
             {

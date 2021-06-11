@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Gw2_AddonHelper_UpdateCheck": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "Environment": "Development",
+        "OAuthToken": "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"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
