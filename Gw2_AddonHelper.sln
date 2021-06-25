@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper", "Gw2_Addo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.UpdateCheck", "Gw2_AddonHelper.UpdateCheck\Gw2_AddonHelper.UpdateCheck.csproj", "{ADEE470E-8B92-437E-8217-E7846B6C9D89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gw2_AddonHelper.AddonLib", "Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj", "{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.AddonLib", "Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj", "{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gw2_AddonHelper.SelfUpdater", "Gw2_AddonHelper.SelfUpdater\Gw2_AddonHelper.SelfUpdater.csproj", "{DCBFA0EB-DED1-4052-A642-A79079DF9447}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCBFA0EB-DED1-4052-A642-A79079DF9447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCBFA0EB-DED1-4052-A642-A79079DF9447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCBFA0EB-DED1-4052-A642-A79079DF9447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCBFA0EB-DED1-4052-A642-A79079DF9447}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

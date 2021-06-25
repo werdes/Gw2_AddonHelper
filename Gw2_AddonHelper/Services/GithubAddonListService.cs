@@ -1,11 +1,12 @@
-﻿using Gw2_AddonHelper.AddonLib.Extensions;
+﻿using Gw2_AddonHelper.AddonLib.Custom.YamlDotNet;
+using Gw2_AddonHelper.AddonLib.Extensions;
 using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.AddonList;
 using Gw2_AddonHelper.AddonLib.Model.AddonList.Github;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Gw2_AddonHelper.AddonLib.Utility.Github;
-using Gw2_AddonHelper.Custom.YamlDotNet;
+using Gw2_AddonHelper.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Octokit;
@@ -37,11 +38,8 @@ namespace Gw2_AddonHelper.Services
             _log = log;
             _config = configuration;
             _userConfigService = userConfigService;
-
+            _githubClient = App.ServiceProvider.GetService<GitHubClient>();
             _addonList = new GithubAddonList();
-            _githubClient = new GitHubClient(new ProductHeaderValue(
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
             Load();
         }
@@ -61,7 +59,7 @@ namespace Gw2_AddonHelper.Services
                 .Build();
 
             DateTime lastCheck = _userConfigService.GetConfig().LastGithubCheck;
-            DateTime checkThreshold = DateTime.UtcNow.AddMinutes(-1 * _config.GetValue<int>("githubAddonList:refreshCooldown"));
+            DateTime checkThreshold = DateTime.UtcNow.Add(-1 * _config.GetValue<TimeSpan>("githubAddonList:refreshCooldown"));
 
             //Check Refresh cooldown, Ratelimit 
             if ((lastCheck <= checkThreshold || !File.Exists(storedFile)) &&
@@ -94,6 +92,7 @@ namespace Gw2_AddonHelper.Services
                                     addonDescriptionYamlContent = addonDescriptionYamlContent.Replace("\\\"", string.Empty);
                                     addonDescriptionYamlContent = Regex.Replace(addonDescriptionYamlContent, "\"[^\"]*(?:\"\"[^\"]*)*\"",
                                                                                 match => match.Value.Replace("\n", "").Replace("\r", ""));
+                                    addonDescriptionYamlContent = addonDescriptionYamlContent.Replace("\\n", Environment.NewLine);
 
                                     Addon addon = yamlDeserializer.Deserialize<Addon>(addonDescriptionYamlContent);
                                     addon.AddonId = addonDescription.FileName.Split('/')[1];

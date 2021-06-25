@@ -9,7 +9,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 
-namespace Gw2_AddonHelper.Custom.YamlDotNet
+namespace Gw2_AddonHelper.AddonLib.Custom.YamlDotNet
 {
     /// <summary>
     /// Custom attribute based yaml enum deserializer 

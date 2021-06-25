@@ -1,6 +1,5 @@
-﻿using Gw2_AddonHelper.AddonLib.Model.UserConfig;
+﻿using Gw2_AddonHelper.Model.UserConfig;
 using Gw2_AddonHelper.Services;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,13 +10,15 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Windows;
+using Gw2_AddonHelper.Services.Interfaces;
+using Octokit;
 
 namespace Gw2_AddonHelper
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static ServiceProvider ServiceProvider { get; private set; }
         private ILogger<App> _log;
@@ -52,7 +53,6 @@ namespace Gw2_AddonHelper
             IUserConfigService userConfigService = ServiceProvider.GetService<IUserConfigService>();
 
             userConfigService.Load();
-            UserConfig userConfig = userConfigService.GetConfig();
 
 
             InitializeEnvironment(config);
@@ -104,11 +104,16 @@ namespace Gw2_AddonHelper
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false)
                 .Build();
+            GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
             services.AddSingleton(configuration);
+            services.AddSingleton(gitHubClient);
             services.AddSingleton<IAddonListService, GithubAddonListService>();
             services.AddSingleton<IAddonGameStateService, AddonGameStateService>();
             services.AddSingleton<IUserConfigService, JsonUserConfigService>();
+            services.AddSingleton<IAppUpdaterService, AddonHelperAppUpdateService>();
 
             services.AddTransient<UI.MainWindow>();
         }

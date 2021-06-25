@@ -1,10 +1,13 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.Model.UI;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using Gw2_AddonHelper.AddonLib.Extensions;
 
 namespace Gw2_AddonHelper.UI.Controls
 {
@@ -13,6 +16,8 @@ namespace Gw2_AddonHelper.UI.Controls
     /// </summary>
     public partial class AddonListItem : UserControl, INotifyPropertyChanged
     {
+        private ILogger<AddonListItem> _log;
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -51,6 +56,8 @@ namespace Gw2_AddonHelper.UI.Controls
         public AddonListItem()
         {
             InitializeComponent();
+
+            _log = App.ServiceProvider.GetService<ILogger<AddonListItem>>();
         }
 
         /// <summary>
@@ -112,5 +119,22 @@ namespace Gw2_AddonHelper.UI.Controls
         {
             AddonContainer.Checked = !AddonContainer.Checked;
         }
+
+        /// <summary>
+        /// Open the addon website
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnImageDeveloperLinkMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                AddonContainer?.Addon?.Website?.OpenWeb();
+            }
+            catch(Exception ex)
+            {
+                _log.LogError(ex, $"Opening link for [{AddonContainer.Addon.AddonId}]");
+            }
+        } 
     }
 }

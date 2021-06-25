@@ -1,5 +1,4 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,16 +11,16 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
     public abstract class BaseAddonInstaller
     {
         protected IConfiguration _config;
-        protected IUserConfigService _userConfigService;
+        protected string _gamePath;
         protected ILogger<BaseAddonInstaller> _log;
 
         protected Model.AddonList.Addon _addon;
 
-        public BaseAddonInstaller(Model.AddonList.Addon addon)
+        public BaseAddonInstaller(Model.AddonList.Addon addon, string gamePath)
         {
             _config = Lib.ServiceProvider.GetService<IConfiguration>();
-            _userConfigService = Lib.ServiceProvider.GetService<IUserConfigService>();
             _log = Lib.ServiceProvider.GetService<ILogger<BaseAddonInstaller>>();
+            _gamePath = gamePath;
             _addon = addon;
         }
 
@@ -35,7 +34,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         public async Task<bool> Disable()
         {
             bool disabled = false;
-            string gamePath = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
+            string gamePath = Path.GetDirectoryName(_gamePath);
             string newExtension = _config.GetValue<string>("installation:disabledExtension");
             string installationFile = Path.Combine(gamePath,
                                                    GetInstallationEntrypointFile());
@@ -63,7 +62,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         public async Task<bool> Enable()
         {
             bool enabled = false;
-            string gamePath = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
+            string gamePath = Path.GetDirectoryName(_gamePath);
             string newExtension = _config.GetValue<string>("installation:disabledExtension");
             string installationFile = Path.Combine(gamePath,
                                                    GetInstallationEntrypointFile());
@@ -89,7 +88,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// <returns></returns>
         public string GetInstallationVersionFile()
         {
-            string gamePath = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
+            string gamePath = Path.GetDirectoryName(_gamePath);
             string relativeFilePath = GetInstallationEntrypointFile();
             string filePath = Path.Combine(gamePath, relativeFilePath);
 

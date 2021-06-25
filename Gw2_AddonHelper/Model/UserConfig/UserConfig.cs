@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Gw2_AddonHelper.AddonLib.Model;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -10,26 +11,31 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.AddonLib.Model.UserConfig
+namespace Gw2_AddonHelper.Model.UserConfig
 {
-    public class UserConfig : PropertyLoader<UserConfig>, INotifyPropertyChanged
+    public class UserConfig : PropertyLoader<UserConfig>, IPropertyLoader, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<LanguageChangedEventArgs> LanguageChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        private Uri _gameLocation;
+        private CultureInfo _lang;
+        private DateTime _lastGithubCheck;
+        private DateTime _lastSelfUpdateCheck;
+
         public UserConfig()
         {
-            IConfiguration config = Lib.ServiceProvider.GetService<IConfiguration>();
+            IConfiguration config = App.ServiceProvider.GetService<IConfiguration>();
 
             _gameLocation = new Uri(config.GetValue<string>("defaultValues:gamePath"));
             _lang = CultureInfo.GetCultureInfo(config.GetValue<string>("defaultValues:language"));
             _lastGithubCheck = DateTime.MinValue;
         }
 
-        private Uri _gameLocation;
         [JsonProperty("game_location")]
-        public Uri GameLocation { 
+        public Uri GameLocation
+        {
             get => _gameLocation;
             set
             {
@@ -38,7 +44,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.UserConfig
             }
         }
 
-        private CultureInfo _lang;
         [JsonProperty("language")]
         public CultureInfo Language
         {
@@ -51,7 +56,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.UserConfig
             }
         }
 
-        private DateTime _lastGithubCheck;
         [JsonProperty("last_github_check")]
         public DateTime LastGithubCheck
         {
@@ -59,6 +63,17 @@ namespace Gw2_AddonHelper.AddonLib.Model.UserConfig
             set
             {
                 _lastGithubCheck = value;
+                Notify();
+            }
+        }
+
+        [JsonProperty("last_self_update_check")]
+        public DateTime LastSelfUpdateCheck
+        {
+            get => _lastSelfUpdateCheck;
+            set
+            {
+                _lastSelfUpdateCheck = value;
                 Notify();
             }
         }

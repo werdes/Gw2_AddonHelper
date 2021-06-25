@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.AddonLib.Model.UserConfig
+namespace Gw2_AddonHelper.Model.UserConfig
 {
     public class LanguageChangedEventArgs : EventArgs
     {

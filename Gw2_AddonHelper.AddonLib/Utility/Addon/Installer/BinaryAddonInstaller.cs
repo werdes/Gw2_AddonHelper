@@ -14,7 +14,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public class BinaryAddonInstaller : BaseAddonInstaller, IAddonInstaller
     {
-        public BinaryAddonInstaller(Model.AddonList.Addon addon) : base(addon)
+        public BinaryAddonInstaller(Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
         {
         }
 
@@ -49,7 +49,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         public async Task<bool> Remove()
         {
             bool removed = false;
-            string gamePath = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
+            string gamePath = Path.GetDirectoryName(_gamePath);
             string installationFile = Path.Combine(gamePath,
                                                    GetInstallationEntrypointFile());
 
@@ -74,7 +74,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         public async Task<bool> Install(ExtractionResult extraction, DownloadResult download)
         {
             bool installed = false;
-            string gamePath = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
+            string gamePath = Path.GetDirectoryName(_gamePath);
             string relativePath = GetInstallationBaseDirectory();
             string installDirectory = Path.Combine(gamePath, relativePath);
 

@@ -1,5 +1,5 @@
-﻿using Gw2_AddonHelper.AddonLib.Model.UserConfig;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
+﻿using Gw2_AddonHelper.Model.UserConfig;
+using Gw2_AddonHelper.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

@@ -1,6 +1,6 @@
-﻿using Gw2_AddonHelper.AddonLib.Model.UserConfig;
+﻿using Gw2_AddonHelper.Model.UserConfig;
 
-namespace Gw2_AddonHelper.AddonLib.Services.Interfaces
+namespace Gw2_AddonHelper.Services.Interfaces
 {
     public interface IUserConfigService
     {

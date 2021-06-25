@@ -115,7 +115,7 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
 
         public int SortKey
         {
-            get => (int)_installState;
+            get => QuickUpdateAvailable ? int.MinValue + (int)InstallState : (int)InstallState;
         }
     }
 }

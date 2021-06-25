@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gw2_AddonHelper.AddonLib.Model
 {
-    public abstract class PropertyLoader<T>
+    public abstract class PropertyLoader<T> : IPropertyLoader
     {
         private Type _type;
         private PropertyInfo[] _properties;
@@ -22,13 +22,21 @@ namespace Gw2_AddonHelper.AddonLib.Model
         /// Loads the properties of the supplied object
         /// </summary>
         /// <param name="obj"></param>
-        public void Load(T obj)
+        public void Load(object obj)
         {
             if (!GetType().Equals(_type)) throw new ArgumentException($"Types are not equal");
 
             foreach (var property in _properties)
             {
-                property.SetValue(this, property.GetValue(obj));
+                if (typeof(IPropertyLoader).IsAssignableFrom(property.PropertyType))
+                {
+                    IPropertyLoader propertyLoader = (IPropertyLoader)property.GetValue(this);
+                    propertyLoader.Load(property.GetValue(obj));
+                }
+                else
+                {
+                    property.SetValue(this, property.GetValue(obj));
+                }
             }
         }
     }

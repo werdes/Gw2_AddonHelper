@@ -1,0 +1,802 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Gw2_AddonHelper</name>
+    </assembly>
+    <members>
+        <member name="T:Gw2_AddonHelper.App">
+            <summary>
+            Interaction logic for App.xaml
+            </summary>
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.#ctor">
+            <summary>
+            Constructor
+             > Initialize IOC
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.Application_Startup(System.Object,System.Windows.StartupEventArgs)">
+            <summary>
+            Startup Event
+             > Show Main Window
+             > Check App Environment Directories
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.InitializeEnvironment(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Check and create necessary Directories
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Configures IOC
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.App.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.DisableAddon(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Disables an addon by addon container
+            </summary>
+            <param name="addonContainer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.EnableAddon(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Enables an addon by addon container
+            </summary>
+            <param name="addonContainer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.InstallAddon(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Installs an addon by addon container
+            </summary>
+            <param name="addonContainer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.RemoveAddon(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Uninstalls an addon by addon container
+            </summary>
+            <param name="addonContainer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.UpdateAddon(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Updates an addon, enables and disables it if necessary
+            </summary>
+            <param name="addonContainer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.CheckAddonForUpdate(Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer)">
+            <summary>
+            Checks if the installed addon version is different from the supplied one
+            </summary>
+            <param name="addonContainer"></param>
+            <param name="latestVersion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetUpdateableAddons(System.Collections.Generic.IEnumerable{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer})">
+            <summary>
+            Checks a list of addons for Updates, either by quick update service (if recent enough) or by the provided downloader/installer methods
+            </summary>
+            <param name="installedAddons"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetAddonContainer(Gw2_AddonHelper.AddonLib.Model.AddonList.Addon)">
+            <summary>
+            Returns the local installation of the given addon
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetAddonContainers(System.Collections.Generic.IEnumerable{Gw2_AddonHelper.AddonLib.Model.AddonList.Addon})">
+            <summary>
+            returns multiple containers
+            </summary>
+            <param name="addons"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetVersions">
+            <summary>
+            Loads a list of current versions for quick update check on list creation
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetParentAddons(System.Collections.Generic.List{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer},Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer,System.Collections.Generic.HashSet{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer})">
+            <summary>
+            fills the "result" parameter with required addons for the installation of the given addon
+            </summary>
+            <param name="allAddons"></param>
+            <param name="addon"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.GetChildAddons(System.Collections.Generic.List{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer},Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer,System.Collections.Generic.HashSet{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer})">
+            <summary>
+            Fills the "result" parameter with addons that have the given addon as a requirement
+            </summary>
+            <param name="allAddons"></param>
+            <param name="addon"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonGameStateService.CheckConflicts(System.Collections.Generic.IEnumerable{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer},System.Collections.Generic.IEnumerable{Gw2_AddonHelper.AddonLib.Model.GameState.AddonContainer})">
+            <summary>
+            Checks the list of new addons against the list of installed addons for conflicts
+            </summary>
+            <param name="installedAddons"></param>
+            <param name="newAddons"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonHelperAppUpdateService.CheckForUpdates">
+            <summary>
+            Checks if an update to the application is available
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.AddonHelperAppUpdateService.Update">
+            <summary>
+            Updates the launcher
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.GetAddonsAsync">
+            <summary>
+            Returns a list of yaml based addons from a Github Repository
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.GetLoaderKey(Gw2_AddonHelper.AddonLib.Model.AddonList.Addon)">
+            <summary>
+            Returns the key which the addon loader plugin uses
+            </summary>
+            <param name="addon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.GetVersioningType(Gw2_AddonHelper.AddonLib.Model.AddonList.Addon)">
+            <summary>
+            Returns the versioning type of the given addon
+            </summary>
+            <param name="addon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.GetAddonDescriptionsFromZipBall(System.Uri)">
+            <summary>
+            Downloads the repository zip ball, extracts the yaml configuration files
+            </summary>
+            <param name="zipBallUrl"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.Load">
+            <summary>
+            Loads the addon list from json file
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.Store">
+            <summary>
+            Stores the addon list as JSON
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.GithubAddonListService.GetCurrentRepositoryCommitSha">
+            <summary>
+            Gets the current SHA of the approved addons repository
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.JsonUserConfigService.Load">
+            <summary>
+            Loads the current user configuration
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.Services.JsonUserConfigService.Store">
+            <summary>
+            Stores the current user configuration
+            </summary>
+        </member>
+        <member name="T:Gw2_AddonHelper.UI.Controls.AddonConflictItem">
+            <summary>
+            Interaktionslogik für AddonConflictItem.xaml
+            </summary>
+            <summary>
+            AddonConflictItem
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonConflictItem.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:Gw2_AddonHelper.UI.Controls.AddonInstallProgressItem">
+            <summary>
+            Interaktionslogik für AddonInstallProgressItem.xaml
+            </summary>
+            <summary>
+            AddonInstallProgressItem
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonInstallProgressItem.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:Gw2_AddonHelper.UI.Controls.AddonListItem">
+            <summary>
+            Interaktionslogik für AddonListItem.xaml
+            </summary>
+            <summary>
+            AddonListItem
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonOpenClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            On "Open"-Button click -> Fire "Open" event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonInstallClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            On "Install"-Button click -> Fire "Install" event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonRemoveClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            On "Remove"-Button click -> Fire "Remove" event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonEnableClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            On "Enable"-Button click -> Fire "Enable" event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonDisableClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            On "Disable"-Button click -> Fire "Disable" event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnButtonCheckClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Toggle the "checkbox"
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.OnImageDeveloperLinkMouseLeftButtonDown(System.Object,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Open the addon website
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Controls.AddonListItem.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:Gw2_AddonHelper.UI.Localization.Localization">
+            <summary>
+              Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ResourceManager">
+            <summary>
+              Gibt die zwischengespeicherte ResourceManager-Instanz zurück, die von dieser Klasse verwendet wird.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.Culture">
+            <summary>
+              Überschreibt die CurrentUICulture-Eigenschaft des aktuellen Threads für alle
+              Ressourcenzuordnungen, die diese stark typisierte Ressourcenklasse verwenden.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.AboutButtonBackText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {AboutButtonBackText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.AboutHeaderText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {AboutHeaderText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.AddonListGroupAddonPlural">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {AddonListGroupAddonPlural} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.AddonListGroupAddonSingular">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {AddonListGroupAddonSingular} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.AddonTitleBy">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {AddonTitleBy} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonAboutText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonAboutText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonApplyText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonApplyText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonCancelText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonCancelText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonDisableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonDisableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonEnableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonEnableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonFindGameExecutableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonFindGameExecutableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonInstallText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonInstallText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonOpenText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonOpenText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonRemoveText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonRemoveText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonRetryText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonRetryText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonSaveText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonSaveText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonSettingsText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonSettingsText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ButtonUpdateText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ButtonUpdateText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ConflictsButtonBackText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ConflictsButtonBackText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ConflictsDescriptionText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ConflictsDescriptionText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.ConflictsHeaderText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {ConflictsHeaderText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.GameNotFoundError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {GameNotFoundError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.HeaderSettingsText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {HeaderSettingsText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallAddonError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallAddonError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerDescriptionAddonDisableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerDescriptionAddonDisableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerDescriptionAddonEnableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerDescriptionAddonEnableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerDescriptionAddonInstallText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerDescriptionAddonInstallText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerDescriptionAddonRemoveText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerDescriptionAddonRemoveText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerDescriptionAddonUpdateText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerDescriptionAddonUpdateText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerHeaderAddonDisableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerHeaderAddonDisableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerHeaderAddonEnableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerHeaderAddonEnableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerHeaderAddonInstallText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerHeaderAddonInstallText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerHeaderAddonRemoveText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerHeaderAddonRemoveText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallerHeaderAddonUpdateText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallerHeaderAddonUpdateText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallProgressCompletedText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallProgressCompletedText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallProgressErrorText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallProgressErrorText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallProgressInProgressText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallProgressInProgressText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallProgressWaitingText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallProgressWaiting} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallStateError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallStateError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallStateInstalledDisabled">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallStateInstalledDisabled} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallStateInstalledEnabled">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallStateInstalledEnabled} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.InstallStateNotInstalled">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {InstallStateNotInstalled} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.LegalNoticeArenanet">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {LegalNoticeArenanet} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.LegalNoticeIcons">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {LegalNoticeIcons} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.Loading">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {Loading} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.OpenAddonError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {OpenAddonError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.QuickUpdateAvailableText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {QuickUpdateAvailableText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SetGamePathError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SetGamePathError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SettingsError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SettingsError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SettingsGamePathDescription">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SettingsGamePathDescription} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SettingsGamePathText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SettingsGamePathText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SettingsLanguageDescription">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SettingsLanguageDescription} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.SettingsLanguageText">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {SettingsLanguageText} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.UiErrorWarning">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {UiErrorWarning} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.UncategorizedError">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {UncategorizedError} ähnelt.
+            </summary>
+        </member>
+        <member name="P:Gw2_AddonHelper.UI.Localization.Localization.WindowTitle">
+            <summary>
+              Sucht eine lokalisierte Zeichenfolge, die {WindowTitle} ähnelt.
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Localization.LocalizationProvider.GetAvailableCultures">
+            <summary>
+            Returns a list of available languages
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Localization.LocalizationProvider.GetInstance">
+            <summary>
+            Provides a new instance of a Localization resource for the object data provider
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.Localization.LocalizationProvider.ChangeCulture(System.Globalization.CultureInfo)">
+            <summary>
+            Changes the resource culture and refreshes the data provider
+            </summary>
+            <param name="culture"></param>
+        </member>
+        <member name="T:Gw2_AddonHelper.UI.MainWindow">
+            <summary>
+            Interaction logic for MainWindow.xaml
+            </summary>
+            <summary>
+            MainWindow
+            </summary>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnWindowLoaded(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Window loaded event
+             > Initialize UI
+             > Check Game Path
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.CheckGamePath">
+            <summary>
+            Checks if the game is selected correctly
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.LoadAvailableLanguages">
+            <summary>
+            Returns the available Languages from the resource file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.InitializeUi">
+            <summary>
+            Builds the UI
+             > Also refreshes the addon list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.SetUiError(System.Exception,System.String)">
+            <summary>
+            Sets the UI "Error" Panel to visible
+            </summary>
+            <param name="ex"></param>
+            <param name="errorTitle"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonRetryClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Resets the UI
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonSettingsClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Show UserConfig settings page
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonAboutClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Show about page
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonSettingsSaveClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Save Userconfig
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonSettingsCancelClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Cancels the Settings dialog and resets the userconfig
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnAddonListItemOpen(System.Object,Gw2_AddonHelper.Model.UI.AddonEventArgs)">
+            <summary>
+            Opens the addon directory if possible
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnUserConfigLanguageChanged(System.Object,Gw2_AddonHelper.AddonLib.Model.UserConfig.LanguageChangedEventArgs)">
+            <summary>
+            Refresh data provider on language change
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnAddonListItemInstall(System.Object,Gw2_AddonHelper.Model.UI.AddonEventArgs)">
+            <summary>
+            Button click handler for installing addons
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnAddonListItemRemove(System.Object,Gw2_AddonHelper.Model.UI.AddonEventArgs)">
+            <summary>
+            Click handler for removing a given addon
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnAddonListItemDisable(System.Object,Gw2_AddonHelper.Model.UI.AddonEventArgs)">
+            <summary>
+            Click handler for disabling a given addon
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnAddonListItemEnable(System.Object,Gw2_AddonHelper.Model.UI.AddonEventArgs)">
+            <summary>
+            Click handler for enabling a given addon
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonFindGameExecutableClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Display a open file dialog and set the corresponding userconfig
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonInstallerCancelClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Return to default UI panel
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonConflictsBackClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Return to default UI panel
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonAboutBackClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Return to default UI panel
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonInstallerInstallClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Performs the requested action on the list of selected addons
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.PerformAddonAction(Gw2_AddonHelper.AddonLib.Model.GameState.AddonInstallProgress)">
+            <summary>
+            Performs the requested Action on an addon
+            </summary>
+            <param name="addonGameStateService"></param>
+            <param name="addonInstallProgress"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonUpdateClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Checks the installed (active/inactive) addons for updates
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnButtonInstallStateShortcutClick(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Shortcut to Install State group 
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.OnTextBlockLegalNoticeIconsMouseLeftButtonDown(System.Object,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Opens the icon link
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Gw2_AddonHelper.UI.MainWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>

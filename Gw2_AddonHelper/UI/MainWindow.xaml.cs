@@ -1,12 +1,12 @@
-﻿using Gw2_AddonHelper.AddonLib.Model;
+﻿using Gw2_AddonHelper.AddonLib.Extensions;
+using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.AddonList;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.AddonLib.Extensions;
-using Gw2_AddonHelper.Model.UI;
-using Gw2_AddonHelper.AddonLib.Model.UserConfig;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
-using Gw2_AddonHelper.UI.Localization;
+using Gw2_AddonHelper.Model.UserConfig;
 using Gw2_AddonHelper.Extensions;
+using Gw2_AddonHelper.Model.UI;
+using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.UI.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,9 +18,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Gw2_AddonHelper.AddonLib.Utility.Github;
 
 namespace Gw2_AddonHelper.UI
 {
@@ -33,15 +35,20 @@ namespace Gw2_AddonHelper.UI
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
         private ILogger<MainWindow> _log;
+        
+        private bool _initializationFinished = false;
 
         public MainWindow(IConfiguration config, ILogger<MainWindow> log, IAddonListService addonListManager, IUserConfigService userConfigService)
         {
             InitializeComponent();
 
+
+
             _viewModel = new MainWindowViewModel();
-            _viewModel.UiState = UiState.Loading;
+            _viewModel.UiState = Enums.UiState.Loading;
             _viewModel.UserConfig = userConfigService.GetConfig();
             _viewModel.UserConfig.LanguageChanged += OnUserConfigLanguageChanged;
+            _viewModel.Version = Assembly.GetExecutingAssembly().GetName().Version;
 
             _log = log;
             _config = config;
@@ -52,19 +59,73 @@ namespace Gw2_AddonHelper.UI
             DataContext = _viewModel;
         }
 
+        /// <summary>
+        /// Window loaded event
+        ///  > Initialize UI
+        ///  > Check Game Path
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (_viewModel.AddonContainers.Count == 0)
-                {
-                    await InitializeUi();
-                }
+                _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
+                _viewModel.AppUpdateAvailable = await CheckAppUpdateAvailable();
+
+                await InitializeUi();
+
+                _initializationFinished = true;
             }
             catch (Exception ex)
             {
+                _log.LogCritical(ex, nameof(OnWindowLoaded));
                 SetUiError(ex, Localization.Localization.UiErrorWarning);
             }
+        }
+
+        /// <summary>
+        /// Checks, if an update for this application is available
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> CheckAppUpdateAvailable()
+        {
+            IAppUpdaterService appUpdaterService = App.ServiceProvider.GetService<IAppUpdaterService>();
+            Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+            DateTime lastCheck = _userConfigService.GetConfig().LastSelfUpdateCheck;
+            DateTime checkThreshold = DateTime.UtcNow.Add(-1 * _config.GetValue<TimeSpan>("selfUpdate:refreshCooldown"));
+
+
+            //Check Refresh cooldown, Ratelimit 
+            if (lastCheck <= checkThreshold && GithubRatelimitService.Instance.CanCall())
+            {
+                Version latestVersion = await appUpdaterService.GetLatestVersion();
+
+                if (latestVersion != null)
+                {
+                    _userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.UtcNow;
+                    _userConfigService.Store();
+
+                    return latestVersion > currentVersion;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the game is selected correctly
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckGamePath()
+        {
+            Uri gamePath = _userConfigService.GetConfig().GameLocation;
+
+            return new FileInfo(gamePath.LocalPath).Exists;
         }
 
         /// <summary>
@@ -92,24 +153,29 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                _viewModel.UiState = UiState.Loading;
+                _viewModel.UiState= Enums.UiState.Loading;
 
-                IAddonListService addonListService = App.ServiceProvider.GetService<IAddonListService>();
-                IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+                if (CheckGamePath())
+                {
+                    IAddonListService addonListService = App.ServiceProvider.GetService<IAddonListService>();
+                    IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
-                List<Addon> lstAddons = await addonListService.GetAddonsAsync();
-                addonListService.Store();
+                    List<Addon> lstAddons = await addonListService.GetAddonsAsync();
+                    addonListService.Store();
 
-                List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons)).OrderByDescending(x => x.SortKey).ToList();
-                _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
-                _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
-
-                _viewModel.UiState = UiState.AddonList;
+                    List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons)).OrderByDescending(x => x.SortKey).ToList();
+                    _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
+                    _viewModel.UiState= Enums.UiState.AddonList;
+                }
+                else
+                {
+                    SetUiError(new FileNotFoundException(_userConfigService.GetConfig().GameLocation.LocalPath), Localization.Localization.GameNotFoundError);
+                }
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UiErrorWarning);
-                _log.LogError(ex, $"Initializing UI");
+                _log.LogCritical(ex, $"Initializing UI");
             }
         }
 
@@ -120,7 +186,7 @@ namespace Gw2_AddonHelper.UI
         /// <param name="errorTitle"></param>
         private void SetUiError(Exception ex, string errorTitle)
         {
-            _viewModel.UiState = UiState.Error;
+            _viewModel.UiState= Enums.UiState.Error;
             _viewModel.ErrorMessageText = ex.Message;
             _viewModel.ErrorTitleText = errorTitle;
         }
@@ -142,7 +208,17 @@ namespace Gw2_AddonHelper.UI
         /// <param name="e"></param>
         private void OnButtonSettingsClick(object sender, RoutedEventArgs e)
         {
-            _viewModel.UiState = UiState.Settings;
+            _viewModel.UiState= Enums.UiState.Settings;
+        }
+
+        /// <summary>
+        /// Show about page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnButtonAboutClick(object sender, RoutedEventArgs e)
+        {
+            _viewModel.UiState= Enums.UiState.About;
         }
 
         /// <summary>
@@ -162,7 +238,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.SettingsError);
-                _log.LogError(ex, $"Save Click");
+                _log.LogCritical(ex, nameof(OnButtonSettingsSaveClick));
             }
         }
 
@@ -183,7 +259,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.SettingsError);
-                _log.LogError(ex, $"Cancel Click");
+                _log.LogCritical(ex, nameof(OnButtonSettingsCancelClick));
             }
         }
 
@@ -208,7 +284,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.OpenAddonError + e.AddonContainer?.Addon?.AddonName);
-                _log.LogError(ex, $"Opening directory for [{e.AddonContainer?.Addon?.AddonId}]");
+                _log.LogCritical(ex, $"Opening directory for [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
 
@@ -244,7 +320,7 @@ namespace Gw2_AddonHelper.UI
                 installableAddons.Add(e.AddonContainer);
 
                 HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
-                
+
 
                 List<AddonContainer> installedAddons = installableAddons.ToList();
                 installedAddons.AddRange(enableableAddons);
@@ -260,19 +336,19 @@ namespace Gw2_AddonHelper.UI
                     _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
                     _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
 
-                    _viewModel.UiState = UiState.Installer;
+                    _viewModel.UiState= Enums.UiState.Installer;
                 }
                 else
                 {
                     _viewModel.AddonConflicts.Clear();
                     _viewModel.AddonConflicts.AddRange(addonConflicts);
-                    _viewModel.UiState = UiState.Conflicts;
+                    _viewModel.UiState= Enums.UiState.Conflicts;
                 }
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError + e.AddonContainer?.Addon?.AddonName);
-                _log.LogError(ex, $"Installing [{e.AddonContainer?.Addon?.AddonId}]");
+                _log.LogCritical(ex, $"Installing [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
 
@@ -300,13 +376,13 @@ namespace Gw2_AddonHelper.UI
                 _viewModel.AddonInstallActions.Clear();
                 _viewModel.AddonInstallActions.AddRange(removableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Remove)));
 
-                _viewModel.UiState = UiState.Installer;
+                _viewModel.UiState= Enums.UiState.Installer;
 
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError + e.AddonContainer?.Addon?.AddonName);
-                _log.LogError(ex, $"Removing [{e.AddonContainer?.Addon?.AddonId}]");
+                _log.LogCritical(ex, $"Removing [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
 
@@ -335,12 +411,12 @@ namespace Gw2_AddonHelper.UI
                 _viewModel.AddonInstallActions.Clear();
                 _viewModel.AddonInstallActions.AddRange(disableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Disable)));
 
-                _viewModel.UiState = UiState.Installer;
+                _viewModel.UiState= Enums.UiState.Installer;
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError + e.AddonContainer?.Addon?.AddonName);
-                _log.LogError(ex, $"Disabling [{e.AddonContainer?.Addon?.AddonId}]");
+                _log.LogCritical(ex, $"Disabling [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
 
@@ -377,19 +453,19 @@ namespace Gw2_AddonHelper.UI
                     _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
                     _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
 
-                    _viewModel.UiState = UiState.Installer;
+                    _viewModel.UiState= Enums.UiState.Installer;
                 }
                 else
                 {
                     _viewModel.AddonConflicts.Clear();
                     _viewModel.AddonConflicts.AddRange(addonConflicts);
-                    _viewModel.UiState = UiState.Conflicts;
+                    _viewModel.UiState= Enums.UiState.Conflicts;
                 }
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError + e.AddonContainer?.Addon?.AddonName);
-                _log.LogError(ex, $"Enabling [{e.AddonContainer?.Addon?.AddonId}]");
+                _log.LogCritical(ex, $"Enabling [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
 
@@ -418,7 +494,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.SetGamePathError);
-                _log.LogError(ex, $"Setting game path");
+                _log.LogCritical(ex, $"Setting game path");
             }
         }
 
@@ -443,6 +519,16 @@ namespace Gw2_AddonHelper.UI
         }
 
         /// <summary>
+        /// Return to default UI panel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnButtonAboutBackClick(object sender, RoutedEventArgs e)
+        {
+            _viewModel.UiState= Enums.UiState.AddonList;
+        }
+
+        /// <summary>
         /// Performs the requested action on the list of selected addons
         /// </summary>
         /// <param name="sender"></param>
@@ -455,7 +541,7 @@ namespace Gw2_AddonHelper.UI
                 _viewModel.AddonInstallProgresses.Clear();
                 _viewModel.AddonInstallProgresses.AddRange(_viewModel.AddonInstallActions.Select(x => new AddonInstallProgress(x)));
 
-                _viewModel.UiState = UiState.InstallerProgress;
+                _viewModel.UiState= Enums.UiState.InstallerProgress;
 
                 foreach (AddonInstallProgress addonInstallProgress in _viewModel.AddonInstallProgresses)
                 {
@@ -475,7 +561,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError);
-                _log.LogError(ex, $"Installing");
+                _log.LogCritical(ex, $"Installing");
             }
         }
 
@@ -541,7 +627,7 @@ namespace Gw2_AddonHelper.UI
             try
             {
                 _log.LogDebug($"Checking for updates");
-                _viewModel.UiState = UiState.Loading;
+                _viewModel.UiState= Enums.UiState.Loading;
                 IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
                 List<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled ||
@@ -554,17 +640,17 @@ namespace Gw2_AddonHelper.UI
 
                 if (_viewModel.AddonInstallActions.Count > 0)
                 {
-                    _viewModel.UiState = UiState.Installer;
+                    _viewModel.UiState= Enums.UiState.Installer;
                 }
                 else
                 {
-                    _viewModel.UiState = UiState.AddonList;
+                    _viewModel.UiState= Enums.UiState.AddonList;
                 }
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.InstallAddonError);
-                _log.LogError(ex, $"Updating");
+                _log.LogCritical(ex, $"Updating");
             }
         }
 
@@ -589,7 +675,7 @@ namespace Gw2_AddonHelper.UI
                         List<GroupItem> items = itemscontrolAddonListAddonItems.GetChildrenOfType<GroupItem>();
                         GroupItem desiredItem = items.Where(x => Enum.Parse<InstallState>(x.Tag.ToString()) == installState).FirstOrDefault();
 
-                        if(desiredItem != null)
+                        if (desiredItem != null)
                         {
                             ItemsControl itemsControl = (ItemsControl)scrollviewerAddonListAddonItems.Content;
                             var point = desiredItem.TranslatePoint(new Point(), itemsControl);
@@ -601,8 +687,34 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
-                _log.LogError(ex, $"Finding scroll point");
+                _log.LogCritical(ex, $"Finding scroll point");
             }
+        }
+
+        /// <summary>
+        /// Opens the icon link
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTextBlockLegalNoticeIconsMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            string url = _config.GetValue<string>("about:iconsLinkUrl");
+            try
+            {
+                Uri uri = new Uri(url);
+                uri.OpenWeb();
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, $"Icons legal text block click");
+            }
+        }
+
+        private void OnButtonAppUpdateClick(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.Exceptions;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.AddonLib.Utility.Github;
+using Microsoft.Extensions.DependencyInjection;
 using Octokit;
 using System;
 using System.IO;
@@ -11,13 +12,11 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
 {
     public class GithubAddonDownloader : BaseAddonDownloader, IAddonDownloader
     {
-        private static Lazy<GitHubClient> _gitHubClient = new Lazy<GitHubClient>(() => new GitHubClient(new ProductHeaderValue(
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())));
-        private static GitHubClient GitHubClient { get => _gitHubClient.Value; }
+        private GitHubClient _gitHubClient;
 
         public GithubAddonDownloader(Model.AddonList.Addon addon) : base(addon)
         {
+            _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>(); 
         }
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
-                Release githubRelease = (await GitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
+                Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
                 GithubRatelimitService.Instance.RegisterCall();
 
                 if (githubRelease != null)
@@ -58,7 +57,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
-                Release githubRelease = (await GitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
+                Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
                 GithubRatelimitService.Instance.RegisterCall();
 
                 return githubRelease.TagName;

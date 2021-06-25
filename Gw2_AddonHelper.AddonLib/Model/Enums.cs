@@ -67,16 +67,6 @@ namespace Gw2_AddonHelper.AddonLib.Model
         Unknown
     }
 
-    public enum UiState
-    {
-        Loading,
-        AddonList,
-        Installer,
-        InstallerProgress,
-        Settings,
-        Error,
-        Conflicts
-    }
 
     public enum InstallerActionType
     {

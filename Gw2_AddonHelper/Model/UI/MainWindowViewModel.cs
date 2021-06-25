@@ -1,10 +1,12 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.AddonLib.Model.UserConfig;
+using Gw2_AddonHelper.Model.UserConfig;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Gw2_AddonHelper.Model.UI;
+using System;
 
 namespace Gw2_AddonHelper.Model.UI
 {
@@ -16,14 +18,15 @@ namespace Gw2_AddonHelper.Model.UI
 
         private ObservableCollection<AddonContainer> _addonContainers;
         private ObservableCollection<AddonInstallAction> _addonInstallActions;
-        private UiState _uiState;
+        private Enums.UiState _uiState;
         private string _errorMessageText;
         private string _errorTitleText;
-        private UserConfig _userConfig;
+        private UserConfig.UserConfig _userConfig;
         private ObservableCollection<CultureInfo> _availableCultures;
         private ObservableCollection<AddonConflict> _addonConflicts;
         private ObservableCollection<AddonInstallProgress> _addonInstallProgresses;
-
+        private bool _appUpdateAvailable;
+        private Version _version;
 
         public MainWindowViewModel()
         {
@@ -63,7 +66,7 @@ namespace Gw2_AddonHelper.Model.UI
         }
 
 
-        public UiState UiState
+        public Enums.UiState UiState
         {
             get => _uiState;
             set
@@ -77,16 +80,19 @@ namespace Gw2_AddonHelper.Model.UI
                 Notify(nameof(ShowInstallerProgress));
                 Notify(nameof(ShowSettings));
                 Notify(nameof(ShowConflicts));
+                Notify(nameof(ShowAbout));
             }
         }
 
-        public bool ShowLoading => _uiState == UiState.Loading;
-        public bool ShowAddonList => _uiState == UiState.AddonList;
-        public bool ShowError => _uiState == UiState.Error;
-        public bool ShowInstaller => _uiState == UiState.Installer;
-        public bool ShowInstallerProgress => _uiState == UiState.InstallerProgress;
-        public bool ShowSettings => _uiState == UiState.Settings;
-        public bool ShowConflicts => _uiState == UiState.Conflicts;
+        public bool ShowLoading => _uiState == Enums.UiState.Loading;
+        public bool ShowAddonList => _uiState == Enums.UiState.AddonList;
+        public bool ShowError => _uiState == Enums.UiState.Error;
+        public bool ShowInstaller => _uiState == Enums.UiState.Installer;
+        public bool ShowInstallerProgress => _uiState == Enums.UiState.InstallerProgress;
+        public bool ShowSettings => _uiState == Enums.UiState.Settings;
+        public bool ShowConflicts => _uiState == Enums.UiState.Conflicts;
+        public bool ShowAbout => _uiState == Enums.UiState.About;
+
 
 
         public string ErrorTitleText
@@ -109,7 +115,7 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
-        public UserConfig UserConfig
+        public UserConfig.UserConfig UserConfig
         {
             get => _userConfig;
             set
@@ -139,5 +145,23 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
+        public bool AppUpdateAvailable
+        {
+            get => _appUpdateAvailable;
+            set
+            {
+                _appUpdateAvailable = value;
+                Notify();
+            }
+        }
+        public Version Version
+        {
+            get => _version;
+            set
+            {
+                _version = value;
+                Notify();
+            }
+        }
     }
 }

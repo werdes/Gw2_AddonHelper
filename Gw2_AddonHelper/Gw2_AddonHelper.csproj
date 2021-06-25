@@ -7,15 +7,31 @@
     <UseWPF>true</UseWPF>
 	<Deterministic>false</Deterministic>
 	<ApplicationIcon>UI\Resources\app.ico</ApplicationIcon>
+	<SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <OutputPath></OutputPath>
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="UI\Resources\app.ico" />
     <None Remove="UI\Resources\Images\app.png" />
+    <None Remove="UI\Resources\Images\bottom.png" />
+    <None Remove="UI\Resources\Images\icon-back.png" />
     <None Remove="UI\Resources\Images\icon-checked.png" />
     <None Remove="UI\Resources\Images\icon-conflict.png" />
     <None Remove="UI\Resources\Images\icon-disable.png" />
     <None Remove="UI\Resources\Images\icon-enable.png" />
+    <None Remove="UI\Resources\Images\icon-external-link.png" />
+    <None Remove="UI\Resources\Images\icon-info.png" />
     <None Remove="UI\Resources\Images\icon-install.png" />
     <None Remove="UI\Resources\Images\icon-installer-completed.png" />
     <None Remove="UI\Resources\Images\icon-installer-error.png" />
@@ -49,10 +65,14 @@
   <ItemGroup>
     <Resource Include="UI\Resources\app.ico" />
     <Resource Include="UI\Resources\Images\app.png" />
+    <Resource Include="UI\Resources\Images\bottom.png" />
+    <Resource Include="UI\Resources\Images\icon-back.png" />
     <Resource Include="UI\Resources\Images\icon-checked.png" />
     <Resource Include="UI\Resources\Images\icon-conflict.png" />
     <Resource Include="UI\Resources\Images\icon-disable.png" />
     <Resource Include="UI\Resources\Images\icon-enable.png" />
+    <Resource Include="UI\Resources\Images\icon-external-link.png" />
+    <Resource Include="UI\Resources\Images\icon-info.png" />
     <Resource Include="UI\Resources\Images\icon-install.png" />
     <Resource Include="UI\Resources\Images\icon-installer-completed.png" />
     <Resource Include="UI\Resources\Images\icon-installer-error.png" />

@@ -3,6 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
@@ -16,7 +17,8 @@
                       AcrylicWindowStyle="NoIcon"
                       TintColor="Black"
                       Foreground="White"
-                      NoiseOpacity="0" Icon="/UI/Resources/app.ico">
+                      NoiseOpacity="0" 
+                      Icon="/UI/Resources/app.ico">
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:InstallStateToDescriptionConverter x:Key="InstallStateToDescriptionConverter" />
@@ -24,12 +26,18 @@
         <converters:InstallerActionToDescriptionTextConverter x:Key="InstallerActionToDescriptionTextConverter" />
         <converters:InstallerActionToCheckboxVisibilityConverter x:Key="InstallerActionToCheckboxVisibilityConverter" />
         <converters:NumberToAddonListGroupAddonQuantityFormConverter x:Key="NumberToAddonListGroupAddonQuantityFormConverter" />
+        <converters:VersionToStringConverter x:Key="VersionToStringConverter" />
 
         <CollectionViewSource x:Key="AddonContainersByInstallState"
                           Source="{Binding Path=AddonContainers, Mode=TwoWay}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="InstallState" />
             </CollectionViewSource.GroupDescriptions>
+
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="InstallState" Direction="Descending" />
+                <scm:SortDescription PropertyName="SortKey" />
+            </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
         <CollectionViewSource x:Key="AddonInstallActionsByActionType"
                           Source="{Binding Path=AddonInstallActions, Mode=TwoWay}">
@@ -45,6 +53,18 @@
         </CollectionViewSource>
     </Window.Resources>
     <Grid>
+        <Border>
+            <Border.OpacityMask>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Transparent" />
+                    <GradientStop Color="Black" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.OpacityMask>
+            <Border.Background>
+                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom.png" Stretch="Uniform" Opacity="0.4"/>
+            </Border.Background>
+        </Border>
+
         <!-- Loading Panel -->
         <Grid Visibility="{Binding Path=ShowLoading, Converter={StaticResource BoolToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -52,7 +72,6 @@
                 <Label Content="{Binding Source={StaticResource Localization}, Path=Loading}" FontFamily="Segoe UI Light" Margin="0,0,0,20" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
             </StackPanel>
         </Grid>
-
 
         <!-- Error Screen Panel -->
         <Grid Visibility="{Binding Path=ShowError, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -63,8 +82,16 @@
                     <TextBlock TextWrapping="Wrap" Text="{Binding ErrorTitleText}" FontFamily="Segoe UI Light" FontSize="24" HorizontalAlignment="Left" Foreground="White"></TextBlock>
                     <TextBlock TextWrapping="Wrap" Text="{Binding ErrorMessageText}" FontFamily="Segoe UI Light" FontSize="16" HorizontalAlignment="Left" Foreground="White"></TextBlock>
 
-                    <Button fluent:PointerTracker.Enabled="True" Click="OnButtonRetryClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Content="{Binding Source={StaticResource Localization}, Path=ButtonRetryText}">
-                    </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button fluent:PointerTracker.Enabled="True" Click="OnButtonRetryClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Content="{Binding Source={StaticResource Localization}, Path=ButtonRetryText}">
+                        </Button>
+                        <Button fluent:PointerTracker.Enabled="True" Click="OnButtonSettingsClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                                <Image Height="10" Width="10" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
+                                <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -79,7 +106,9 @@
                 <RowDefinition Height="50" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <ScrollViewer Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="10">
+
+            <!-- Shortcuts-->
+            <ScrollViewer Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Margin="10">
                 <ItemsControl ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}, Path=Groups}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -106,7 +135,8 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <ScrollViewer x:Name="scrollviewerAddonListAddonItems" Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="10">
+            <!-- Main List-->
+            <ScrollViewer Grid.Row="1" x:Name="scrollviewerAddonListAddonItems" VerticalScrollBarVisibility="Auto" Margin="10">
                 <ItemsControl x:Name="itemscontrolAddonListAddonItems" ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -148,22 +178,43 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            <StackPanel Grid.Column="1" Grid.RowSpan="2" Margin="0,10,10,10" fluent:PointerTracker.Enabled="True">
-                <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonUpdateClick">
-                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
-                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonUpdateText}"/>
-                    </StackPanel>
-                </Button>
-                <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsClick">
-                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
-                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
 
+            <!-- Main panel side buttons -->
+            <Grid Grid.Column="1" Grid.RowSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
+                    <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonUpdateClick">
+                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                            <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
+                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonUpdateText}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsClick">
+                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                            <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
+                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Grid.Row="1" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
+                    <Button Visibility="{Binding AppUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,5" Height="50" VerticalAlignment="Bottom" Padding="10,3,10,3" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
+                            <TextBlock MaxWidth="140" TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=ButtonAppUpdateText}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="0,0,0,5" Height="30" VerticalAlignment="Bottom" Padding="10,5,10,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutClick">
+                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                            <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-info.png" />
+                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonAboutText}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
 
         <!-- Settings Panel -->
         <Grid Visibility="{Binding Path=ShowSettings, Converter={StaticResource BoolToVisibilityConverter}}" Margin="20,0,0,0">
@@ -294,7 +345,6 @@
             </StackPanel>
         </Grid>
 
-
         <!-- InstallerProgress Panel -->
         <Grid Visibility="{Binding Path=ShowInstallerProgress, Converter={StaticResource BoolToVisibilityConverter}}" Margin="10">
             <Grid.RowDefinitions>
@@ -377,6 +427,36 @@
                     <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                         <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-plugin.png" />
                         <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ConflictsButtonBackText}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- About Panel -->
+        <Grid Visibility="{Binding Path=ShowAbout, Converter={StaticResource BoolToVisibilityConverter}}" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="40" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Vertical" Grid.Row="0">
+                <Label Content="{Binding Source={StaticResource Localization}, Path=AboutHeaderText}" FontFamily="Segoe UI Light" Margin="10,0,0,20" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
+
+                <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeArenanet}" />
+                <TextBlock Cursor="Hand" MouseLeftButtonDown="OnTextBlockLegalNoticeIconsMouseLeftButtonDown" TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeIcons}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" Grid.Row="1">
+                <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Version, Converter={StaticResource VersionToStringConverter}}" />
+            </StackPanel>
+
+            <!--Buttons-->
+            <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="0,0,5,5">
+                <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutBackClick">
+                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-back.png" />
+                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=AboutButtonBackText}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

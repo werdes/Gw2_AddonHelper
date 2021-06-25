@@ -16,7 +16,7 @@
         <converters:BoolToCheckboxBackgroundConverter x:Key="BoolToCheckboxBackgroundConverter" />
         <converters:BoolToInvertedVisibilityConverter x:Key="BoolToInvertedVisibilityConverter" />
     </UserControl.Resources>
-    <Grid Background="#FF111111" Margin="0,0,0,5">
+    <Grid Background="#B2111111" Margin="0,0,0,5">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -45,14 +45,17 @@
             <Image Source="/UI/Resources/Images/icon-plugin.png" RenderOptions.BitmapScalingMode="HighQuality" Width="18" Height="18" Margin="8,5,5,5" />
             <StackPanel Orientation="Vertical">
                 <Label TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" Margin="0" FontSize="16" Foreground="White" Content="{Binding AddonContainer.Addon.AddonName, RelativeSource={RelativeSource AncestorType=UserControl}}" VerticalContentAlignment="Center" Padding="5,5,5,0"></Label>
-                <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="10" Margin="5,0,5,0" Padding="0" Foreground="White" Opacity=".6">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0} {1}">
-                            <Binding Source="{StaticResource Localization}" Path="AddonTitleBy"/>
-                            <Binding Path="AddonContainer.Addon.Developer" RelativeSource="{RelativeSource AncestorType=UserControl}" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="10" Margin="5,0,5,0" Padding="0" Foreground="White" Opacity=".6">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} {1}">
+                                <Binding Source="{StaticResource Localization}" Path="AddonTitleBy"/>
+                                <Binding Path="AddonContainer.Addon.Developer" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <Image Cursor="Hand" MouseLeftButtonDown="OnImageDeveloperLinkMouseLeftButtonDown" Opacity=".6" RenderOptions.BitmapScalingMode="HighQuality" Width="10" Height="10" Source="/UI/Resources/Images/icon-external-link.png"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,0,5,5">

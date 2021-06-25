@@ -61,6 +61,24 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {AboutButtonBackText} ähnelt.
+        /// </summary>
+        public static string AboutButtonBackText {
+            get {
+                return ResourceManager.GetString("AboutButtonBackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {AboutHeaderText} ähnelt.
+        /// </summary>
+        public static string AboutHeaderText {
+            get {
+                return ResourceManager.GetString("AboutHeaderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {AddonListGroupAddonPlural} ähnelt.
         /// </summary>
         public static string AddonListGroupAddonPlural {
@@ -88,11 +106,29 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonAboutText} ähnelt.
+        /// </summary>
+        public static string ButtonAboutText {
+            get {
+                return ResourceManager.GetString("ButtonAboutText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonApplyText} ähnelt.
         /// </summary>
         public static string ButtonApplyText {
             get {
                 return ResourceManager.GetString("ButtonApplyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonAppUpdateText} ähnelt.
+        /// </summary>
+        public static string ButtonAppUpdateText {
+            get {
+                return ResourceManager.GetString("ButtonAppUpdateText", resourceCulture);
             }
         }
         
@@ -219,6 +255,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         public static string ConflictsHeaderText {
             get {
                 return ResourceManager.GetString("ConflictsHeaderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {GameNotFoundError} ähnelt.
+        /// </summary>
+        public static string GameNotFoundError {
+            get {
+                return ResourceManager.GetString("GameNotFoundError", resourceCulture);
             }
         }
         
@@ -399,6 +444,24 @@ namespace Gw2_AddonHelper.UI.Localization {
         public static string InstallStateNotInstalled {
             get {
                 return ResourceManager.GetString("InstallStateNotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {LegalNoticeArenanet} ähnelt.
+        /// </summary>
+        public static string LegalNoticeArenanet {
+            get {
+                return ResourceManager.GetString("LegalNoticeArenanet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {LegalNoticeIcons} ähnelt.
+        /// </summary>
+        public static string LegalNoticeIcons {
+            get {
+                return ResourceManager.GetString("LegalNoticeIcons", resourceCulture);
             }
         }
         

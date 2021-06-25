@@ -1,12 +1,11 @@
-﻿using Gw2_AddonHelper.AddonLib.Extensions;
-using Gw2_AddonHelper.AddonLib.Model;
+﻿using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.AddonList;
 using Gw2_AddonHelper.AddonLib.Model.Exceptions;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.AddonLib.Services.Interfaces;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Installer;
+using Gw2_AddonHelper.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -15,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gw2_AddonHelper.Services
@@ -52,7 +50,7 @@ namespace Gw2_AddonHelper.Services
             {
                 _log.LogInformation($"Enabling [{addonContainer.Addon.AddonId}]");
 
-                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                 disabled = await addonInstaller.Disable();
             }
             return disabled;
@@ -70,7 +68,7 @@ namespace Gw2_AddonHelper.Services
             {
                 _log.LogInformation($"Disabling [{addonContainer.Addon.AddonId}]");
 
-                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                 enabled = await addonInstaller.Enable();
             }
             return enabled;
@@ -90,7 +88,7 @@ namespace Gw2_AddonHelper.Services
 
                 IAddonDownloader addonDownloader = AddonDownloaderFactory.GetDownloader(addonContainer.Addon);
                 IAddonExtractor addonExtractor = AddonExtractorFactory.GetExtractor(addonContainer.Addon);
-                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
                 DownloadResult downloadResult = await addonDownloader.Download();
                 ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, downloadResult.Version);
@@ -123,7 +121,7 @@ namespace Gw2_AddonHelper.Services
 
                 _log.LogInformation($"Removing [{addonContainer.Addon.AddonId}]");
 
-                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                 removalResult = await addonInstaller.Remove();
             }
             return removalResult && enableResult;
@@ -150,7 +148,7 @@ namespace Gw2_AddonHelper.Services
 
             IAddonDownloader addonDownloader = AddonDownloaderFactory.GetDownloader(addonContainer.Addon);
             IAddonExtractor addonExtractor = AddonExtractorFactory.GetExtractor(addonContainer.Addon);
-            IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+            IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
             DownloadResult downloadResult = await addonDownloader.Download();
             ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, downloadResult.Version);
@@ -179,7 +177,7 @@ namespace Gw2_AddonHelper.Services
                 addonContainer.InstallState == InstallState.InstalledEnabled)
             {
                 IAddonDownloader addonDownloader = AddonDownloaderFactory.GetDownloader(addonContainer.Addon);
-                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
                 string installedVersion = addonInstaller.GetInstalledVersion();
                 updateAvailable = await addonDownloader.GetLatestVersion() != installedVersion;
@@ -214,7 +212,7 @@ namespace Gw2_AddonHelper.Services
                 if (addonContainer.InstallState == InstallState.InstalledDisabled ||
                     addonContainer.InstallState == InstallState.InstalledEnabled)
                 {
-                    IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon);
+                    IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                     string installedVersion = addonInstaller.GetInstalledVersion();
 
                     if (addonInstaller.GetInstalledVersion() != versionContainer.Versions[addonContainer.Addon.AddonId])
@@ -242,7 +240,7 @@ namespace Gw2_AddonHelper.Services
         private AddonContainer GetAddonContainer(Addon addon)
         {
             AddonContainer addonContainer = new AddonContainer(addon);
-            IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon);
+            IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
             string gameDirectory = Path.GetDirectoryName(_userConfigService.GetConfig().GameLocation.LocalPath);
             string disabledExtension = _config.GetValue<string>("installation:disabledExtension");
@@ -284,7 +282,7 @@ namespace Gw2_AddonHelper.Services
                 {
                     if (versions.Versions.ContainsKey(addon.AddonId))
                     {
-                        IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon);
+                        IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                         container.QuickUpdateAvailable = !addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating) &&
                                                          addonInstaller.GetInstalledVersion() != versions.Versions[addon.AddonId];
                     }

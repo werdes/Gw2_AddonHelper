@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutButtonBackText" xml:space="preserve">
+    <value>{AboutButtonBackText}</value>
+  </data>
+  <data name="AboutHeaderText" xml:space="preserve">
+    <value>{AboutHeaderText}</value>
+  </data>
   <data name="AddonListGroupAddonPlural" xml:space="preserve">
     <value>{AddonListGroupAddonPlural}</value>
   </data>
@@ -126,8 +132,14 @@
   <data name="AddonTitleBy" xml:space="preserve">
     <value>{AddonTitleBy}</value>
   </data>
+  <data name="ButtonAboutText" xml:space="preserve">
+    <value>{ButtonAboutText}</value>
+  </data>
   <data name="ButtonApplyText" xml:space="preserve">
     <value>{ButtonApplyText}</value>
+  </data>
+  <data name="ButtonAppUpdateText" xml:space="preserve">
+    <value>{ButtonAppUpdateText}</value>
   </data>
   <data name="ButtonCancelText" xml:space="preserve">
     <value>{ButtonCancelText}</value>
@@ -170,6 +182,9 @@
   </data>
   <data name="ConflictsHeaderText" xml:space="preserve">
     <value>{ConflictsHeaderText}</value>
+  </data>
+  <data name="GameNotFoundError" xml:space="preserve">
+    <value>{GameNotFoundError}</value>
   </data>
   <data name="HeaderSettingsText" xml:space="preserve">
     <value>{HeaderSettingsText}</value>
@@ -230,6 +245,12 @@
   </data>
   <data name="InstallStateNotInstalled" xml:space="preserve">
     <value>{InstallStateNotInstalled}</value>
+  </data>
+  <data name="LegalNoticeArenanet" xml:space="preserve">
+    <value>{LegalNoticeArenanet}</value>
+  </data>
+  <data name="LegalNoticeIcons" xml:space="preserve">
+    <value>{LegalNoticeIcons}</value>
   </data>
   <data name="Loading" xml:space="preserve">
     <value>{Loading}</value>
