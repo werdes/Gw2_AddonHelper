@@ -15,7 +15,6 @@ namespace Gw2_AddonHelper.Model.UI
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-
         private ObservableCollection<AddonContainer> _addonContainers;
         private ObservableCollection<AddonInstallAction> _addonInstallActions;
         private Enums.UiState _uiState;
@@ -55,6 +54,7 @@ namespace Gw2_AddonHelper.Model.UI
                 Notify();
             }
         }
+
         public ObservableCollection<AddonInstallProgress> AddonInstallProgresses
         {
             get => _addonInstallProgresses;
@@ -65,7 +65,6 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
-
         public Enums.UiState UiState
         {
             get => _uiState;
@@ -73,27 +72,8 @@ namespace Gw2_AddonHelper.Model.UI
             {
                 _uiState = value;
                 Notify();
-                Notify(nameof(ShowLoading));
-                Notify(nameof(ShowAddonList));
-                Notify(nameof(ShowError));
-                Notify(nameof(ShowInstaller));
-                Notify(nameof(ShowInstallerProgress));
-                Notify(nameof(ShowSettings));
-                Notify(nameof(ShowConflicts));
-                Notify(nameof(ShowAbout));
             }
         }
-
-        public bool ShowLoading => _uiState == Enums.UiState.Loading;
-        public bool ShowAddonList => _uiState == Enums.UiState.AddonList;
-        public bool ShowError => _uiState == Enums.UiState.Error;
-        public bool ShowInstaller => _uiState == Enums.UiState.Installer;
-        public bool ShowInstallerProgress => _uiState == Enums.UiState.InstallerProgress;
-        public bool ShowSettings => _uiState == Enums.UiState.Settings;
-        public bool ShowConflicts => _uiState == Enums.UiState.Conflicts;
-        public bool ShowAbout => _uiState == Enums.UiState.About;
-
-
 
         public string ErrorTitleText
         {

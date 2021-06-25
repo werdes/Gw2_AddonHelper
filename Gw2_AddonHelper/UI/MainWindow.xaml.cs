@@ -42,8 +42,6 @@ namespace Gw2_AddonHelper.UI
         {
             InitializeComponent();
 
-
-
             _viewModel = new MainWindowViewModel();
             _viewModel.UiState = Enums.UiState.Loading;
             _viewModel.UserConfig = userConfigService.GetConfig();
