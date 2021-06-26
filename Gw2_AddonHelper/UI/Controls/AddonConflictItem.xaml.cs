@@ -9,12 +9,8 @@ namespace Gw2_AddonHelper.UI.Controls
     /// <summary>
     /// Interaktionslogik für AddonConflictItem.xaml
     /// </summary>
-    public partial class AddonConflictItem : UserControl, INotifyPropertyChanged
+    public partial class AddonConflictItem : UserControl
     {
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
         public static readonly DependencyProperty AddonConflictProperty =
             DependencyProperty.RegisterAttached(nameof(AddonConflict), typeof(AddonConflict), typeof(AddonConflictItem), new PropertyMetadata(null));
 

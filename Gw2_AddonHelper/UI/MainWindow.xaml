@@ -7,6 +7,7 @@
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
+                      xmlns:panes="clr-namespace:Gw2_AddonHelper.UI.Controls.Panes"
                       xmlns:uimodel="clr-namespace:Gw2_AddonHelper.Model.UI"
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI"
                       mc:Ignorable="d"
@@ -28,27 +29,6 @@
         <converters:NumberToAddonListGroupAddonQuantityFormConverter x:Key="NumberToAddonListGroupAddonQuantityFormConverter" />
         <converters:VersionToStringConverter x:Key="VersionToStringConverter" />
 
-        <CollectionViewSource x:Key="AddonContainersByInstallState" Source="{Binding Path=AddonContainers, Mode=TwoWay}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="InstallState" />
-            </CollectionViewSource.GroupDescriptions>
-
-            <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="InstallState" Direction="Descending" />
-                <scm:SortDescription PropertyName="SortKey" />
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-        <CollectionViewSource x:Key="AddonInstallActionsByActionType" Source="{Binding Path=AddonInstallActions, Mode=TwoWay}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="InstallActionType" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-        <CollectionViewSource x:Key="AddonInstallProgressesByActionType" Source="{Binding Path=AddonInstallProgresses, Mode=TwoWay}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="AddonInstallAction.InstallActionType" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-
         <!-- UIState Pane Container -->
         <Style TargetType="controls:UiStatePaneContainer">
             <Setter Property="Template">
@@ -65,6 +45,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <!-- UIState Pane -->
         <Style TargetType="controls:UiStatePane">
             <Setter Property="Template">
@@ -74,7 +55,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Visibility" Value="Collapsed" />
         </Style>
     </Window.Resources>
     <Grid>
@@ -94,424 +74,57 @@
             <controls:UiStatePaneContainer.Panes>
 
                 <!-- Loading Panel -->
-                <controls:UiStatePane Visibility="Visible" UiState="Loading">
-                    <Grid>
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="/UI/Resources/Images/app.png" Width="100" Height="100" Margin="0,0,0,0" />
-                            <Label Content="{Binding Source={StaticResource Localization}, Path=Loading}" FontFamily="Segoe UI Light" Margin="0,0,0,20" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:LoadingPane x:Name="loadingPane" Visibility="Visible" />
 
 
                 <!-- Error Screen Panel -->
-                <controls:UiStatePane UiState="Error">
-                    <Grid>
-                        <StackPanel Margin="40" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="/UI/Resources/Images/icon-warning.png" Width="100" Height="100" Margin="0,0,30,0"/>
-                            <StackPanel MaxWidth="600" Margin="10">
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=UiErrorWarning}" FontFamily="Segoe UI Light" FontSize="36" HorizontalAlignment="Left" Foreground="White"></TextBlock>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding ErrorTitleText}" FontFamily="Segoe UI Light" FontSize="24" HorizontalAlignment="Left" Foreground="White"></TextBlock>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding ErrorMessageText}" FontFamily="Segoe UI Light" FontSize="16" HorizontalAlignment="Left" Foreground="White"></TextBlock>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <Button fluent:PointerTracker.Enabled="True" Click="OnButtonRetryClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Content="{Binding Source={StaticResource Localization}, Path=ButtonRetryText}">
-                                    </Button>
-                                    <Button fluent:PointerTracker.Enabled="True" Click="OnButtonSettingsClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand">
-                                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                            <Image Height="10" Width="10" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
-                                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:ErrorPane x:Name="errorScreenPane" Visibility="Collapsed" 
+                                 RetryClick="OnButtonRetryClick"
+                                 SettingsClick="OnButtonSettingsClick"/>
 
 
                 <!-- Addon List Panel -->
-                <controls:UiStatePane UiState="AddonList">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="1*" MinWidth="150" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <!-- Shortcuts-->
-                        <ScrollViewer Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Margin="10">
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}, Path=Groups}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" fluent:PointerTracker.Enabled="True"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Tag="{Binding Name}" Click="OnButtonInstallStateShortcutClick" Margin="0,0,5,0" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000">
-                                            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                                <TextBlock>
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="{}{0} ({1} {2})">
-                                                            <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
-                                                            <Binding Path="ItemCount" />
-                                                            <Binding Path="ItemCount" Converter="{StaticResource NumberToAddonListGroupAddonQuantityFormConverter}"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-
-                        <!-- Main List-->
-                        <ScrollViewer Grid.Row="1" x:Name="scrollviewerAddonListAddonItems" VerticalScrollBarVisibility="Auto" Margin="10">
-                            <ItemsControl x:Name="itemscontrolAddonListAddonItems" ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.GroupStyle>
-                                    <GroupStyle>
-                                        <GroupStyle.ContainerStyle>
-                                            <Style TargetType="{x:Type GroupItem}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                            <StackPanel Margin="0,0,0,30" Orientation="Vertical">
-
-                                                                <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="18" Margin="5,5,0,10" Padding="0" Foreground="White">
-                                                                    <TextBlock.Text>
-                                                                        <MultiBinding StringFormat="{}{0} ({1} {2})">
-                                                                            <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
-                                                                            <Binding Path="ItemCount" />
-                                                                            <Binding Source="{StaticResource Localization}" Path="AddonListGroupAddonPlural"/>
-                                                                        </MultiBinding>
-                                                                    </TextBlock.Text>
-                                                                </TextBlock>
-                                                                <ItemsPresenter />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Setter Property="Tag" Value="{Binding Name}" />
-                                            </Style>
-                                        </GroupStyle.ContainerStyle>
-                                    </GroupStyle>
-                                </ItemsControl.GroupStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <controls:AddonListItem AddonContainer="{Binding}" ShowActions="true" Open="OnAddonListItemOpen" Install="OnAddonListItemInstall" Remove="OnAddonListItemRemove" Enable="OnAddonListItemEnable" Disable="OnAddonListItemDisable"></controls:AddonListItem>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-
-                        <!-- Main panel side buttons -->
-                        <Grid Grid.Column="1" Grid.RowSpan="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
-                                <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonUpdateClick">
-                                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
-                                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonUpdateText}"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsClick">
-                                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
-                                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
-                                <Button Visibility="{Binding AppUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,5" Height="50" VerticalAlignment="Bottom" Padding="10,3,10,3" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
-                                        <TextBlock MaxWidth="140" TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=ButtonAppUpdateText}"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button Margin="0,0,0,5" Height="30" VerticalAlignment="Bottom" Padding="10,5,10,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutClick">
-                                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-info.png" />
-                                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonAboutText}"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:AddonListPane x:Name="addonListPane" Visibility="Collapsed"
+                                     AboutClick="OnButtonAboutClick"
+                                     SettingsClick="OnButtonSettingsClick"
+                                     AddonsUpdateClick="OnButtonUpdateClick"
+                                     AppUpdateClick="OnButtonAppUpdateClick"
+                                     AddonOpen="OnAddonListItemOpen"
+                                     AddonInstall="OnAddonListItemInstall"
+                                     AddonEnable="OnAddonListItemEnable"
+                                     AddonDisable="OnAddonListItemDisable"
+                                     AddonRemove="OnAddonListItemRemove" />
 
 
                 <!-- Settings Panel -->
-                <controls:UiStatePane UiState="Settings">
-                    <Grid Margin="20,0,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="80" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="50" />
-                        </Grid.RowDefinitions>
-                        <Label Grid.Row="0" Content="{Binding Source={StaticResource Localization}, Path=HeaderSettingsText}" FontFamily="Segoe UI Light" Margin="0,0,0,20" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
-
-                        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="10,0,15,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Label Grid.Row="0" VerticalAlignment="Top" Content="{Binding Source={StaticResource Localization}, Path=SettingsGamePathText}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="16" Foreground="White"></Label>
-
-                            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="0,0,0,20">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" Text="{Binding UserConfig.GameLocation}" Style="{StaticResource TextBoxRevealStyle}" />
-                                    <Button Grid.Column="1" fluent:PointerTracker.Enabled="True" Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonFindGameExecutableClick">
-                                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                            <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-open.png" />
-                                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonFindGameExecutableText}"/>
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                                <Label Content="{Binding Source={StaticResource Localization}, Path=SettingsGamePathDescription}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="11" Foreground="White" Opacity=".5"></Label>
-                            </StackPanel>
-
-                            <Label Grid.Row="1" VerticalAlignment="Top" Content="{Binding Source={StaticResource Localization}, Path=SettingsLanguageText}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="16" Foreground="White"></Label>
-
-                            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="0,0,0,20">
-                                <ComboBox Style="{StaticResource ComboBoxRevealStyle}" ItemsSource="{Binding AvailableCultures}" SelectedItem="{Binding UserConfig.Language}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding NativeName}" />
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                                <Label Content="{Binding Source={StaticResource Localization}, Path=SettingsLanguageDescription}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="11" Foreground="White" Opacity=".5"></Label>
-                            </StackPanel>
-
-                        </Grid>
-
-                        <!--Buttons-->
-                        <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="10,0,15,15">
-                            <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsSaveClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-enable.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSaveText}"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsCancelClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-disable.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonCancelText}"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:SettingsPane x:Name="settingsPane" Visibility="Collapsed" 
+                                    CancelClick="OnButtonSettingsCancelClick" 
+                                    FindExecutableClick="OnButtonFindGameExecutableClick" 
+                                    SaveClick="OnButtonSettingsSaveClick"/>
 
 
                 <!-- Installer Panel -->
-                <controls:UiStatePane UiState="Installer">
-                    <Grid Margin="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource AddonInstallActionsByActionType}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.GroupStyle>
-                                    <GroupStyle>
-                                        <GroupStyle.ContainerStyle>
-                                            <Style TargetType="{x:Type GroupItem}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                            <StackPanel Margin="0,0,0,30" Orientation="Vertical">
-                                                                <Label FontSize="18" Padding="0" Margin="5,5,0,10" FontFamily="Segoe UI Light" Foreground="White" Content="{Binding Name, Converter={StaticResource InstallerActionToHeaderTextConverter}}"/>
-                                                                <Label FontSize="12" Padding="0" Margin="5,5,0,10" FontFamily="Segoe UI Light" Foreground="White" Content="{Binding Name, Converter={StaticResource InstallerActionToDescriptionTextConverter}}"/>
-                                                                <ItemsPresenter />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </GroupStyle.ContainerStyle>
-                                    </GroupStyle>
-                                </ItemsControl.GroupStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <controls:AddonListItem ShowActions="False" ShowCheckbox="{Binding Path=InstallActionType, Converter={StaticResource InstallerActionToCheckboxVisibilityConverter}}" AddonContainer="{Binding AddonContainer}"></controls:AddonListItem>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-
-
-                        <!--Buttons-->
-                        <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="0,0,5,5">
-                            <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonInstallerInstallClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-enable.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonApplyText}"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonInstallerCancelClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-disable.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonCancelText}"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:InstallerPane x:Name="installerPane" Visibility="Collapsed"
+                                     CancelClick="OnButtonInstallerCancelClick" 
+                                     InstallClick="OnButtonInstallerInstallClick"/>
 
 
                 <!-- InstallerProgress Panel -->
-                <controls:UiStatePane UiState="InstallerProgress">
-                    <Grid Margin="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
-                        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource AddonInstallProgressesByActionType}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.GroupStyle>
-                                    <GroupStyle>
-                                        <GroupStyle.ContainerStyle>
-                                            <Style TargetType="{x:Type GroupItem}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                            <StackPanel Margin="0,0,0,30" Orientation="Vertical">
-                                                                <Label FontSize="18" Padding="0" Margin="5,5,0,10" FontFamily="Segoe UI Light" Foreground="White" Content="{Binding Name, Converter={StaticResource InstallerActionToHeaderTextConverter}}"/>
-                                                                <Label FontSize="12" Padding="0" Margin="5,5,0,10" FontFamily="Segoe UI Light" Foreground="White" Content="{Binding Name, Converter={StaticResource InstallerActionToDescriptionTextConverter}}"/>
-                                                                <ItemsPresenter />
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </GroupStyle.ContainerStyle>
-                                    </GroupStyle>
-                                </ItemsControl.GroupStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <controls:AddonInstallProgressItem AddonInstallProgress="{Binding}"></controls:AddonInstallProgressItem>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                        <!--Buttons-->
-                        <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="0,0,5,5">
-                            <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonInstallerCancelClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-disable.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonCancelText}"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:InstallerProgressPane x:Name="installerProgressPane" DataContext="{Binding}" Visibility="Collapsed"
+                                             CancelClick="OnButtonInstallerCancelClick"/>
 
 
                 <!-- Conflicts Panel -->
-                <controls:UiStatePane UiState="Conflicts">
-                    <Grid Margin="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
-                        <StackPanel Orientation="Vertical">
-                            <Label Content="{Binding Source={StaticResource Localization}, Path=ConflictsHeaderText}" FontFamily="Segoe UI Light" Margin="0,0,0,0" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
-                            <TextBlock Padding="7,0,0,0" TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=ConflictsDescriptionText}" FontFamily="Segoe UI Light" Margin="0,0,0,10" TextOptions.TextRenderingMode="ClearType" FontSize="16" Opacity=".6" Foreground="White"></TextBlock>
-
-                            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding AddonConflicts}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Vertical"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <controls:AddonConflictItem AddonConflict="{Binding}"></controls:AddonConflictItem>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-                        </StackPanel>
-
-                        <!--Buttons-->
-                        <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="0,0,5,5">
-                            <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonConflictsBackClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-plugin.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ConflictsButtonBackText}"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
+                <panes:ConflictsPane x:Name="conflictsPane" Visibility="Collapsed"
+                                     BackClick="OnButtonConflictsBackClick"/>
 
 
                 <!-- About Panel -->
-                <controls:UiStatePane UiState="About">
-                    <Grid Margin="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
+                <panes:AboutPane x:Name="aboutPane" Visibility="Collapsed" 
+                                 BackClick="OnButtonAboutBackClick" 
+                                 LegalNoticeIconsClick="OnTextBlockLegalNoticeIconsMouseLeftButtonDown"/>
 
-                        <StackPanel Orientation="Vertical" Grid.Row="0">
-                            <Label Content="{Binding Source={StaticResource Localization}, Path=AboutHeaderText}" FontFamily="Segoe UI Light" Margin="10,0,0,20" TextOptions.TextRenderingMode="ClearType" FontSize="36" Foreground="White"></Label>
 
-                            <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeArenanet}" />
-                            <TextBlock Cursor="Hand" MouseLeftButtonDown="OnTextBlockLegalNoticeIconsMouseLeftButtonDown" TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeIcons}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Vertical" Grid.Row="1">
-                            <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Version, Converter={StaticResource VersionToStringConverter}}" />
-                        </StackPanel>
-
-                        <!--Buttons-->
-                        <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="0,0,5,5">
-                            <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutBackClick">
-                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-back.png" />
-                                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=AboutButtonBackText}"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </controls:UiStatePane>
             </controls:UiStatePaneContainer.Panes>
         </controls:UiStatePaneContainer>
     </Grid>

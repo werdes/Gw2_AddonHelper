@@ -17,15 +17,16 @@ namespace Gw2_AddonHelper.Model.UI
 
         private ObservableCollection<AddonContainer> _addonContainers;
         private ObservableCollection<AddonInstallAction> _addonInstallActions;
-        private Enums.UiState _uiState;
-        private string _errorMessageText;
-        private string _errorTitleText;
-        private UserConfig.UserConfig _userConfig;
         private ObservableCollection<CultureInfo> _availableCultures;
         private ObservableCollection<AddonConflict> _addonConflicts;
         private ObservableCollection<AddonInstallProgress> _addonInstallProgresses;
-        private bool _appUpdateAvailable;
+        private UserConfig.UserConfig _userConfig;
         private Version _version;
+        private Enums.UiState _uiState;
+        private string _errorMessageText;
+        private string _errorTitleText;
+        private bool _appUpdateAvailable;
+        private bool _installerProgressCancelEnabled;
 
         public MainWindowViewModel()
         {
@@ -134,12 +135,23 @@ namespace Gw2_AddonHelper.Model.UI
                 Notify();
             }
         }
+
         public Version Version
         {
             get => _version;
             set
             {
                 _version = value;
+                Notify();
+            }
+        }
+
+        public bool InstallerProgressCancelEnabled
+        {
+            get => _installerProgressCancelEnabled;
+            set
+            {
+                _installerProgressCancelEnabled = value;
                 Notify();
             }
         }

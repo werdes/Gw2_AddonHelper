@@ -10,7 +10,7 @@ using System.Windows.Markup;
 
 namespace Gw2_AddonHelper.UI.Controls
 {
-    public class UiStatePane : ContentControl
+    public abstract class UiStatePane : UserControl
     {
         public static readonly DependencyProperty UiStateProperty =
             DependencyProperty.RegisterAttached(nameof(UiState), typeof(Enums.UiState), typeof(UiStatePane), new PropertyMetadata(Enums.UiState.Loading));

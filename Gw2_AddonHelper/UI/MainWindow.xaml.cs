@@ -536,6 +536,7 @@ namespace Gw2_AddonHelper.UI
             bool chainSuccess = true;
             try
             {
+                _viewModel.InstallerProgressCancelEnabled = false;
                 _viewModel.AddonInstallProgresses.Clear();
                 _viewModel.AddonInstallProgresses.AddRange(_viewModel.AddonInstallActions.Select(x => new AddonInstallProgress(x)));
 
@@ -549,6 +550,7 @@ namespace Gw2_AddonHelper.UI
                     }
                 }
 
+                _viewModel.InstallerProgressCancelEnabled = !chainSuccess;
                 if (chainSuccess)
                 {
                     //Delay to allow display of final status
@@ -652,42 +654,6 @@ namespace Gw2_AddonHelper.UI
             }
         }
 
-        /// <summary>
-        /// Shortcut to Install State group 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnButtonInstallStateShortcutClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                InstallState installState;
-
-                if (e.Source is Button)
-                {
-                    Button senderButton = (Button)e.Source;
-                    string installStateName = senderButton.Tag.ToString();
-
-                    if (Enum.TryParse(installStateName, out installState))
-                    {
-                        List<GroupItem> items = itemscontrolAddonListAddonItems.GetChildrenOfType<GroupItem>();
-                        GroupItem desiredItem = items.Where(x => Enum.Parse<InstallState>(x.Tag.ToString()) == installState).FirstOrDefault();
-
-                        if (desiredItem != null)
-                        {
-                            ItemsControl itemsControl = (ItemsControl)scrollviewerAddonListAddonItems.Content;
-                            var point = desiredItem.TranslatePoint(new Point(), itemsControl);
-                            scrollviewerAddonListAddonItems.ScrollToVerticalOffset(point.Y);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SetUiError(ex, Localization.Localization.UncategorizedError);
-                _log.LogCritical(ex, $"Finding scroll point");
-            }
-        }
 
         /// <summary>
         /// Opens the icon link
