@@ -92,7 +92,7 @@ namespace Gw2_AddonHelper.Services
                                     addonDescriptionYamlContent = addonDescriptionYamlContent.Replace("\\\"", string.Empty);
                                     addonDescriptionYamlContent = Regex.Replace(addonDescriptionYamlContent, "\"[^\"]*(?:\"\"[^\"]*)*\"",
                                                                                 match => match.Value.Replace("\n", "").Replace("\r", ""));
-                                    addonDescriptionYamlContent = addonDescriptionYamlContent.Replace("\\n", Environment.NewLine);
+                                    addonDescriptionYamlContent = addonDescriptionYamlContent.Replace("\\n", "");
 
                                     Addon addon = yamlDeserializer.Deserialize<Addon>(addonDescriptionYamlContent);
                                     addon.AddonId = addonDescription.FileName.Split('/')[1];
@@ -114,7 +114,7 @@ namespace Gw2_AddonHelper.Services
                         _addonList.Addons.AddRange(addons);
 
                         // Addon Loader
-                        Addon addonLoader = _config.GetSection("addonLoader").Get<Addon>();
+                        Addon addonLoader = _config.GetSection("defaultValues:addonLoader").Get<Addon>();
 
                         _addonList.Addons.ForEach(x => x.RequiredAddons.Insert(0, addonLoader.AddonId));
                         _addonList.Addons.Insert(0, addonLoader);
@@ -173,7 +173,7 @@ namespace Gw2_AddonHelper.Services
         private async Task<List<YamlAddonDescription>> GetAddonDescriptionsFromZipBall(Uri zipBallUrl)
         {
             List<YamlAddonDescription> fileContents = new List<YamlAddonDescription>();
-            byte[] buffer = (await _githubClient.Connection.Get<byte[]>(zipBallUrl, TimeSpan.FromSeconds(30))).Body;   //await _webClient.DownloadDataTaskAsync(zipBallUrl);
+            byte[] buffer = (await _githubClient.Connection.Get<byte[]>(zipBallUrl, TimeSpan.FromSeconds(30))).Body;
             using (MemoryStream zipStream = new MemoryStream(buffer))
             {
                 using (ZipArchive zipArchive = new ZipArchive(zipStream))

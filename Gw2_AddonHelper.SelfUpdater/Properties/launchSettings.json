@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Gw2_AddonHelper.SelfUpdater": {
+      "commandName": "Project",
+      "commandLineArgs": "\"F:\\Files\\gw2addonhelper\\publish\\Gw2_AddonHelper.exe\" 29356 \"F:\\Files\\gw2addonhelper\\publish\\Gw2_AddonHelper_0.1.7848.30030.zip\" \"F:\\Files\\gw2addonhelper\\publish\""
+    }
+  }
+}

@@ -1,12 +1,25 @@
-﻿<Window x:Class="Gw2_AddonHelper.SelfUpdater.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Gw2_AddonHelper.SelfUpdater"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
+﻿<fluent:AcrylicWindow x:Class="Gw2_AddonHelper.SelfUpdater.UI.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:local="clr-namespace:Gw2_AddonHelper.SelfUpdater"
+                      xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+                      xmlns:converters="clr-namespace:Gw2_AddonHelper.SelfUpdater.UI.Converters"
+                      mc:Ignorable="d"
+                      Title="Update" 
+                      AcrylicWindowStyle="NoIcon"
+                      TintColor="Black"
+                      Foreground="White"
+                      NoiseOpacity="0" 
+                      Icon="/UI/Resources/app.ico"
+                      Height="70" 
+                      Width="300"
+                      Loaded="OnWindowLoaded">
+    <Window.Resources>
+        <converters:ProgressToProgressbarBrushConverter x:Key="ProgressToProgressbarBrushConverter" />
+    </Window.Resources>
+    <Grid Background="{Binding Progress, Converter={StaticResource ProgressToProgressbarBrushConverter}}">
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding ProgressText}" Foreground="White" FontFamily="Segoe UI Light" FontSize="14" />
     </Grid>
-</Window>
+</fluent:AcrylicWindow>

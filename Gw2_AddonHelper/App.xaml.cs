@@ -69,7 +69,9 @@ namespace Gw2_AddonHelper
             lstDirs.Add(Path.GetDirectoryName(config["addonsFile"]));
             lstDirs.Add(Path.GetDirectoryName(config["userConfig"]));
             lstDirs.Add(Path.GetDirectoryName(config["githubRatelimitFile"]));
-            lstDirs.Add(Path.GetDirectoryName(config["githubAddonList:filePath"])); 
+            lstDirs.Add(Path.GetDirectoryName(config["githubAddonList:filePath"]));
+            lstDirs.Add(Path.GetDirectoryName(config["selfUpdate:updaterDirectory"]));
+            lstDirs.Add(Path.GetDirectoryName(config["selfUpdate:updaterAssetDirectory"]));
 
             try
             {
@@ -107,6 +109,7 @@ namespace Gw2_AddonHelper
             GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
+
 
             services.AddSingleton(configuration);
             services.AddSingleton(gitHubClient);

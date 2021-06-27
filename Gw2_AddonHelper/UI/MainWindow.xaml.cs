@@ -105,7 +105,7 @@ namespace Gw2_AddonHelper.UI
                     _userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.UtcNow;
                     _userConfigService.Store();
 
-                    return latestVersion > currentVersion;
+                    return latestVersion != currentVersion;
                 }
                 else
                 {
@@ -672,13 +672,22 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
-                _log.LogCritical(ex, $"Icons legal text block click");
+                _log.LogCritical(ex, nameof(OnTextBlockLegalNoticeIconsMouseLeftButtonDown));
             }
         }
 
-        private void OnButtonAppUpdateClick(object sender, RoutedEventArgs e)
+        private async void OnButtonAppUpdateClick(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                IAppUpdaterService appUpdaterService = App.ServiceProvider.GetService<IAppUpdaterService>();
+                await appUpdaterService.Update();
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, nameof(OnButtonAppUpdateClick));
+            }
         }
     }
 }
