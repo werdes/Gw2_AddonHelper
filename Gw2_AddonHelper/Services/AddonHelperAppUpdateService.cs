@@ -96,6 +96,12 @@ namespace Gw2_AddonHelper.Services
                         string extractionDirectory = Environment.CurrentDirectory;
                         string callerPath = Environment.GetCommandLineArgs().First();
 
+                        //Reset stored version and version check timestamp
+                        IUserConfigService userConfigService = App.ServiceProvider.GetService<IUserConfigService>();
+                        userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.MinValue;
+                        userConfigService.GetConfig().LatestVersion = new Version();
+                        userConfigService.Store();
+
                         Process process = new Process();
                         process.StartInfo.ArgumentList.Add(callerPath);
                         process.StartInfo.ArgumentList.Add(currentProcessId.ToString());
