@@ -1,9 +1,12 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
+using Gw2_AddonHelper.Model.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -23,6 +26,8 @@ namespace Gw2_AddonHelper.Model.UserConfig
         private CultureInfo _lang;
         private DateTime _lastGithubCheck;
         private DateTime _lastSelfUpdateCheck;
+        private Version _latestVersion;
+        private ObservableCollection<Enums.UiFlag> _uiFlags;
 
         public UserConfig()
         {
@@ -31,6 +36,8 @@ namespace Gw2_AddonHelper.Model.UserConfig
             _gameLocation = new Uri(config.GetValue<string>("defaultValues:gamePath"));
             _lang = CultureInfo.GetCultureInfo(config.GetValue<string>("defaultValues:language"));
             _lastGithubCheck = DateTime.MinValue;
+            _latestVersion = new Version();
+            _uiFlags = new ObservableCollection<Enums.UiFlag>();
         }
 
         [JsonProperty("game_location")]
@@ -74,6 +81,28 @@ namespace Gw2_AddonHelper.Model.UserConfig
             set
             {
                 _lastSelfUpdateCheck = value;
+                Notify();
+            }
+        }
+
+        [JsonProperty("latest_version")]
+        public Version LatestVersion
+        {
+            get => _latestVersion;
+            set
+            {
+                _latestVersion = value;
+                Notify();
+            }
+        }
+
+        [JsonProperty("ui_flags", ItemConverterType = typeof(StringEnumConverter))]
+        public ObservableCollection<Enums.UiFlag> UiFlags
+        {
+            get => _uiFlags;
+            set
+            {
+                _uiFlags = value;
                 Notify();
             }
         }

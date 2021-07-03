@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Gw2_AddonHelper.UI.Controls.MultiLanguageLabel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
+             Loaded="OnControlLoaded"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="{Binding MainOrientation, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}">
+            <TextBlock TextOptions.TextRenderingMode="ClearType" TextWrapping="Wrap" Padding="{Binding Padding, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" Margin="{Binding Margin, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" Text="{Binding EnglishVersion, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+            <ItemsControl ItemsSource="{Binding OtherVersions, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel VerticalAlignment="Bottom" Orientation="{Binding OtherVersionsOrientation, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock TextOptions.TextRenderingMode="ClearType" Padding="{Binding OtherVersionsPadding, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" Margin="{Binding OtherVersionsMargin, RelativeSource={RelativeSource AncestorType={x:Type controls:MultiLanguageLabel}}}" Opacity=".65" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" TextWrapping="Wrap" FontSize="{Binding ReducedFontSize, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Text="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>

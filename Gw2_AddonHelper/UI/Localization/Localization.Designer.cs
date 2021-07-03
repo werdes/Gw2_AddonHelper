@@ -232,6 +232,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonWelcomeStartText} ähnelt.
+        /// </summary>
+        public static string ButtonWelcomeStartText {
+            get {
+                return ResourceManager.GetString("ButtonWelcomeStartText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {ConflictsButtonBackText} ähnelt.
         /// </summary>
         public static string ConflictsButtonBackText {
@@ -561,6 +570,42 @@ namespace Gw2_AddonHelper.UI.Localization {
         public static string UncategorizedError {
             get {
                 return ResourceManager.GetString("UncategorizedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {WelcomeFindGameExecutableText} ähnelt.
+        /// </summary>
+        public static string WelcomeFindGameExecutableText {
+            get {
+                return ResourceManager.GetString("WelcomeFindGameExecutableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {WelcomeSelectLanguageText} ähnelt.
+        /// </summary>
+        public static string WelcomeSelectLanguageText {
+            get {
+                return ResourceManager.GetString("WelcomeSelectLanguageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {WelcomeSettingsHintText} ähnelt.
+        /// </summary>
+        public static string WelcomeSettingsHintText {
+            get {
+                return ResourceManager.GetString("WelcomeSettingsHintText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {WelcomeText} ähnelt.
+        /// </summary>
+        public static string WelcomeText {
+            get {
+                return ResourceManager.GetString("WelcomeText", resourceCulture);
             }
         }
         

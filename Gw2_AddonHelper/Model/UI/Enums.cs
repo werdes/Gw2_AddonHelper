@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace Gw2_AddonHelper.Model.UI
     {
         public enum UiState
         {
+            Welcome,
             Loading,
             AddonList,
             Installer,
@@ -18,6 +20,12 @@ namespace Gw2_AddonHelper.Model.UI
             Error,
             Conflicts,
             About
+        }
+
+        public enum UiFlag
+        {
+            [EnumMember(Value = "welcome_screen_dismissed")]
+            WelcomeScreenDismissed
         }
     }
 }

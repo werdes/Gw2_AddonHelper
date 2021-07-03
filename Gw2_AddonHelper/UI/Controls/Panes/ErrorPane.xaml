@@ -9,6 +9,9 @@
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
                       mc:Ignorable="d" 
                       d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <StackPanel Margin="40" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Image Source="/UI/Resources/Images/icon-warning.png" Width="100" Height="100" Margin="0,0,30,0"/>
@@ -17,13 +20,19 @@
                 <TextBlock TextWrapping="Wrap" Text="{Binding ErrorTitleText}" FontFamily="Segoe UI Light" FontSize="24" HorizontalAlignment="Left" Foreground="White"></TextBlock>
                 <TextBlock TextWrapping="Wrap" Text="{Binding ErrorMessageText}" FontFamily="Segoe UI Light" FontSize="16" HorizontalAlignment="Left" Foreground="White"></TextBlock>
 
-                <StackPanel Orientation="Horizontal">
-                    <Button fluent:PointerTracker.Enabled="True" Click="OnButtonRetryClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Content="{Binding Source={StaticResource Localization}, Path=ButtonRetryText}">
+                <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal">
+                    <Button Click="OnButtonRetryClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" Content="{Binding Source={StaticResource Localization}, Path=ButtonRetryText}">
                     </Button>
-                    <Button fluent:PointerTracker.Enabled="True" Click="OnButtonSettingsClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand">
+                    <Button Click="OnButtonSettingsClick" Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand">
                         <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                             <Image Height="10" Width="10" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
                             <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Visibility="{Binding AppUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}"  Margin="5,15,5,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Image Height="10" Width="10" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-appupdate.png" />
+                            <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonAppUpdateText}"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

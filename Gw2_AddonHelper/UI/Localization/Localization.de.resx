@@ -174,6 +174,9 @@
   <data name="ButtonUpdateText" xml:space="preserve">
     <value>Nach Updates suchen</value>
   </data>
+  <data name="ButtonWelcomeStartText" xml:space="preserve">
+    <value>Los geht's!</value>
+  </data>
   <data name="ConflictsButtonBackText" xml:space="preserve">
     <value>Zurück zur Addon-Liste</value>
   </data>
@@ -293,6 +296,18 @@
   </data>
   <data name="UncategorizedError" xml:space="preserve">
     <value>Unspezifizerter Fehler</value>
+  </data>
+  <data name="WelcomeFindGameExecutableText" xml:space="preserve">
+    <value>Das Wichtigste zuerst: Bitte suche unten deinen Guild Wars 2 Launcher. Die Datei heißt 'gw2-64.exe', du findest sie in deinem Guild Wars 2 Installationsordner.</value>
+  </data>
+  <data name="WelcomeSelectLanguageText" xml:space="preserve">
+    <value>Zweitens: Wähle die Sprache aus, in der dir diese Anwendung angezeigt wird:</value>
+  </data>
+  <data name="WelcomeSettingsHintText" xml:space="preserve">
+    <value>Du kannst diese Einstellungen später verändern, indem du im Hauptbildschirm auf "Einstellungen" klickst.</value>
+  </data>
+  <data name="WelcomeText" xml:space="preserve">
+    <value>Willkommen!</value>
   </data>
   <data name="WindowTitle" xml:space="preserve">
     <value>Guild Wars 2 Addon Helper</value>

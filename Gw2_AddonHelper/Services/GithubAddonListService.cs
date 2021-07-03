@@ -65,19 +65,25 @@ namespace Gw2_AddonHelper.Services
             if ((lastCheck <= checkThreshold || !File.Exists(storedFile)) &&
                 GithubRatelimitService.Instance.CanCall())
             {
+                _log.LogInformation($"Loading addon list from github");
 
                 //Check if a commit was made since last update -> commit sha changed
                 string currentSha = await GetCurrentRepositoryCommitSha();
+
+                _log.LogInformation($"Current repo version is [{currentSha}]");
                 if (currentSha != _addonList.CommitSha)
                 {
                     Uri zipBallUrl = new Uri(_config.GetValue<string>("githubAddonList:repositoryZipBallUrl"));
-                    
+                    _log.LogInformation($"Loading repo from [{zipBallUrl}]");
+
                     try
                     {
                         List<YamlAddonDescription> fileContents = await GetAddonDescriptionsFromZipBall(zipBallUrl);
 
                         foreach (YamlAddonDescription addonDescription in fileContents)
                         {
+
+                            _log.LogInformation($"Reading addon [{addonDescription.FileName}]");
                             try
                             {
                                 // more than 2 segments in addon description file path -> ignore the template file located in the repo root
@@ -100,6 +106,7 @@ namespace Gw2_AddonHelper.Services
                                     addon.LoaderKey = GetLoaderKey(addon);
 
                                     addons.Add(addon);
+                                    _log.LogInformation($"Addon added: [{addon.AddonId}]");
                                 }
                             }
                             catch (YamlException ex)
@@ -149,6 +156,10 @@ namespace Gw2_AddonHelper.Services
             {
                 loaderKey = customLoaderKey;
             }
+
+
+            _log.LogDebug($"Addon key for [{addon.AddonId}]: [{loaderKey}]");
+
             return loaderKey;
         }
 

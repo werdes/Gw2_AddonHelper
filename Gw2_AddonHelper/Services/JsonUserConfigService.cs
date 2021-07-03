@@ -37,6 +37,7 @@ namespace Gw2_AddonHelper.Services
 
             try
             {
+                _log.LogInformation($"Loading user config from [{configFile}]");
                 if (File.Exists(configFile))
                 {
                     string json = File.ReadAllText(configFile, Encoding.UTF8);
@@ -59,6 +60,7 @@ namespace Gw2_AddonHelper.Services
             string configFile = _configuration["userConfig"];
             try
             {
+                _log.LogInformation($"Storing user config to [{configFile}]");
                 string json = JsonConvert.SerializeObject(_userConfig, Formatting.Indented);
                 File.WriteAllText(configFile, json, Encoding.UTF8);
             }

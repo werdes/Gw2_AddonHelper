@@ -23,6 +23,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
     {
         public event RoutedEventHandler RetryClick;
         public event RoutedEventHandler SettingsClick;
+        public event RoutedEventHandler AppUpdateClick;
 
         public ErrorPane()
         {
@@ -32,5 +33,6 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
 
         protected void OnButtonRetryClick(object sender, RoutedEventArgs e) => RetryClick?.Invoke(sender, e);
         protected void OnButtonSettingsClick(object sender, RoutedEventArgs e) => SettingsClick?.Invoke(sender, e);
+        protected void OnButtonAppUpdateClick(object sender, RoutedEventArgs e) => AppUpdateClick?.Invoke(sender, e);
     }
 }

@@ -35,7 +35,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding UserConfig.GameLocation}" Style="{StaticResource TextBoxRevealStyle}" />
+                    <TextBox Grid.Column="0" IsReadOnly="True" Text="{Binding UserConfig.GameLocation}" Style="{StaticResource TextBoxRevealStyle}" />
                     <Button Grid.Column="1" fluent:PointerTracker.Enabled="True" Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsFindExecutableClick">
                         <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                             <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-open.png" />

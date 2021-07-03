@@ -132,7 +132,7 @@
             <StackPanel Grid.Row="1" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
                 <Button Visibility="{Binding AppUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,5" Height="50" VerticalAlignment="Bottom" Padding="10,3,10,3" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
+                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-appupdate.png" />
                         <TextBlock MaxWidth="140" TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=ButtonAppUpdateText}"/>
                     </StackPanel>
                 </Button>

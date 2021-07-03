@@ -12,8 +12,8 @@
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI"
                       mc:Ignorable="d"
                       Title="{Binding Source={StaticResource Localization}, Path=WindowTitle}" 
-                      Height="450"
-                      Width="800"
+                      Height="600"
+                      Width="950"
                       Loaded="OnWindowLoaded"
                       AcrylicWindowStyle="NoIcon"
                       TintColor="Black"
@@ -69,9 +69,14 @@
                 <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom.png" Stretch="Uniform" Opacity="0.4"/>
             </Border.Background>
         </Border>
-
         <controls:UiStatePaneContainer UiState="{Binding UiState}">
             <controls:UiStatePaneContainer.Panes>
+
+                <!-- Welcome Panel -->
+                <panes:WelcomePane x:Name="welcomePane" Visibility="Collapsed"
+                                   FindExecutableClick="OnButtonFindGameExecutableClick"
+                                   ContinueClick="OnButtonWelcomeContinueClick"/>
+
 
                 <!-- Loading Panel -->
                 <panes:LoadingPane x:Name="loadingPane" Visibility="Visible" />
@@ -93,7 +98,7 @@
                                      AddonInstall="OnAddonListItemInstall"
                                      AddonEnable="OnAddonListItemEnable"
                                      AddonDisable="OnAddonListItemDisable"
-                                     AddonRemove="OnAddonListItemRemove" />
+                                     AddonRemove="OnAddonListItemRemove"/>
 
 
                 <!-- Settings Panel -->

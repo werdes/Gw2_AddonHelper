@@ -41,13 +41,17 @@ namespace Gw2_AddonHelper.Services
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
+
                 Uri repoUrl = _config.GetValue<Uri>("selfUpdate:repoReleaseUrl");
+                _log.LogInformation($"Getting latest app version from [{repoUrl}]");
                 try
                 {
                     Release githubRelease = (await _gitHubClient.Connection.Get<Release>(repoUrl, TimeSpan.FromSeconds(30))).Body;
                     GithubRatelimitService.Instance.RegisterCall();
 
                     Version version = new Version(githubRelease.TagName);
+
+                    _log.LogInformation($"Latest app version is [{version}]");
                     return version;
                 }
                 catch (Exception ex) when (ex is NotFoundException or ArgumentNullException)
@@ -69,6 +73,7 @@ namespace Gw2_AddonHelper.Services
                 Uri repoUrl = _config.GetValue<Uri>("selfUpdate:repoReleaseUrl");
                 try
                 {
+                    _log.LogInformation($"Getting app update from [{repoUrl}]");
                     Release githubRelease = (await _gitHubClient.Connection.Get<Release>(repoUrl, TimeSpan.FromSeconds(30))).Body;
                     GithubRatelimitService.Instance.RegisterCall();
 
@@ -82,6 +87,7 @@ namespace Gw2_AddonHelper.Services
                     {
                         byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
                         await File.WriteAllBytesAsync(outputFileName, buffer);
+                        _log.LogInformation($"Stored update archive with [{buffer.Length}] bytes to [{outputFileName}]");
                     }
 
                     if (await SelfUpdateUpdater(outputFileName))
@@ -126,7 +132,7 @@ namespace Gw2_AddonHelper.Services
 
             try
             {
-
+                _log.LogInformation($"Updating self updater");
                 using (FileStream zipStream = File.OpenRead(zipPath))
                 {
                     using (ZipArchive zipArchive = new ZipArchive(zipStream))
@@ -147,6 +153,7 @@ namespace Gw2_AddonHelper.Services
                                     Directory.CreateDirectory(outputDirectory);
                                 }
 
+                                _log.LogInformation($"Extracting self updater to [{outputPath}]");
                                 await Task.Run(() => entry.ExtractToFile(outputPath, true));
                             }
                         }
