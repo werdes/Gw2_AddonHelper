@@ -27,7 +27,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1">
-            <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Version, Converter={StaticResource VersionToStringConverter}}" />
+            <controls:VersionNumberLabel Foreground="White" Opacity=".5" Margin="10,10,60,10" FontSize="12"/>
         </StackPanel>
 
         <!--Buttons-->

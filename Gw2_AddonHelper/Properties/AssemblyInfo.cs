@@ -13,5 +13,5 @@ using System.Windows;
 
 [assembly: AssemblyTitle("Guild Wars 2 Addon Helper")]
 [assembly: AssemblyProduct("Guild Wars 2 Addon Helper")]
-[assembly: AssemblyVersion("0.1.*")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyFileVersion("0.2.0.0")]

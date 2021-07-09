@@ -19,6 +19,23 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        private string _loaderKey;
+        private ObservableCollection<AddonFlag> _additionalFlags;
+        private ObservableCollection<string> _conflicts;
+        private ObservableCollection<string> _requiredAddons;
+        private string _pluginName;
+        private InstallMode _installMode;
+        private DownloadType _downloadType;
+        private Uri _versionUrl;
+        private Uri _hostUrl;
+        private HostType _hostType;
+        private string _tooltip;
+        private string _description;
+        private string _addonName;
+        private Uri _website;
+        private string _developer;
+        private string _addonId;
+
         public Addon()
         {
             _additionalFlags = new ObservableCollection<AddonFlag>();
@@ -26,7 +43,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             _conflicts = new ObservableCollection<string>();
         }
 
-        private string _addonId;
         [JsonProperty("addon_id")]
         [JsonPropertyName("addon_id")]
         public string AddonId
@@ -35,7 +51,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             set { _addonId = value; }
         }
 
-        private string _developer;
         [YamlMember(Alias = "developer")]
         [JsonProperty("developer")]
         [JsonPropertyName("developer")]
@@ -49,7 +64,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private Uri _website;
         [YamlMember(Alias = "website")]
         [JsonProperty("website")]
         [JsonPropertyName("website")]
@@ -63,7 +77,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private string _addonName;
         [YamlMember(Alias = "addon_name")]
         [JsonProperty("addon_name")]
         [JsonPropertyName("addon_name")]
@@ -77,7 +90,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private string _description;
         [YamlMember(Alias = "description")]
         [JsonProperty("description")]
         [JsonPropertyName("description")]
@@ -91,7 +103,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private string _tooltip;
         [YamlMember(Alias = "tooltip")]
         [JsonProperty("tooltip")]
         [JsonPropertyName("tooltip")]
@@ -105,7 +116,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private HostType _hostType;
         [YamlMember(Alias = "host_type")]
         [JsonProperty("host_type")]
         [JsonPropertyName("host_type")]
@@ -117,10 +127,10 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             {
                 _hostType = value;
                 Notify();
+                Notify(nameof(VersioningType));
             }
         }
 
-        private Uri _hostUrl;
         [YamlMember(Alias = "host_url")]
         [JsonProperty("host_url")]
         [JsonPropertyName("host_url")]
@@ -134,7 +144,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private Uri _versionUrl;
         [YamlMember(Alias = "version_url")]
         [JsonProperty("version_url")]
         [JsonPropertyName("version_url")]
@@ -145,10 +154,10 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             {
                 _versionUrl = value;
                 Notify();
+                Notify(nameof(VersioningType));
             }
         }
 
-        private DownloadType _downloadType;
         [YamlMember(Alias = "download_type")]
         [JsonProperty("download_type")]
         [JsonPropertyName("download_type")]
@@ -163,7 +172,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private InstallMode _installMode;
         [YamlMember(Alias = "install_mode")]
         [JsonProperty("install_mode")]
         [JsonPropertyName("install_mode")]
@@ -178,7 +186,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private string _pluginName;
         [YamlMember(Alias = "plugin_name")]
         [JsonProperty("plugin_name")]
         [JsonPropertyName("plugin_name")]
@@ -192,7 +199,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private ObservableCollection<string> _requiredAddons;
         [YamlMember(Alias = "requires")]
         [JsonProperty("required_addons")]
         [JsonPropertyName("required_addons")]
@@ -206,7 +212,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private ObservableCollection<string> _conflicts;
         [YamlMember(Alias = "conflicts")]
         [JsonProperty("conflicts")]
         [JsonPropertyName("conflicts")]
@@ -220,7 +225,6 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             }
         }
 
-        private ObservableCollection<AddonFlag> _additionalFlags;
         [YamlMember(Alias = "additional_flags")]
         [JsonProperty("additional_flags", ItemConverterType = typeof(StringEnumConverter))]
         [JsonPropertyName("additional_flags")]
@@ -230,24 +234,24 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
             {
                 _additionalFlags = value ?? new ObservableCollection<AddonFlag>(); ;
                 Notify();
+                Notify(nameof(VersioningType));
             }
         }
 
-        private VersioningType _versioningType;
         [JsonProperty("versioning_type")]
         [JsonPropertyName("versioning_type")]
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public VersioningType VersioningType
         {
-            get => _versioningType;
-            set
+            get
             {
-                _versioningType = value;
-                Notify();
+                if (HostType == HostType.Github) return VersioningType.GithubCommitSha;
+                if (HostType == HostType.Standalone && VersionUrl != null) return VersioningType.HostFileMd5;
+                if (HostType == HostType.Standalone && AdditionalFlags.Contains(AddonFlag.SelfUpdating)) return VersioningType.SelfUpdating;
+                return VersioningType.Unknown;
             }
         }
 
-        private string _loaderKey;
         [JsonProperty("loader_key")]
         [JsonPropertyName("loader_key")]
         public string LoaderKey
@@ -262,7 +266,7 @@ namespace Gw2_AddonHelper.AddonLib.Model.AddonList
 
         public override bool Equals(object obj)
         {
-            if(obj is Addon)
+            if (obj is Addon)
             {
                 return ((Addon)obj).AddonId == AddonId;
             }

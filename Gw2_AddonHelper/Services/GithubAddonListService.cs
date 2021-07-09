@@ -102,7 +102,6 @@ namespace Gw2_AddonHelper.Services
 
                                     Addon addon = yamlDeserializer.Deserialize<Addon>(addonDescriptionYamlContent);
                                     addon.AddonId = addonDescription.FileName.Split('/')[1];
-                                    addon.VersioningType = GetVersioningType(addon);
                                     addon.LoaderKey = GetLoaderKey(addon);
 
                                     addons.Add(addon);
@@ -161,19 +160,6 @@ namespace Gw2_AddonHelper.Services
             _log.LogDebug($"Addon key for [{addon.AddonId}]: [{loaderKey}]");
 
             return loaderKey;
-        }
-
-        /// <summary>
-        /// Returns the versioning type of the given addon
-        /// </summary>
-        /// <param name="addon"></param>
-        /// <returns></returns>
-        private VersioningType GetVersioningType(Addon addon)
-        {
-            if (addon.HostType == HostType.Github) return VersioningType.GithubCommitSha;
-            if (addon.HostType == HostType.Standalone && addon.VersionUrl != null) return VersioningType.HostFileMd5;
-            if (addon.HostType == HostType.Standalone && addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating)) return VersioningType.SelfUpdating;
-            return VersioningType.Unknown;
         }
 
         /// <summary>

@@ -54,7 +54,6 @@
             </StackPanel>
         </ScrollViewer>
 
-
         <!--Buttons-->
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="10,0,15,15">
             <Button Margin="0,0,0,0" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonContinueClick">
@@ -63,6 +62,7 @@
                     <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonWelcomeStartText}"/>
                 </StackPanel>
             </Button>
+            <controls:VersionNumberLabel Foreground="White" Opacity=".5" Margin="10,10,60,10" FontSize="12"/>
         </StackPanel>
     </Grid>
 </controls:UiStatePane>
