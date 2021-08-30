@@ -58,7 +58,7 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,0,5,5">
+        <StackPanel Grid.Column="1" Grid.Row="1" Margin="10,0,5,5">
             <TextBlock TextOptions.TextRenderingMode="Aliased" TextWrapping="Wrap" FontFamily="Segoe UI Light" FontSize="12" Foreground="White" Text="{Binding AddonContainer.Addon.Description, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity=".6"/>
         </StackPanel>
         <StackPanel Grid.Column="1" fluent:PointerTracker.Enabled="True" Visibility="{Binding ShowActions, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Row="2" Margin="0,2,5,5">
