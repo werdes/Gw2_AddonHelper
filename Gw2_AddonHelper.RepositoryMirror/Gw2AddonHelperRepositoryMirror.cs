@@ -23,14 +23,14 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace Gw2_AddonHelper.UpdateCheck
 {
-    public class Gw2AddonHelperUpdateCheck
+    public class Gw2AddonHelperRepositoryMirror
     {
         private ILogger _log;
         private IConfiguration _config;
 
-        public Gw2AddonHelperUpdateCheck()
+        public Gw2AddonHelperRepositoryMirror()
         {
-            _log = Program.ServiceProvider.GetService<ILogger<Gw2AddonHelperUpdateCheck>>();
+            _log = Program.ServiceProvider.GetService<ILogger<Gw2AddonHelperRepositoryMirror>>();
             _config = Program.ServiceProvider.GetService<IConfiguration>();
 
             Task.WaitAll(Run());
@@ -63,7 +63,7 @@ namespace Gw2_AddonHelper.UpdateCheck
                         versionContainer.Versions.Add(addon.AddonId, await downloader.GetLatestVersion());
                     }
 
-                    string[] files = _config.GetSection("outputPath").Get<string[]>();
+                    string[] files = _config.GetSection("updatesOutputPath").Get<string[]>();
                     foreach (string outputFile in files)
                     {
                         _log.LogInformation($"Writing output [{outputFile}]");

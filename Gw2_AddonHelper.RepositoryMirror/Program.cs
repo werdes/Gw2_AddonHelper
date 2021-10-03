@@ -19,7 +19,7 @@ namespace Gw2_AddonHelper.UpdateCheck
 
             ServiceProvider = services.BuildServiceProvider();
             Lib.ServiceProvider = ServiceProvider;
-            new Gw2AddonHelperUpdateCheck();
+            new Gw2AddonHelperRepositoryMirror();
         }
 
 

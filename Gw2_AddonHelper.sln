@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper", "Gw2_AddonHelper\Gw2_AddonHelper.csproj", "{8A249464-C83B-40D2-B292-B6173632A5A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.UpdateCheck", "Gw2_AddonHelper.UpdateCheck\Gw2_AddonHelper.UpdateCheck.csproj", "{ADEE470E-8B92-437E-8217-E7846B6C9D89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.UpdateCheck", "Gw2_AddonHelper.RepositoryMirror\Gw2_AddonHelper.RepositoryMirror.csproj", "{ADEE470E-8B92-437E-8217-E7846B6C9D89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gw2_AddonHelper.AddonLib", "Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj", "{D3437E6B-2D9A-4DB8-B1EF-055CC86DCEDE}"
 EndProject
