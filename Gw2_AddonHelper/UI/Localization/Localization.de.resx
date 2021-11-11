@@ -144,8 +144,14 @@
   <data name="ButtonCancelText" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="ButtonDisableAllText" xml:space="preserve">
+    <value>Alle deaktivieren</value>
+  </data>
   <data name="ButtonDisableText" xml:space="preserve">
     <value>Deaktivieren</value>
+  </data>
+  <data name="ButtonEnableAllText" xml:space="preserve">
+    <value>Alle aktivieren</value>
   </data>
   <data name="ButtonEnableText" xml:space="preserve">
     <value>Aktivieren</value>
@@ -170,6 +176,9 @@
   </data>
   <data name="ButtonSettingsText" xml:space="preserve">
     <value>Einstellungen</value>
+  </data>
+  <data name="ButtonUninstallAllText" xml:space="preserve">
+    <value>Alle entfernen</value>
   </data>
   <data name="ButtonUpdateText" xml:space="preserve">
     <value>Nach Updates suchen</value>

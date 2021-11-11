@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gw2_AddonHelper.Common.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;

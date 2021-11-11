@@ -1,6 +1,7 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.Exceptions;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.AddonLib.Utility.Github;
+using Gw2_AddonHelper.Common.Utility.Github;
+using Gw2_AddonHelper.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Octokit;
 using System;
@@ -14,7 +15,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
     {
         private GitHubClient _gitHubClient;
 
-        public GithubAddonDownloader(Model.AddonList.Addon addon) : base(addon)
+        public GithubAddonDownloader(Common.Model.AddonList.Addon addon) : base(addon)
         {
             _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>(); 
         }

@@ -10,7 +10,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
 {
     public class StandaloneAddonDownloader : BaseAddonDownloader, IAddonDownloader
     {        
-        public StandaloneAddonDownloader(Model.AddonList.Addon addon) : base(addon)
+        public StandaloneAddonDownloader(Common.Model.AddonList.Addon addon) : base(addon)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
             byte[] fileContent = await WebClient.DownloadDataTaskAsync(_addon.HostUrl);
             
             string version = DateTime.UtcNow.ToString("s");
-            if (_addon.VersioningType == Model.VersioningType.HostFileMd5)
+            if (_addon.VersioningType == Common.Model.VersioningType.HostFileMd5)
             {
                 version = (await WebClient.DownloadStringTaskAsync(_addon.VersionUrl)).Split(' ').First();
             }
@@ -44,7 +44,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         /// <returns></returns>
         public async Task<string> GetLatestVersion()
         {
-            if(_addon.VersioningType == Model.VersioningType.HostFileMd5)
+            if(_addon.VersioningType == Common.Model.VersioningType.HostFileMd5)
             {
                 string latestVersionHash = await WebClient.DownloadStringTaskAsync(_addon.VersionUrl);
                 return latestVersionHash.Split(' ').FirstOrDefault();

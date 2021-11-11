@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
+using Gw2_AddonHelper.Common.Model;
 using SourceChord.FluentWPF;
 using System;
 using System.Collections.Generic;

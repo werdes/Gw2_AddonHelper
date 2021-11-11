@@ -15,4 +15,8 @@
     <PackageReference Include="YamlDotNet" Version="11.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Gw2_AddonHelper.Common\Gw2_AddonHelper.Common.csproj" />
+  </ItemGroup>
+
 </Project>

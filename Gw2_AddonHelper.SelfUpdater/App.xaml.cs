@@ -1,4 +1,4 @@
-﻿using Gw2_AddonHelper.AddonLib.Extensions;
+﻿using Gw2_AddonHelper.Common.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

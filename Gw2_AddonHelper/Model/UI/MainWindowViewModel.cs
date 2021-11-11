@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Gw2_AddonHelper.Model.UI;
 using System;
+using Gw2_AddonHelper.Common.Model;
 
 namespace Gw2_AddonHelper.Model.UI
 {
@@ -27,6 +28,7 @@ namespace Gw2_AddonHelper.Model.UI
         private string _errorTitleText;
         private bool _appUpdateAvailable;
         private bool _installerProgressCancelEnabled;
+        private AddonListSource _addonListSource;
 
         public MainWindowViewModel()
         {
@@ -152,6 +154,16 @@ namespace Gw2_AddonHelper.Model.UI
             set
             {
                 _installerProgressCancelEnabled = value;
+                Notify();
+            }
+        }
+
+        public AddonListSource AddonListSource
+        {
+            get => _addonListSource;
+            set
+            {
+                _addonListSource = value;
                 Notify();
             }
         }

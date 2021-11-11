@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
+using Gw2_AddonHelper.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public static class AddonInstallerFactory
     {
-        public static IAddonInstaller GetInstaller(Model.AddonList.Addon addon, string gamePath)
+        public static IAddonInstaller GetInstaller(Common.Model.AddonList.Addon addon, string gamePath)
         {
             switch (addon.InstallMode)
             {

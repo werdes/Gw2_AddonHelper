@@ -1,4 +1,4 @@
-﻿using Gw2_AddonHelper.AddonLib;
+﻿using Gw2_AddonHelper.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,7 +18,13 @@ namespace Gw2_AddonHelper.UpdateCheck
             ConfigureServices(services);
 
             ServiceProvider = services.BuildServiceProvider();
-            Lib.ServiceProvider = ServiceProvider;
+            AddonLib.Lib.ServiceProvider = ServiceProvider;
+            Services.Lib.ServiceProvider = ServiceProvider;
+            Common.Lib.ServiceProvider = ServiceProvider;
+
+            IUserConfigService userConfigService = ServiceProvider.GetService<IUserConfigService>();
+            userConfigService.Load();
+
             new Gw2AddonHelperRepositoryMirror();
         }
 
@@ -50,6 +56,8 @@ namespace Gw2_AddonHelper.UpdateCheck
 
             services.AddSingleton(configuration);
             services.AddSingleton(githubClient);
+            services.AddSingleton<IAddonListService, Services.GithubAddonListService>();
+            services.AddSingleton<IUserConfigService, Services.JsonUserConfigService>();
         }
     }
 }

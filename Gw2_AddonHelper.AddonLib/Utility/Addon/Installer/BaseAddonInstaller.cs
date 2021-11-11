@@ -14,9 +14,9 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         protected string _gamePath;
         protected ILogger<BaseAddonInstaller> _log;
 
-        protected Model.AddonList.Addon _addon;
+        protected Common.Model.AddonList.Addon _addon;
 
-        public BaseAddonInstaller(Model.AddonList.Addon addon, string gamePath)
+        public BaseAddonInstaller(Common.Model.AddonList.Addon addon, string gamePath)
         {
             _config = Lib.ServiceProvider.GetService<IConfiguration>();
             _log = Lib.ServiceProvider.GetService<ILogger<BaseAddonInstaller>>();

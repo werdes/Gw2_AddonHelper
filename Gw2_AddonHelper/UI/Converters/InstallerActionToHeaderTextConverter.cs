@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
+using Gw2_AddonHelper.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

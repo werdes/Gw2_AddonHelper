@@ -24,6 +24,7 @@
     <None Remove="UI\Resources\app.ico" />
     <None Remove="UI\Resources\Images\app.png" />
     <None Remove="UI\Resources\Images\bottom.png" />
+    <None Remove="UI\Resources\Images\bottom_eod.png" />
     <None Remove="UI\Resources\Images\icon-appupdate.png" />
     <None Remove="UI\Resources\Images\icon-back.png" />
     <None Remove="UI\Resources\Images\icon-checked.png" />
@@ -46,6 +47,7 @@
     <None Remove="UI\Resources\Images\icon-update.png" />
     <None Remove="UI\Resources\Images\icon-update2.png" />
     <None Remove="UI\Resources\Images\icon-warning.png" />
+    <None Remove="UI\Resources\Images\left_eod.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,12 +63,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj" />
+    <ProjectReference Include="..\Gw2_AddonHelper.Services\Gw2_AddonHelper.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="UI\Resources\app.ico" />
     <Resource Include="UI\Resources\Images\app.png" />
     <Resource Include="UI\Resources\Images\bottom.png" />
+    <Resource Include="UI\Resources\Images\bottom_eod.png" />
     <Resource Include="UI\Resources\Images\icon-appupdate.png" />
     <Resource Include="UI\Resources\Images\icon-back.png" />
     <Resource Include="UI\Resources\Images\icon-checked.png" />
@@ -89,6 +93,7 @@
     <Resource Include="UI\Resources\Images\icon-update.png" />
     <Resource Include="UI\Resources\Images\icon-update2.png" />
     <Resource Include="UI\Resources\Images\icon-warning.png" />
+    <Resource Include="UI\Resources\Images\left_eod.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,5 @@
-﻿using Gw2_AddonHelper.AddonLib.Extensions;
-using Gw2_AddonHelper.AddonLib.Model.SelfUpdate;
+﻿using Gw2_AddonHelper.AddonLib.Model.SelfUpdate;
+using Gw2_AddonHelper.Common.Extensions;
 using Gw2_AddonHelper.SelfUpdater.Model.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

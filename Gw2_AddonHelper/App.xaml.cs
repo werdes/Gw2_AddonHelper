@@ -1,5 +1,4 @@
 ﻿using Gw2_AddonHelper.Model.UserConfig;
-using Gw2_AddonHelper.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -34,6 +33,8 @@ namespace Gw2_AddonHelper
 
             ServiceProvider = services.BuildServiceProvider();
             AddonLib.Lib.ServiceProvider = ServiceProvider;
+            Services.Lib.ServiceProvider = ServiceProvider;
+            Common.Lib.ServiceProvider = ServiceProvider;
 
             _log = ServiceProvider.GetService<ILogger<App>>();
 
@@ -110,13 +111,13 @@ namespace Gw2_AddonHelper
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
-
             services.AddSingleton(configuration);
             services.AddSingleton(gitHubClient);
-            services.AddSingleton<IAddonListService, GithubAddonListService>();
-            services.AddSingleton<IAddonGameStateService, AddonGameStateService>();
-            services.AddSingleton<IUserConfigService, JsonUserConfigService>();
-            services.AddSingleton<IAppUpdaterService, AddonHelperAppUpdateService>();
+            services.AddSingleton<Services.GithubAddonListService>();
+            services.AddSingleton<Services.RepositoryMirrorAddonListService>();
+            services.AddSingleton<IAddonGameStateService, Services.AddonGameStateService>();
+            services.AddSingleton<IUserConfigService, Services.JsonUserConfigService>();
+            services.AddSingleton<IAppUpdaterService, Services.AddonHelperAppUpdateService>();
 
             services.AddTransient<UI.MainWindow>();
         }

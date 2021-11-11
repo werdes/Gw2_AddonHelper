@@ -13,7 +13,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor
     public class ArchiveAddonExtractor : BaseAddonExtractor, IAddonExtractor
     {
 
-        public ArchiveAddonExtractor(Model.AddonList.Addon addon) : base(addon)
+        public ArchiveAddonExtractor(Common.Model.AddonList.Addon addon) : base(addon)
         {
         }
 

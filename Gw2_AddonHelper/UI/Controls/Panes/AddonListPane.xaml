@@ -14,6 +14,9 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:InstallStateToDescriptionConverter x:Key="InstallStateToDescriptionConverter" />
         <converters:NumberToAddonListGroupAddonQuantityFormConverter x:Key="NumberToAddonListGroupAddonQuantityFormConverter" />
+        <converters:InstallStateToBatchUninstallButtonVisibilityConverter x:Key="InstallStateToBatchUninstallButtonVisibilityConverter" />
+        <converters:InstallStateToBatchEnableButtonVisibilityConverter x:Key="InstallStateToBatchEnableButtonVisibilityConverter" />
+        <converters:InstallStateToBatchDisableButtonVisibilityConverter x:Key="InstallStateToBatchDisableButtonVisibilityConverter" />
 
 
         <CollectionViewSource x:Key="AddonContainersByInstallState" Source="{Binding Path=AddonContainers, Mode=TwoWay}">
@@ -81,16 +84,23 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type GroupItem}">
                                             <StackPanel Margin="0,0,0,30" Orientation="Vertical">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="18" Margin="5,5,20,10" Padding="0" Foreground="White">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} ({1} {2})">
+                                                                <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
+                                                                <Binding Path="ItemCount" />
+                                                                <Binding Source="{StaticResource Localization}" Path="AddonListGroupAddonPlural"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
 
-                                                <TextBlock TextOptions.TextRenderingMode="Aliased" FontFamily="Segoe UI Light" FontSize="18" Margin="5,5,0,10" Padding="0" Foreground="White">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="{}{0} ({1} {2})">
-                                                            <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
-                                                            <Binding Path="ItemCount" />
-                                                            <Binding Source="{StaticResource Localization}" Path="AddonListGroupAddonPlural"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
+                                                    <Button Click="OnAddonBatchEnableClick" Tag="{Binding Name}" Visibility="{Binding Name, Converter={StaticResource InstallStateToBatchEnableButtonVisibilityConverter}}" Margin="0,5,5,10" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000" Content="{Binding Source={StaticResource Localization}, Path=ButtonEnableAllText}" />
+
+                                                    <Button Click="OnAddonBatchDisableClick" Tag="{Binding Name}" Visibility="{Binding Name, Converter={StaticResource InstallStateToBatchDisableButtonVisibilityConverter}}" Margin="0,5,5,10" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000" Content="{Binding Source={StaticResource Localization}, Path=ButtonDisableAllText}" />
+
+                                                    <Button Click="OnAddonBatchUninstallClick" Tag="{Binding Name}" Visibility="{Binding Name, Converter={StaticResource InstallStateToBatchUninstallButtonVisibilityConverter}}" Margin="0,5,5,10" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000" Content="{Binding Source={StaticResource Localization}, Path=ButtonUninstallAllText}" />
+                                                </StackPanel>
                                                 <ItemsPresenter />
                                             </StackPanel>
                                         </ControlTemplate>

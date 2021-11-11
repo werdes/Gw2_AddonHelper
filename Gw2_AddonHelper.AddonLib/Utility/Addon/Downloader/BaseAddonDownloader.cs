@@ -8,14 +8,14 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
     {
         private WebClient _webClient;
         protected ILogger<BaseAddonDownloader> _log;
-        protected Model.AddonList.Addon _addon;
+        protected Common.Model.AddonList.Addon _addon;
 
         protected WebClient WebClient
         {
             get => _webClient;
         }
 
-        public BaseAddonDownloader(Model.AddonList.Addon addon)
+        public BaseAddonDownloader(Common.Model.AddonList.Addon addon)
         {
             _log = Lib.ServiceProvider.GetService<ILogger<BaseAddonDownloader>>();
 

@@ -10,7 +10,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor
 {
     public class DllAddonExtractor : BaseAddonExtractor, IAddonExtractor
     {
-        public DllAddonExtractor(Model.AddonList.Addon addon) : base(addon)
+        public DllAddonExtractor(Common.Model.AddonList.Addon addon) : base(addon)
         {
         }
 

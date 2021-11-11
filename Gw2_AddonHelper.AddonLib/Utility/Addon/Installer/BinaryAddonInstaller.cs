@@ -14,7 +14,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public class BinaryAddonInstaller : BaseAddonInstaller, IAddonInstaller
     {
-        public BinaryAddonInstaller(Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
+        public BinaryAddonInstaller(Common.Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
         {
         }
 

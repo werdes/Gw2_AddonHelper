@@ -1,4 +1,5 @@
-﻿using Gw2_AddonHelper.AddonLib.Model.AddonList;
+﻿using Gw2_AddonHelper.Common.Model;
+using Gw2_AddonHelper.Common.Model.AddonList;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;

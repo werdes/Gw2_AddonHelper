@@ -66,7 +66,8 @@
                 </LinearGradientBrush>
             </Border.OpacityMask>
             <Border.Background>
-                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom.png" Stretch="Uniform" Opacity="0.4"/>
+                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom_eod.png" Stretch="Uniform" Opacity="0.4">
+                </ImageBrush>
             </Border.Background>
         </Border>
         <controls:UiStatePaneContainer UiState="{Binding UiState}">
@@ -98,7 +99,8 @@
                                      AddonInstall="OnAddonListItemInstall"
                                      AddonEnable="OnAddonListItemEnable"
                                      AddonDisable="OnAddonListItemDisable"
-                                     AddonRemove="OnAddonListItemRemove"/>
+                                     AddonRemove="OnAddonListItemRemove"
+                                     AddonBatchAction="OnAddonListBatchAction"/>
 
 
                 <!-- Settings Panel -->

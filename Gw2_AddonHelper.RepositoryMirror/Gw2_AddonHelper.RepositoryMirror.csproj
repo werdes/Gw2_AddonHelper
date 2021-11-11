@@ -37,5 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj" />
+    <ProjectReference Include="..\Gw2_AddonHelper.Services\Gw2_AddonHelper.Services.csproj" />
   </ItemGroup>
 </Project>

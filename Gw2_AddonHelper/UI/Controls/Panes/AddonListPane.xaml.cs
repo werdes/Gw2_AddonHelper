@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Gw2_AddonHelper.Common.Model;
 
 namespace Gw2_AddonHelper.UI.Controls.Panes
 {
@@ -37,6 +38,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         public event EventHandler<AddonEventArgs> AddonRemove;
         public event EventHandler<AddonEventArgs> AddonEnable;
         public event EventHandler<AddonEventArgs> AddonDisable;
+        public event EventHandler<AddonListBatchActionEventArgs> AddonBatchAction;
 
         public AddonListPane()
         {
@@ -55,6 +57,9 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         protected void OnAddonListItemRemove(object sender, AddonEventArgs e) => AddonRemove?.Invoke(sender, e);
         protected void OnAddonListItemEnable(object sender, AddonEventArgs e) => AddonEnable?.Invoke(sender, e);
         protected void OnAddonListItemDisable(object sender, AddonEventArgs e) => AddonDisable?.Invoke(sender, e);
+        protected void OnAddonBatchEnableClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Enable, sender, e);
+        protected void OnAddonBatchDisableClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Disable, sender, e);
+        protected void OnAddonBatchUninstallClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Uninstall, sender, e);
 
 
         /// <summary>
@@ -84,6 +89,36 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
                             var point = desiredItem.TranslatePoint(new Point(), itemsControl);
                             scrollviewerAddonListAddonItems.ScrollToVerticalOffset(point.Y);
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogCritical(ex, $"Finding scroll point");
+                UiError?.Invoke(this, new UiErrorEventArgs(ex, Localization.Localization.UncategorizedError));
+            }
+        }
+
+        /// <summary>
+        /// Invokes the AddonBatchAction event
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandleBatchAction(AddonBatchAction action, object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                InstallState installState;
+
+                if (e.Source is Button)
+                {
+                    Button senderButton = (Button)e.Source;
+                    string installStateName = senderButton.Tag.ToString();
+
+                    if (Enum.TryParse(installStateName, out installState))
+                    {
+                        AddonBatchAction?.Invoke(this, new AddonListBatchActionEventArgs(action, installState));
                     }
                 }
             }

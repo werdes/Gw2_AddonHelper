@@ -13,7 +13,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public class AddonLoaderAddonInstaller : BaseAddonInstaller, IAddonInstaller
     {
-        public AddonLoaderAddonInstaller(Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
+        public AddonLoaderAddonInstaller(Common.Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
         {
         }
 

@@ -1,4 +1,4 @@
-﻿using Gw2_AddonHelper.AddonLib.Extensions;
+﻿using Gw2_AddonHelper.Common.Extensions;
 using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.AddonList;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
@@ -22,7 +22,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Gw2_AddonHelper.AddonLib.Utility.Github;
+using Gw2_AddonHelper.Common.Utility.Github;
+using Gw2_AddonHelper.Common.Model.AddonList;
+using Gw2_AddonHelper.Common.Model;
+using Gw2_AddonHelper.Services;
 
 namespace Gw2_AddonHelper.UI
 {
@@ -35,10 +38,11 @@ namespace Gw2_AddonHelper.UI
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
         private ILogger<MainWindow> _log;
+        private IAddonListService _addonListService;
 
         private bool _initializationFinished = false;
 
-        public MainWindow(IConfiguration config, ILogger<MainWindow> log, IAddonListService addonListManager, IUserConfigService userConfigService)
+        public MainWindow(IConfiguration config, ILogger<MainWindow> log, IUserConfigService userConfigService)
         {
             InitializeComponent();
 
@@ -71,7 +75,7 @@ namespace Gw2_AddonHelper.UI
                 _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
                 _viewModel.AppUpdateAvailable = await CheckAppUpdateAvailable();
 
-                if (_userConfigService.GetConfig().UiFlags.Contains(Enums.UiFlag.WelcomeScreenDismissed))
+                if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
                 {
                     await InitializeUi();
                 }
@@ -164,13 +168,12 @@ namespace Gw2_AddonHelper.UI
 
                 if (CheckGamePath())
                 {
-                    IAddonListService addonListService = App.ServiceProvider.GetService<IAddonListService>();
                     IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
-                    List<Addon> lstAddons = await addonListService.GetAddonsAsync();
-                    addonListService.Store();
+                    List<Addon> lstAddons = await LoadAddons();
+                    VersionContainer versionContainer = await _addonListService.GetVersions();
 
-                    List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons)).OrderByDescending(x => x.SortKey).ToList();
+                    List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons, versionContainer)).OrderByDescending(x => x.SortKey).ToList();
                     _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
                     _viewModel.UiState = Enums.UiState.AddonList;
                 }
@@ -184,6 +187,34 @@ namespace Gw2_AddonHelper.UI
                 SetUiError(ex, Localization.Localization.UiErrorWarning);
                 _log.LogCritical(ex, $"Initializing UI");
             }
+        }
+
+        /// <summary>
+        /// Loads addons from either repo mirror or github
+        /// </summary>
+        /// <returns></returns>
+        private async Task<List<Addon>> LoadAddons()
+        {
+            List<Addon> addons = new List<Addon>();
+            DateTime minCrawlTime = DateTime.UtcNow - _config.GetValue<TimeSpan>("repositoryMirrorAddonList:maxAge");
+
+            //Try first with repo mirror service
+            _addonListService = App.ServiceProvider.GetService<RepositoryMirrorAddonListService>();
+            addons = await _addonListService.GetAddonsAsync();
+            _viewModel.AddonListSource = AddonListSource.RepositorMirror;
+            
+            if (await _addonListService.GetListTimestamp() < minCrawlTime)
+            {
+                _log.LogInformation("Repo mirror is outdated, loading from GitHub");
+                _addonListService = App.ServiceProvider.GetService<GithubAddonListService>();
+                addons = await _addonListService.GetAddonsAsync();
+
+                _viewModel.AddonListSource = AddonListSource.GitHub;
+            }
+
+            await _addonListService.Store();
+
+            return addons;
         }
 
         /// <summary>
@@ -239,7 +270,7 @@ namespace Gw2_AddonHelper.UI
             try
             {
                 IUserConfigService userConfigService = App.ServiceProvider.GetService<IUserConfigService>();
-                userConfigService.GetConfig().UiFlags.Add(Enums.UiFlag.WelcomeScreenDismissed);
+                userConfigService.GetConfig().UiFlags.Add(UiFlag.WelcomeScreenDismissed);
                 userConfigService.Store();
 
                 await InitializeUi();
@@ -342,40 +373,7 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                _log.LogDebug($"Installing [{e.AddonContainer.Addon.AddonId}]");
-                IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
-
-                HashSet<AddonContainer> requiredAddons = new HashSet<AddonContainer>();
-                await addonGameStateService.GetParentAddons(_viewModel.AddonContainers.ToList(), e.AddonContainer, requiredAddons);
-
-                HashSet<AddonContainer> installableAddons = requiredAddons.Where(x => x.InstallState != InstallState.InstalledEnabled && x.InstallState != InstallState.InstalledDisabled).ToHashSet();
-                installableAddons.Add(e.AddonContainer);
-
-                HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
-
-
-                List<AddonContainer> installedAddons = installableAddons.ToList();
-                installedAddons.AddRange(enableableAddons);
-
-
-                IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);
-                if (addonConflicts.Count() == 0)
-                {
-                    _log.LogInformation($"Required addons for [{e.AddonContainer.Addon.AddonId}]:");
-                    _log.LogObject(installableAddons);
-
-                    _viewModel.AddonInstallActions.Clear();
-                    _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
-                    _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
-
-                    _viewModel.UiState = Enums.UiState.Installer;
-                }
-                else
-                {
-                    _viewModel.AddonConflicts.Clear();
-                    _viewModel.AddonConflicts.AddRange(addonConflicts);
-                    _viewModel.UiState = Enums.UiState.Conflicts;
-                }
+                await InstallAddon(e.AddonContainer);
             }
             catch (Exception ex)
             {
@@ -393,22 +391,7 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                _log.LogDebug($"Removing [{e.AddonContainer.Addon.AddonId}]");
-                IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
-
-                HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
-                await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), e.AddonContainer, childAddons);
-
-                HashSet<AddonContainer> removableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled || x.InstallState == InstallState.InstalledDisabled).ToHashSet();
-                removableAddons.Add(e.AddonContainer);
-
-                _log.LogInformation($"Removable addons for [{e.AddonContainer.Addon.AddonId}]:");
-                _log.LogObject(removableAddons);
-
-                _viewModel.AddonInstallActions.Clear();
-                _viewModel.AddonInstallActions.AddRange(removableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Remove)));
-
-                _viewModel.UiState = Enums.UiState.Installer;
+                await RemoveAddon(e.AddonContainer);
 
             }
             catch (Exception ex)
@@ -427,23 +410,7 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                _log.LogDebug($"Disabling [{e.AddonContainer.Addon.AddonId}]");
-                IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
-
-                HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
-                await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), e.AddonContainer, childAddons);
-
-                HashSet<AddonContainer> disableableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
-                disableableAddons.Add(e.AddonContainer);
-                HashSet<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
-
-                _log.LogInformation($"Disableable addons for [{e.AddonContainer.Addon.AddonId}]:");
-                _log.LogObject(disableableAddons);
-
-                _viewModel.AddonInstallActions.Clear();
-                _viewModel.AddonInstallActions.AddRange(disableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Disable)));
-
-                _viewModel.UiState = Enums.UiState.Installer;
+                await DisableAddon(e.AddonContainer);
             }
             catch (Exception ex)
             {
@@ -461,38 +428,7 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                _log.LogDebug($"Enabling [{e.AddonContainer.Addon.AddonId}]");
-                IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
-
-                HashSet<AddonContainer> requiredAddons = new HashSet<AddonContainer>();
-                await addonGameStateService.GetParentAddons(_viewModel.AddonContainers.ToList(), e.AddonContainer, requiredAddons);
-
-                HashSet<AddonContainer> installableAddons = requiredAddons.Where(x => x.InstallState != InstallState.InstalledEnabled && x.InstallState != InstallState.InstalledDisabled).ToHashSet();
-
-                HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
-                enableableAddons.Add(e.AddonContainer);
-
-                List<AddonContainer> installedAddons = installableAddons.ToList();
-                installedAddons.AddRange(enableableAddons);
-
-                IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);
-                if (addonConflicts.Count() == 0)
-                {
-                    _log.LogInformation($"Required addons for [{e.AddonContainer.Addon.AddonId}]:");
-                    _log.LogObject(installableAddons);
-
-                    _viewModel.AddonInstallActions.Clear();
-                    _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
-                    _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
-
-                    _viewModel.UiState = Enums.UiState.Installer;
-                }
-                else
-                {
-                    _viewModel.AddonConflicts.Clear();
-                    _viewModel.AddonConflicts.AddRange(addonConflicts);
-                    _viewModel.UiState = Enums.UiState.Conflicts;
-                }
+                await EnableAddon(e.AddonContainer);
             }
             catch (Exception ex)
             {
@@ -500,6 +436,247 @@ namespace Gw2_AddonHelper.UI
                 _log.LogCritical(ex, $"Enabling [{e.AddonContainer?.Addon?.AddonId}]");
             }
         }
+
+        /// <summary>
+        /// Removes an addon
+        /// </summary>
+        /// <param name="addonContainer"></param>
+        /// <returns></returns>
+        private async Task RemoveAddon(AddonContainer addonContainer)
+        {
+            _log.LogDebug($"Removing [{addonContainer.Addon.AddonId}]");
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+
+            HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
+            await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), addonContainer, childAddons);
+
+            HashSet<AddonContainer> removableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled || x.InstallState == InstallState.InstalledDisabled).ToHashSet();
+            removableAddons.Add(addonContainer);
+
+            _log.LogInformation($"Removable addons for [{addonContainer.Addon.AddonId}]:");
+            _log.LogObject(removableAddons);
+
+            _viewModel.AddonInstallActions.Clear();
+            _viewModel.AddonInstallActions.AddRange(removableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Remove)));
+
+            _viewModel.UiState = Enums.UiState.Installer;
+        }
+
+        /// <summary>
+        /// Disables an addon
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task DisableAddon(AddonContainer addonContainer)
+        {
+            _log.LogDebug($"Disabling [{addonContainer.Addon.AddonId}]");
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+
+            HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
+            await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), addonContainer, childAddons);
+
+            HashSet<AddonContainer> disableableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
+            disableableAddons.Add(addonContainer);
+            HashSet<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
+
+            _log.LogInformation($"Disableable addons for [{addonContainer.Addon.AddonId}]:");
+            _log.LogObject(disableableAddons);
+
+            _viewModel.AddonInstallActions.Clear();
+            _viewModel.AddonInstallActions.AddRange(disableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Disable)));
+
+            _viewModel.UiState = Enums.UiState.Installer;
+        }
+
+        /// <summary>
+        /// Enables an Addon
+        /// </summary>
+        /// <param name="addonContainer"></param>
+        /// <returns></returns>
+        private async Task EnableAddon(AddonContainer addonContainer)
+        {
+            _log.LogDebug($"Enabling [{addonContainer.Addon.AddonId}]");
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+
+            HashSet<AddonContainer> requiredAddons = new HashSet<AddonContainer>();
+            await addonGameStateService.GetParentAddons(_viewModel.AddonContainers.ToList(), addonContainer, requiredAddons);
+
+            HashSet<AddonContainer> installableAddons = requiredAddons.Where(x => x.InstallState != InstallState.InstalledEnabled && x.InstallState != InstallState.InstalledDisabled).ToHashSet();
+
+            HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
+            enableableAddons.Add(addonContainer);
+
+            List<AddonContainer> installedAddons = installableAddons.ToList();
+            installedAddons.AddRange(enableableAddons);
+
+            IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);
+            if (addonConflicts.Count() == 0)
+            {
+                _log.LogInformation($"Required addons for [{addonContainer.Addon.AddonId}]:");
+                _log.LogObject(installableAddons);
+
+                _viewModel.AddonInstallActions.Clear();
+                _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
+                _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
+
+                _viewModel.UiState = Enums.UiState.Installer;
+            }
+            else
+            {
+                _viewModel.AddonConflicts.Clear();
+                _viewModel.AddonConflicts.AddRange(addonConflicts);
+                _viewModel.UiState = Enums.UiState.Conflicts;
+            }
+        }
+
+
+        /// <summary>
+        /// Installs an addon
+        /// </summary>
+        /// <param name="addonContainer"></param>
+        /// <returns></returns>
+        private async Task InstallAddon(AddonContainer addonContainer)
+        {
+            _log.LogDebug($"Installing [{addonContainer.Addon.AddonId}]");
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+
+            HashSet<AddonContainer> requiredAddons = new HashSet<AddonContainer>();
+            await addonGameStateService.GetParentAddons(_viewModel.AddonContainers.ToList(), addonContainer, requiredAddons);
+
+            HashSet<AddonContainer> installableAddons = requiredAddons.Where(x => x.InstallState != InstallState.InstalledEnabled && x.InstallState != InstallState.InstalledDisabled).ToHashSet();
+            installableAddons.Add(addonContainer);
+
+            HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
+
+
+            List<AddonContainer> installedAddons = installableAddons.ToList();
+            installedAddons.AddRange(enableableAddons);
+
+
+            IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);
+            if (addonConflicts.Count() == 0)
+            {
+                _log.LogInformation($"Required addons for [{addonContainer.Addon.AddonId}]:");
+                _log.LogObject(installableAddons);
+
+                _viewModel.AddonInstallActions.Clear();
+                _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
+                _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
+
+                _viewModel.UiState = Enums.UiState.Installer;
+            }
+            else
+            {
+                _viewModel.AddonConflicts.Clear();
+                _viewModel.AddonConflicts.AddRange(addonConflicts);
+                _viewModel.UiState = Enums.UiState.Conflicts;
+            }
+        }
+
+
+        /// <summary>
+        /// Removes an addon
+        /// </summary>
+        /// <param name="addonContainer"></param>
+        /// <returns></returns>
+        private async Task RemoveAddons(List<AddonContainer> addonContainers)
+        {
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+
+            HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
+
+            foreach (AddonContainer addonContainer in addonContainers)
+            {
+                _log.LogDebug($"Removing [{addonContainer.Addon.AddonId}]");
+                await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), addonContainer, childAddons);
+            }
+
+            HashSet<AddonContainer> removableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled || x.InstallState == InstallState.InstalledDisabled).ToHashSet();
+            removableAddons.AddRange(addonContainers);
+
+            _log.LogInformation($"Removable addons for [{string.Join(", ", addonContainers.Select(x => x.Addon.AddonId))}]:");
+            _log.LogObject(removableAddons);
+
+            _viewModel.AddonInstallActions.Clear();
+            _viewModel.AddonInstallActions.AddRange(removableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Remove)));
+
+            _viewModel.UiState = Enums.UiState.Installer;
+        }
+
+        /// <summary>
+        /// Disables an addon
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task DisableAddons(List<AddonContainer> addonContainers)
+        {
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+            HashSet<AddonContainer> childAddons = new HashSet<AddonContainer>();
+
+
+            foreach (AddonContainer addonContainer in addonContainers)
+            {
+                _log.LogDebug($"Disabling [{addonContainer.Addon.AddonId}]");
+                await addonGameStateService.GetChildAddons(_viewModel.AddonContainers.ToList(), addonContainer, childAddons);
+
+            }
+            HashSet<AddonContainer> disableableAddons = childAddons.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
+            disableableAddons.AddRange(addonContainers);
+            HashSet<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled).ToHashSet();
+
+            _log.LogInformation($"Disableable addons for [{string.Join(", ", addonContainers.Select(x => x.Addon.AddonId))}]:");
+            _log.LogObject(disableableAddons);
+
+            _viewModel.AddonInstallActions.Clear();
+            _viewModel.AddonInstallActions.AddRange(disableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Disable)));
+
+            _viewModel.UiState = Enums.UiState.Installer;
+        }
+
+        /// <summary>
+        /// Enables an Addon
+        /// </summary>
+        /// <param name="addonContainer"></param>
+        /// <returns></returns>
+        private async Task EnableAddons(List<AddonContainer> addonContainers)
+        {
+            IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
+            HashSet<AddonContainer> requiredAddons = new HashSet<AddonContainer>();
+
+            foreach (AddonContainer addonContainer in addonContainers)
+            {
+                _log.LogDebug($"Enabling [{addonContainer.Addon.AddonId}]");
+                await addonGameStateService.GetParentAddons(_viewModel.AddonContainers.ToList(), addonContainer, requiredAddons);
+            }
+
+            HashSet<AddonContainer> installableAddons = requiredAddons.Where(x => x.InstallState != InstallState.InstalledEnabled && x.InstallState != InstallState.InstalledDisabled).ToHashSet();
+
+            HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
+            enableableAddons.AddRange(addonContainers);
+
+            List<AddonContainer> installedAddons = installableAddons.ToList();
+            installedAddons.AddRange(enableableAddons);
+
+            IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);
+            if (addonConflicts.Count() == 0)
+            {
+                _log.LogInformation($"Required addons for [{string.Join(", ", addonContainers.Select(x => x.Addon.AddonId))}]:");
+                _log.LogObject(installableAddons);
+
+                _viewModel.AddonInstallActions.Clear();
+                _viewModel.AddonInstallActions.AddRange(installableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Install)));
+                _viewModel.AddonInstallActions.AddRange(enableableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Enable)));
+
+                _viewModel.UiState = Enums.UiState.Installer;
+            }
+            else
+            {
+                _viewModel.AddonConflicts.Clear();
+                _viewModel.AddonConflicts.AddRange(addonConflicts);
+                _viewModel.UiState = Enums.UiState.Conflicts;
+            }
+        }
+
 
         /// <summary>
         /// Display a open file dialog and set the corresponding userconfig
@@ -666,8 +843,10 @@ namespace Gw2_AddonHelper.UI
 
                 List<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled ||
                                                                                              x.InstallState == InstallState.InstalledDisabled).ToList();
+                VersionContainer versionContainer = await _addonListService.GetVersions();
 
-                IEnumerable<AddonContainer> updateableAddons = await addonGameStateService.GetUpdateableAddons(installedAddons);
+
+                IEnumerable<AddonContainer> updateableAddons = await addonGameStateService.GetUpdateableAddons(installedAddons, versionContainer);
 
                 _viewModel.AddonInstallActions.Clear();
                 _viewModel.AddonInstallActions.AddRange(updateableAddons.Select(x => new AddonInstallAction(x, InstallerActionType.Update)));
@@ -688,10 +867,8 @@ namespace Gw2_AddonHelper.UI
             }
         }
 
-
         /// <summary>
         /// Opens the icon link
-        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -710,17 +887,59 @@ namespace Gw2_AddonHelper.UI
             }
         }
 
+        /// <summary>
+        /// Starts the Self-Update
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void OnButtonAppUpdateClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 IAppUpdaterService appUpdaterService = App.ServiceProvider.GetService<IAppUpdaterService>();
                 await appUpdaterService.Update();
+
+                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
                 _log.LogCritical(ex, nameof(OnButtonAppUpdateClick));
+            }
+        }
+
+        /// <summary>
+        /// Performs the Batch action
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnAddonListBatchAction(object sender, AddonListBatchActionEventArgs e)
+        {
+            try
+            {
+                List<AddonContainer> affectedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == e.InstallState).ToList();
+                if(affectedAddons.Count > 0)
+                {
+                    switch (e.AddonBatchAction)
+                    {
+                        case AddonBatchAction.Enable:
+                            await EnableAddons(affectedAddons);
+                            break;
+                        case AddonBatchAction.Disable:
+                            await DisableAddons(affectedAddons);
+                            break;
+                        case AddonBatchAction.Uninstall:
+                            await RemoveAddons(affectedAddons);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, nameof(OnAddonListBatchAction));
             }
         }
     }

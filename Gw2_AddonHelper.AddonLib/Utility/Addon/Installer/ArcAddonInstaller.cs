@@ -9,13 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Gw2_AddonHelper.Common.Model;
 
 namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public class ArcAddonInstaller : BaseAddonInstaller, IAddonInstaller
     {
 
-        public ArcAddonInstaller(Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
+        public ArcAddonInstaller(Common.Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
         {
         }
 

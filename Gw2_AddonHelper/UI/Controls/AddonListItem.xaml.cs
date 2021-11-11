@@ -1,13 +1,13 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
+using Gw2_AddonHelper.Common.Extensions;
 using Gw2_AddonHelper.Model.UI;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using Gw2_AddonHelper.AddonLib.Extensions;
 
 namespace Gw2_AddonHelper.UI.Controls
 {

@@ -8,8 +8,8 @@ namespace Gw2_AddonHelper.AddonLib.Model.Exceptions
 {
     public class GithubRatelimitException : Exception
     {
-        public Model.AddonList.Addon Addon { get; set; }
-        public GithubRatelimitException(Model.AddonList.Addon addon)
+        public Common.Model.AddonList.Addon Addon { get; set; }
+        public GithubRatelimitException(Common.Model.AddonList.Addon addon)
         {
             Addon = addon;
         }

@@ -22,10 +22,5 @@ namespace Gw2_AddonHelper.Model.UI
             About
         }
 
-        public enum UiFlag
-        {
-            [EnumMember(Value = "welcome_screen_dismissed")]
-            WelcomeScreenDismissed
-        }
     }
 }
