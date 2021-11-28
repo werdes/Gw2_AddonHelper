@@ -101,9 +101,10 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
                 _log.LogDebug($"Installing addon file [{file.FileName}] to [{installPath}]");
                 await Task.Run(() => File.WriteAllBytes(installPath, file.FileContent));
 
-                StoreVersionFile(download);
                 installed = true;
             }
+            StoreVersionFile(download);
+
             return installed;
         }
     }

@@ -144,6 +144,9 @@
   <data name="ButtonCancelText" xml:space="preserve">
     <value>{ButtonCancelText}</value>
   </data>
+  <data name="ButtonCheckUpdatesText" xml:space="preserve">
+    <value>{ButtonCheckUpdatesText}</value>
+  </data>
   <data name="ButtonDisableAllText" xml:space="preserve">
     <value>{ButtonDisableAllText}</value>
   </data>
@@ -179,6 +182,9 @@
   </data>
   <data name="ButtonUninstallAllText" xml:space="preserve">
     <value>{ButtonUninstallAllText}</value>
+  </data>
+  <data name="ButtonUpdatesNoUpdatesText" xml:space="preserve">
+    <value>{ButtonUpdatesNoUpdatesText}</value>
   </data>
   <data name="ButtonUpdateText" xml:space="preserve">
     <value>{ButtonUpdateText}</value>

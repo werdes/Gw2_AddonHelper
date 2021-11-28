@@ -142,6 +142,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonCheckUpdatesText} ähnelt.
+        /// </summary>
+        public static string ButtonCheckUpdatesText {
+            get {
+                return ResourceManager.GetString("ButtonCheckUpdatesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonDisableAllText} ähnelt.
         /// </summary>
         public static string ButtonDisableAllText {
@@ -246,6 +255,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         public static string ButtonUninstallAllText {
             get {
                 return ResourceManager.GetString("ButtonUninstallAllText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {ButtonUpdatesNoUpdatesText} ähnelt.
+        /// </summary>
+        public static string ButtonUpdatesNoUpdatesText {
+            get {
+                return ResourceManager.GetString("ButtonUpdatesNoUpdatesText", resourceCulture);
             }
         }
         

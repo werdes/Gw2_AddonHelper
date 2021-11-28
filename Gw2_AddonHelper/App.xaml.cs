@@ -11,6 +11,8 @@ using System.Net;
 using System.Windows;
 using Gw2_AddonHelper.Services.Interfaces;
 using Octokit;
+using System.Threading.Tasks;
+using Gw2_AddonHelper.Common.Model;
 
 namespace Gw2_AddonHelper
 {
@@ -20,6 +22,8 @@ namespace Gw2_AddonHelper
     public partial class App : System.Windows.Application
     {
         public static ServiceProvider ServiceProvider { get; private set; }
+        public static IAddonListService AddonListService { get; private set; }
+
         private ILogger<App> _log;
 
         /// <summary>
@@ -55,10 +59,34 @@ namespace Gw2_AddonHelper
 
             userConfigService.Load();
 
-
             InitializeEnvironment(config);
             UI.MainWindow mainWindow = ServiceProvider.GetService<UI.MainWindow>();
             mainWindow.Show();
+        }
+
+        /// <summary>
+        /// Predetermines which type of list provider to use
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<(AddonListSource, DateTime)> DetermineListProvider()
+        {
+            IConfiguration configuration = ServiceProvider.GetService<IConfiguration>();
+            DateTime minCrawlTime = DateTime.UtcNow - configuration.GetValue<TimeSpan>("repositoryMirrorAddonList:maxAge");
+            AddonListSource addonListSource = AddonListSource.RepositoryMirror;
+
+            //Try first with repo mirror service
+            AddonListService = ServiceProvider.GetService<Services.RepositoryMirrorAddonListService>();
+            DateTime crawlTime = await AddonListService.LoadVersions();
+
+            if (crawlTime < minCrawlTime)
+            {
+                AddonListService = ServiceProvider.GetService<Services.GithubAddonListService>();
+                crawlTime = await AddonListService.LoadVersions();
+                addonListSource = AddonListSource.GitHub;
+            }
+
+            await AddonListService.Load();
+            return (addonListSource, crawlTime);
         }
 
         /// <summary>
@@ -104,20 +132,20 @@ namespace Gw2_AddonHelper
             });
 
             IConfiguration configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false)
-                .Build();
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json", false)
+               .Build();
             GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Name,
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
             services.AddSingleton(configuration);
             services.AddSingleton(gitHubClient);
-            services.AddSingleton<Services.GithubAddonListService>();
-            services.AddSingleton<Services.RepositoryMirrorAddonListService>();
             services.AddSingleton<IAddonGameStateService, Services.AddonGameStateService>();
             services.AddSingleton<IUserConfigService, Services.JsonUserConfigService>();
             services.AddSingleton<IAppUpdaterService, Services.AddonHelperAppUpdateService>();
+            services.AddSingleton<Services.GithubAddonListService>();
+            services.AddSingleton<Services.RepositoryMirrorAddonListService>();
 
             services.AddTransient<UI.MainWindow>();
         }

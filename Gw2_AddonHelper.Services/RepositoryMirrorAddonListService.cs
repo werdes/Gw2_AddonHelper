@@ -19,6 +19,7 @@ namespace Gw2_AddonHelper.Services
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
         private AddonListContainer _addonList;
+        private VersionContainer _versionContainer;
         private WebClient _webClient;
 
         public RepositoryMirrorAddonListService(ILogger<RepositoryMirrorAddonListService> log, IConfiguration configuration, IUserConfigService userConfigService)
@@ -32,8 +33,6 @@ namespace Gw2_AddonHelper.Services
             _webClient.Headers.Add("user-agent",
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " +
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
-
-            Load();
         }
 
         /// <summary>
@@ -111,19 +110,42 @@ namespace Gw2_AddonHelper.Services
         /// <returns></returns>
         public async Task<VersionContainer> GetVersions()
         {
-            VersionContainer container = new VersionContainer();
+            if (_versionContainer == null)
+                await LoadVersions();
+
+            return _versionContainer;
+        }
+
+        /// <summary>
+        /// Loads versions
+        /// </summary>
+        /// <returns></returns>
+        public async Task<DateTime> LoadVersions()
+        {
             try
             {
                 Uri updateUri = new Uri(_config.GetValue<string>("repositoryMirrorAddonList:updateUrl"));
                 string json = await _webClient.DownloadStringTaskAsync(updateUri);
 
-                container = JsonConvert.DeserializeObject<VersionContainer>(json);
+                _versionContainer = JsonConvert.DeserializeObject<VersionContainer>(json);
+                DateTime minCrawlTime = DateTime.UtcNow - _config.GetValue<TimeSpan>("repositoryMirrorAddonList:maxAge");
+
+                if (_versionContainer.CrawlTime < minCrawlTime)
+                {
+                    _versionContainer.Versions = new Dictionary<string, string>();
+                }
+                return _versionContainer.CrawlTime;
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, nameof(GetVersions));
             }
-            return container;
+            return DateTime.MinValue;
+        }
+
+        public AddonListSource GetListSource()
+        {
+            return AddonListSource.RepositoryMirror;
         }
     }
 }

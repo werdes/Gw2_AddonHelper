@@ -17,6 +17,8 @@
         <converters:InstallStateToBatchUninstallButtonVisibilityConverter x:Key="InstallStateToBatchUninstallButtonVisibilityConverter" />
         <converters:InstallStateToBatchEnableButtonVisibilityConverter x:Key="InstallStateToBatchEnableButtonVisibilityConverter" />
         <converters:InstallStateToBatchDisableButtonVisibilityConverter x:Key="InstallStateToBatchDisableButtonVisibilityConverter" />
+        <converters:AddonListSourceToUpdateButtonTextConverter x:Key="AddonListSourceToUpdateButtonTextConverter" />
+        <converters:AddonListSourceToUpdateButtonEnabledConverter x:Key="AddonListSourceToUpdateButtonEnabledConverter" />
 
 
         <CollectionViewSource x:Key="AddonContainersByInstallState" Source="{Binding Path=AddonContainers, Mode=TwoWay}">
@@ -127,9 +129,22 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
                 <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonUpdateClick">
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource AddonListSourceToUpdateButtonEnabledConverter}">
+                            <Binding Path="AddonListSource" />
+                            <Binding Path="AddonContainers" />
+                        </MultiBinding>
+                    </Button.IsEnabled>
                     <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                         <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
-                        <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonUpdateText}"/>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AddonListSourceToUpdateButtonTextConverter}">
+                                    <Binding Path="AddonListSource" />
+                                    <Binding Path="AddonContainers" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsClick">

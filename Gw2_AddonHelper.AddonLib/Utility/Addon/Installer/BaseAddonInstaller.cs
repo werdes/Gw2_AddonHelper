@@ -31,7 +31,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// Disables an addon by renaming the central dll file
         /// </summary>
         /// <param name="manifest"></param>
-        public async Task<bool> Disable()
+        public virtual async Task<bool> Disable()
         {
             bool disabled = false;
             string gamePath = Path.GetDirectoryName(_gamePath);
@@ -59,7 +59,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// enables an addon file by naming the dll file back to its original name
         /// </summary>
         /// <param name="manifest"></param>
-        public async Task<bool> Enable()
+        public virtual async Task<bool> Enable()
         {
             bool enabled = false;
             string gamePath = Path.GetDirectoryName(_gamePath);

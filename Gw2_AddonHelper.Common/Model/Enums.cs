@@ -93,7 +93,7 @@ namespace Gw2_AddonHelper.Common.Model
 
     public enum AddonListSource
     {
-        RepositorMirror,
+        RepositoryMirror,
         GitHub
     }
 
@@ -102,5 +102,15 @@ namespace Gw2_AddonHelper.Common.Model
         Enable,
         Disable, 
         Uninstall
+    }
+
+    public enum AddonLoaderFileKey
+    {
+        [EnumMember(Value = "dx9")]
+        DX9,
+        [EnumMember(Value = "dx11")]
+        DX11,
+        [EnumMember(Value = "dxgi")]
+        DXGI
     }
 }

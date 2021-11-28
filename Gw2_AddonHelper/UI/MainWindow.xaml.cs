@@ -38,7 +38,6 @@ namespace Gw2_AddonHelper.UI
         private IConfiguration _config;
         private IUserConfigService _userConfigService;
         private ILogger<MainWindow> _log;
-        private IAddonListService _addonListService;
 
         private bool _initializationFinished = false;
 
@@ -74,6 +73,8 @@ namespace Gw2_AddonHelper.UI
             {
                 _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
                 _viewModel.AppUpdateAvailable = await CheckAppUpdateAvailable();
+
+                (_viewModel.AddonListSource, _viewModel.AddonVersionsCrawlTime) = await App.DetermineListProvider();
 
                 if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
                 {
@@ -171,7 +172,7 @@ namespace Gw2_AddonHelper.UI
                     IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
                     List<Addon> lstAddons = await LoadAddons();
-                    VersionContainer versionContainer = await _addonListService.GetVersions();
+                    VersionContainer versionContainer = await App.AddonListService.GetVersions();
 
                     List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons, versionContainer)).OrderByDescending(x => x.SortKey).ToList();
                     _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
@@ -196,23 +197,9 @@ namespace Gw2_AddonHelper.UI
         private async Task<List<Addon>> LoadAddons()
         {
             List<Addon> addons = new List<Addon>();
-            DateTime minCrawlTime = DateTime.UtcNow - _config.GetValue<TimeSpan>("repositoryMirrorAddonList:maxAge");
 
-            //Try first with repo mirror service
-            _addonListService = App.ServiceProvider.GetService<RepositoryMirrorAddonListService>();
-            addons = await _addonListService.GetAddonsAsync();
-            _viewModel.AddonListSource = AddonListSource.RepositorMirror;
-            
-            if (await _addonListService.GetListTimestamp() < minCrawlTime)
-            {
-                _log.LogInformation("Repo mirror is outdated, loading from GitHub");
-                _addonListService = App.ServiceProvider.GetService<GithubAddonListService>();
-                addons = await _addonListService.GetAddonsAsync();
-
-                _viewModel.AddonListSource = AddonListSource.GitHub;
-            }
-
-            await _addonListService.Store();
+            addons = await App.AddonListService.GetAddonsAsync();
+            _viewModel.AddonListSource = App.AddonListService.GetListSource();
 
             return addons;
         }
@@ -843,8 +830,7 @@ namespace Gw2_AddonHelper.UI
 
                 List<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled ||
                                                                                              x.InstallState == InstallState.InstalledDisabled).ToList();
-                VersionContainer versionContainer = await _addonListService.GetVersions();
-
+                VersionContainer versionContainer = await App.AddonListService.GetVersions();
 
                 IEnumerable<AddonContainer> updateableAddons = await addonGameStateService.GetUpdateableAddons(installedAddons, versionContainer);
 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.AddonLib.Model.SelfUpdate
+namespace Gw2_AddonHelper.Common.Model.SelfUpdate
 {
     public class UpdatePath
     {

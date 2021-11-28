@@ -1,6 +1,7 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.AddonList.Github;
 using Gw2_AddonHelper.Common.Custom.YamlDotNet;
 using Gw2_AddonHelper.Common.Extensions;
+using Gw2_AddonHelper.Common.Model;
 using Gw2_AddonHelper.Common.Model.AddonList;
 using Gw2_AddonHelper.Common.Utility.Github;
 using Gw2_AddonHelper.Services.Interfaces;
@@ -32,6 +33,7 @@ namespace Gw2_AddonHelper.Services
 
         private GitHubClient _githubClient = null;
         private GithubAddonList _addonList = null;
+        private VersionContainer _versionContainer;
         private Branch _branch = null;
         private WebClient _webClient;
 
@@ -47,8 +49,6 @@ namespace Gw2_AddonHelper.Services
             _webClient.Headers.Add("user-agent",
                     System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " +
                     System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
-
-            Load().Wait();
         }
 
         /// <summary>
@@ -296,23 +296,45 @@ namespace Gw2_AddonHelper.Services
         /// <returns></returns>
         public async Task<VersionContainer> GetVersions()
         {
-            VersionContainer container = new VersionContainer();
+            if (_versionContainer == null)
+                await LoadVersions();
+
+            return _versionContainer;
+        }
+
+        /// <summary>
+        /// Loads versions
+        /// </summary>
+        /// <returns></returns>
+        public async Task<DateTime> LoadVersions()
+        {
             try
             {
-
-                //Not available for GitHub due to restrictive API limits
-
-                //Uri updateUri = new Uri(_config.GetValue<string>("quickUpdateCheck:url"));
+                //Uri updateUri = new Uri(_config.GetValue<string>("githubAddonList:quickUpdateCheck:url"));
                 //string json = await _webClient.DownloadStringTaskAsync(updateUri);
-                //container = JsonConvert.DeserializeObject<VersionContainer>(json);
 
+                //_versionContainer = JsonConvert.DeserializeObject<VersionContainer>(json);
+                //DateTime minCrawlTime = DateTime.UtcNow - _config.GetValue<TimeSpan>("githubAddonList:quickUpdateCheck:maxAge");
+
+                //if (_versionContainer.CrawlTime < minCrawlTime)
+                //{
+                //    _versionContainer.Versions = new Dictionary<string, string>();
+                //}
+                //return _versionContainer.CrawlTime;
+
+                _versionContainer = new VersionContainer();
+                return DateTime.Now;
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, nameof(GetVersions));
             }
-            return container;
+            return DateTime.MinValue;
         }
 
+        public AddonListSource GetListSource()
+        {
+            return AddonListSource.GitHub;
+        }
     }
 }

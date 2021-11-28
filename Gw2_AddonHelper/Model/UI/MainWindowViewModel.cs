@@ -29,6 +29,7 @@ namespace Gw2_AddonHelper.Model.UI
         private bool _appUpdateAvailable;
         private bool _installerProgressCancelEnabled;
         private AddonListSource _addonListSource;
+        private DateTime _addonListCrawlTime;
 
         public MainWindowViewModel()
         {
@@ -164,6 +165,16 @@ namespace Gw2_AddonHelper.Model.UI
             set
             {
                 _addonListSource = value;
+                Notify();
+            }
+        }
+
+        public DateTime AddonVersionsCrawlTime
+        {
+            get => _addonListCrawlTime;
+            set
+            {
+                _addonListCrawlTime = value;
                 Notify();
             }
         }
