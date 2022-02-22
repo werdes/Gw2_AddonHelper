@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Gw2_AddonHelper.Common\Gw2_AddonHelper.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="log.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

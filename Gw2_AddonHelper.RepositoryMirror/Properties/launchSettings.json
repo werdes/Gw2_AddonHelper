@@ -4,7 +4,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "Environment": "Development",
-        "OAuthToken": ""
+        "OAuthToken": "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"
       }
     },
     "Docker": {
