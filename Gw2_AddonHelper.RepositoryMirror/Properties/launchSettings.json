@@ -6,8 +6,8 @@
     "Gw2_AddonHelper.RepositoryMirror": {
       "commandName": "Project",
       "environmentVariables": {
-        "OAuthToken": "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",
-        "Environment": "Development"
+        "Environment": "Development",
+        "OAuthToken": ""
       }
     }
   }
