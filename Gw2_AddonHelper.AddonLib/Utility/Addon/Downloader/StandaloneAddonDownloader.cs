@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,18 +21,46 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         /// <returns></returns>
         public async Task<DownloadResult> Download()
         {
-            byte[] fileContent = await WebClient.DownloadDataTaskAsync(_addon.HostUrl);
+            string responseFileName = null;
+            byte[] fileContent = null;
+            byte[] buffer = new byte[4096];
+
+            // Scuffed WebRequest approach to get response filename for obscured addons (e.g. buildPad)
+            WebRequest addonFileRequest = WebRequest.Create(_addon.HostUrl);
+            addonFileRequest.Method = "GET";
+            using (WebResponse addonFileResponse = await addonFileRequest.GetResponseAsync())
+            {
+                responseFileName = Path.GetFileName(addonFileResponse.ResponseUri.AbsoluteUri);
+
+                using(Stream responseStream = addonFileResponse.GetResponseStream())
+                {
+                    using(MemoryStream responseMemoryStream = new MemoryStream())
+                    {
+                        int readBytes = 0;
+                        do
+                        {
+                            readBytes = responseStream.Read(buffer, 0, buffer.Length);
+                            responseMemoryStream.Write(buffer, 0, readBytes);
+
+                        } while (readBytes != 0);
+
+                        fileContent = responseMemoryStream.ToArray();
+                    }
+                }
+            }
             
+
             string version = DateTime.UtcNow.ToString("s");
             if (_addon.VersioningType == Common.Model.VersioningType.HostFileMd5)
             {
                 version = (await WebClient.DownloadStringTaskAsync(_addon.VersionUrl)).Split(' ').First();
             }
 
+
             return new DownloadResult()
             {
                 FileContent = fileContent,
-                FileName = Path.GetFileName(_addon.HostUrl.LocalPath),
+                FileName = responseFileName,
                 Version = version
             };
         }

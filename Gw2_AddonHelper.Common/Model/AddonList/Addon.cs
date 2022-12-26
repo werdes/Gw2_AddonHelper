@@ -35,12 +35,14 @@ namespace Gw2_AddonHelper.Common.Model.AddonList
         private Uri _website;
         private string _developer;
         private string _addonId;
+        private int _sort;
 
         public Addon()
         {
             _additionalFlags = new ObservableCollection<AddonFlag>();
             _requiredAddons = new ObservableCollection<string>();
             _conflicts = new ObservableCollection<string>();
+            _sort = 0;
         }
 
         [JsonProperty("addon_id")]
@@ -260,6 +262,18 @@ namespace Gw2_AddonHelper.Common.Model.AddonList
             set
             {
                 _loaderKey = value;
+                Notify();
+            }
+        }
+
+        [JsonProperty("sort")]
+        [JsonPropertyName("sort")]
+        public int Sort
+        {
+            get => _sort;
+            set
+            {
+                _sort = value;
                 Notify();
             }
         }

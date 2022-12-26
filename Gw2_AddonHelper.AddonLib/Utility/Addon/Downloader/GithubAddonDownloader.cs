@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
 {
@@ -17,7 +18,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
 
         public GithubAddonDownloader(Common.Model.AddonList.Addon addon) : base(addon)
         {
-            _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>(); 
+            _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>();
         }
 
         /// <summary>
@@ -29,22 +30,35 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
-                Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
-                GithubRatelimitService.Instance.RegisterCall();
-
-                if (githubRelease != null)
+                try
                 {
-                    string downloadUrl = githubRelease.Assets.First().BrowserDownloadUrl;
-                    byte[] fileContent = await WebClient.DownloadDataTaskAsync(downloadUrl);
+                    Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
+                    GithubRatelimitService.Instance.RegisterCall();
 
-                    return new DownloadResult()
+                    if (githubRelease != null)
                     {
-                        FileContent = fileContent,
-                        FileName = Path.GetFileName(downloadUrl),
-                        Version = githubRelease.TagName
-                    };
+                        string downloadUrl = githubRelease.Assets.First().BrowserDownloadUrl;
+                        byte[] fileContent = await WebClient.DownloadDataTaskAsync(downloadUrl);
+
+                        return new DownloadResult()
+                        {
+                            FileContent = fileContent,
+                            FileName = Path.GetFileName(downloadUrl),
+                            Version = githubRelease.TagName
+                        };
+                    }
+                    else throw new ArgumentException($"Host release not available for [{_addon.AddonId}]");
                 }
-                else throw new ArgumentException($"Host release not available for [{_addon.AddonId}]");
+
+                catch (RateLimitExceededException ex)
+                {
+                    // Saturate the Ratelimit (Exception from Ratelimit)
+                    _log.LogCritical(ex, $"Github Ratelimit exceeded, saturating limiter");
+                    GithubRatelimitService.Instance.Saturate();
+
+                    throw new GithubRatelimitException(_addon);
+                }
+
             }
             else throw new GithubRatelimitException(_addon);
         }
@@ -58,10 +72,21 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
-                Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
-                GithubRatelimitService.Instance.RegisterCall();
+                try
+                {
+                    Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
+                    GithubRatelimitService.Instance.RegisterCall();
 
-                return githubRelease.TagName;
+                    return githubRelease.TagName;
+                }
+                catch (RateLimitExceededException ex)
+                {
+                    // Saturate the Ratelimit (Exception from Ratelimit)
+                    _log.LogCritical(ex, $"Github Ratelimit exceeded, saturating limiter");
+                    GithubRatelimitService.Instance.Saturate();
+
+                    throw new GithubRatelimitException(_addon);
+                }
             }
             return null;
         }

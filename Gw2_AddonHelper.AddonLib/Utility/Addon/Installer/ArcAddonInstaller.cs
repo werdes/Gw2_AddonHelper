@@ -10,11 +10,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Gw2_AddonHelper.Common.Model;
+using System.Text.RegularExpressions;
 
 namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 {
     public class ArcAddonInstaller : BaseAddonInstaller, IAddonInstaller
     {
+        private const string ARC_PLUGIN_PREFIX = "arcdps_";
 
         public ArcAddonInstaller(Common.Model.AddonList.Addon addon, string gamePath) : base(addon, gamePath)
         {
@@ -50,19 +52,48 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         private string GetAddonDllFilename()
         {
             if (_addon.HostType == HostType.Standalone &&
-               _addon.AdditionalFlags.Contains(AddonFlag.ObscuredFilename))
+                _addon.AdditionalFlags.Contains(AddonFlag.ObscuredFilename))
             {
-                WebRequest addonFileRequest = WebRequest.Create(_addon.HostUrl);
-                addonFileRequest.Method = "GET";
-                using (WebResponse addonFileResponse = addonFileRequest.GetResponse())
+                string obscuredPatternConfigValue = _config.GetValue<string>("obscuredPatterns:" + _addon.AddonId + ":filePattern");
+                if (!string.IsNullOrEmpty(obscuredPatternConfigValue))
                 {
-                    return Path.GetFileName(addonFileResponse.ResponseUri.AbsoluteUri);
+                    string gamePath = Path.GetDirectoryName(_gamePath);
+                    string lookupDirectory = Path.Combine(gamePath, GetInstallationBaseDirectory());
+
+                    if (Directory.Exists(lookupDirectory))
+                    {
+                        List<string> files = Directory.GetFiles(lookupDirectory, obscuredPatternConfigValue).ToList();
+                        files.RemoveAll(x => x.EndsWith(_config.GetValue<string>("installation:versionFileExtension")));
+                        if (files.Count == 1)
+                        {
+                            return Path.ChangeExtension(Path.GetFileName(files[0]), "dll");
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(_addon.PluginName))
+                            {
+                                return _addon.PluginName;
+                            }
+
+                            // This is an exception for obscured addons (e.g. buildPad)
+                            //   it doesn't matter what is returned from here, since the addon wasn't found with a the configured pattern
+                            //   so it's not installed. 
+                            return String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        // This is an exception for obscured addons (e.g. buildPad)
+                        //   it doesn't matter what is returned from here, since the addon wasn't found with a the configured pattern
+                        //   so it's not installed. 
+                        return String.Empty;
+                    }
                 }
 
                 throw new ArgumentException($"No filename for standalone with obscured filename for [{_addon.AddonId}]");
             }
             else if (!string.IsNullOrWhiteSpace(_addon.PluginName))
-            {
+            { 
                 return _addon.PluginName;
             }
             throw new ArgumentException($"No filename for [{_addon.AddonId}]");
@@ -112,12 +143,47 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 
             foreach (ExtractionResultFile file in manifest.AddonFiles)
             {
-                string installPath = Path.Combine(installDirectory, GetAddonDllFilename());
+                string installPath = Path.Combine(installDirectory, file.RelativePath, file.FileName);
+
+                // Either it's a recognized addon entrypoint file OR it's the only .dll-File in the Archive
+                // i cannot think of another way to identify the entrypoint file with wrong information in the repo 
+                //  ( looking at you, boontable a.k.a. d3d9_arcdps_table.dll )
+                //  if there's multiple dll files in an archive with wrong meta information i have no idea which one is the entrypoint
+                if (( CheckFilenameForEntrypoint(file.FileName) ||
+                     ( manifest.AddonFiles.Count(x => x.FileName.EndsWith(".dll")) == 1 && file.FileName.EndsWith(".dll"))) &&
+                    !_addon.AdditionalFlags.Contains(AddonFlag.ObscuredFilename))
+                {
+                    installPath = Path.Combine(installDirectory, file.RelativePath, GetAddonDllFilename());
+                }
                 await Task.Run(() => File.WriteAllBytes(installPath, file.FileContent));
             }
             StoreVersionFile(download);
 
             return true;
+        }
+
+        private bool CheckFilenameForEntrypoint(string fileName)
+        {
+            // Loader Key+dll = Entrypoint
+            if(fileName.Contains(_addon.LoaderKey) &&
+               fileName.EndsWith(".dll"))
+            {
+                return true;
+            }
+
+            // obscured plugins need pattern check
+            if(_addon.AdditionalFlags.Contains(AddonFlag.ObscuredFilename))
+            {
+                string obscuredPatternConfigValue = _config.GetValue<string>("obscuredPatterns:" + _addon.AddonId + ":regexPattern");
+                Regex regex = new Regex(obscuredPatternConfigValue);
+
+                if(regex.Match(fileName).Success)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

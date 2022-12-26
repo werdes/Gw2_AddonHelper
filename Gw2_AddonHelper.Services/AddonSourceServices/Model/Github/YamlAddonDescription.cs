@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.AddonLib.Model.AddonList.Github
+namespace Gw2_AddonHelper.Services.AddonSourceServices.Model.Github
 {
     public class YamlAddonDescription
     {

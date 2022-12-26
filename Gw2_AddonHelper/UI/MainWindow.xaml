@@ -86,7 +86,8 @@
                 <!-- Error Screen Panel -->
                 <panes:ErrorPane x:Name="errorScreenPane" Visibility="Collapsed" 
                                  RetryClick="OnButtonRetryClick"
-                                 SettingsClick="OnButtonSettingsClick"/>
+                                 SettingsClick="OnButtonSettingsClick"
+                                 AppUpdateClick="OnButtonAppUpdateClick"/>
 
 
                 <!-- Addon List Panel -->
@@ -100,7 +101,8 @@
                                      AddonEnable="OnAddonListItemEnable"
                                      AddonDisable="OnAddonListItemDisable"
                                      AddonRemove="OnAddonListItemRemove"
-                                     AddonBatchAction="OnAddonListBatchAction"/>
+                                     AddonBatchAction="OnAddonListBatchAction" 
+                                     Search="OnAddonListSearch"/>
 
 
                 <!-- Settings Panel -->
@@ -129,7 +131,8 @@
                 <!-- About Panel -->
                 <panes:AboutPane x:Name="aboutPane" Visibility="Collapsed" 
                                  BackClick="OnButtonAboutBackClick" 
-                                 LegalNoticeIconsClick="OnTextBlockLegalNoticeIconsMouseLeftButtonDown"/>
+                                 LegalNoticeIconsClick="OnTextBlockLegalNoticeIconsMouseLeftButtonDown"
+                                 BugreportsClick="OnTextBlockBugreportMouseLeftButtonDown"/>
 
 
             </controls:UiStatePaneContainer.Panes>

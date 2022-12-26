@@ -23,12 +23,15 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
         private string _installationEntrypointFile;
         private bool _quickUpdateAvailable;
         private bool _checked;
+        private bool _visible;
+
 
 
         public AddonContainer(Addon addon)
         {
             _addon = addon;
             _checked = true;
+            _visible = true;
         }
 
         [JsonProperty("addon")]
@@ -110,6 +113,15 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
             set
             {
                 _checked = value;
+                Notify();
+            }
+        }
+        public bool Visible
+        {
+            get => _visible;
+            set
+            {
+                _visible = value;
                 Notify();
             }
         }

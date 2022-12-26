@@ -113,9 +113,9 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// <returns></returns>
         public override async Task<bool> Disable()
         {
-            bool disabled = false;
             string gamePath = Path.GetDirectoryName(_gamePath);
             string newExtension = _config.GetValue<string>("installation:disabledExtension");
+            bool allFilesDisabled = true;
 
 
             foreach (AddonLoaderFile file in _configFiles)
@@ -135,15 +135,16 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
                     else
                     {
                         _log.LogWarning($"Cannot disable [{installationFile}] for [{_addon.AddonId}]: File doesn't exist");
+                        allFilesDisabled = false;
                     }
                 }
                 catch (Exception ex)
                 {
                     _log.LogCritical(ex, $"Couldn't remove {file.FileName} from loader installation");
-                    disabled = false;
+                    allFilesDisabled = false;
                 }
             }
-            return disabled;
+            return allFilesDisabled;
         }
 
         /// <summary>

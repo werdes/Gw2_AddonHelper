@@ -123,14 +123,26 @@
   <data name="AboutHeaderText" xml:space="preserve">
     <value>{AboutHeaderText}</value>
   </data>
+  <data name="AddonListFilterText" xml:space="preserve">
+    <value>{AddonListFilterText}</value>
+  </data>
   <data name="AddonListGroupAddonPlural" xml:space="preserve">
     <value>{AddonListGroupAddonPlural}</value>
   </data>
   <data name="AddonListGroupAddonSingular" xml:space="preserve">
     <value>{AddonListGroupAddonSingular}</value>
   </data>
+  <data name="AddonSourcesEmptyDescription" xml:space="preserve">
+    <value>{AddonSourcesEmptyDescription}</value>
+  </data>
+  <data name="AddonSourcesEmptyTitle" xml:space="preserve">
+    <value>{AddonSourcesEmptyTitle}</value>
+  </data>
   <data name="AddonTitleBy" xml:space="preserve">
     <value>{AddonTitleBy}</value>
+  </data>
+  <data name="BugreportsNotice" xml:space="preserve">
+    <value>{BugreportsNotice}</value>
   </data>
   <data name="ButtonAboutText" xml:space="preserve">
     <value>{ButtonAboutText}</value>

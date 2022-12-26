@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gw2_AddonHelper.AddonLib\Gw2_AddonHelper.AddonLib.csproj" />
     <ProjectReference Include="..\Gw2_AddonHelper.Common\Gw2_AddonHelper.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AddonSourceServices\Model\LocalFile\" />
+    <Folder Include="AddonSourceServices\Model\RepositoryMirror\" />
   </ItemGroup>
 
 </Project>

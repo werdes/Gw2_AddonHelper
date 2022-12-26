@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.Services.UserConfigServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -56,8 +57,8 @@ namespace Gw2_AddonHelper.UpdateCheck
 
             services.AddSingleton(configuration);
             services.AddSingleton(githubClient);
-            services.AddSingleton<IAddonListService, Services.GithubAddonListService>();
-            services.AddSingleton<IUserConfigService, Services.JsonUserConfigService>();
+            services.AddSingleton<IAddonSourceService, Services.AddonSourceServices.GithubAddonSourceService>();
+            services.AddSingleton<IUserConfigService, JsonUserConfigService>();
         }
     }
 }

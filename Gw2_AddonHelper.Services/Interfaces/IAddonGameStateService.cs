@@ -1,5 +1,4 @@
-﻿using Gw2_AddonHelper.AddonLib.Model.AddonList;
-using Gw2_AddonHelper.AddonLib.Model.GameState;
+﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.Common.Model.AddonList;
 using System.Collections.Generic;
 using System.Threading.Tasks;

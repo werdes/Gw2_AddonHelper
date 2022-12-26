@@ -1,9 +1,5 @@
 ﻿using Gw2_AddonHelper.Common.Extensions;
-using Gw2_AddonHelper.AddonLib.Model;
-using Gw2_AddonHelper.AddonLib.Model.AddonList;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.Model.UserConfig;
-using Gw2_AddonHelper.Extensions;
 using Gw2_AddonHelper.Model.UI;
 using Gw2_AddonHelper.Services.Interfaces;
 using Gw2_AddonHelper.UI.Localization;
@@ -21,11 +17,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Gw2_AddonHelper.Common.Utility.Github;
 using Gw2_AddonHelper.Common.Model.AddonList;
 using Gw2_AddonHelper.Common.Model;
-using Gw2_AddonHelper.Services;
+using Gw2_AddonHelper.Services.UserConfigServices.Model;
+using Gw2_AddonHelper.Services.AddonSourceServices;
+using Gw2_AddonHelper.Services.AppUpdaterServices;
+using System.Windows.Controls;
 
 namespace Gw2_AddonHelper.UI
 {
@@ -40,6 +38,7 @@ namespace Gw2_AddonHelper.UI
         private ILogger<MainWindow> _log;
 
         private bool _initializationFinished = false;
+        private IAddonSourceService _lastUsedService;
 
         public MainWindow(IConfiguration config, ILogger<MainWindow> log, IUserConfigService userConfigService)
         {
@@ -74,8 +73,6 @@ namespace Gw2_AddonHelper.UI
                 _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
                 _viewModel.AppUpdateAvailable = await CheckAppUpdateAvailable();
 
-                (_viewModel.AddonListSource, _viewModel.AddonVersionsCrawlTime) = await App.DetermineListProvider();
-
                 if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
                 {
                     await InitializeUi();
@@ -100,33 +97,30 @@ namespace Gw2_AddonHelper.UI
         /// <returns></returns>
         private async Task<bool> CheckAppUpdateAvailable()
         {
-            IAppUpdaterService appUpdaterService = App.ServiceProvider.GetService<IAppUpdaterService>();
-            Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            IAppUpdaterService appUpdaterService = await AppUpdaterServicesHelper.GetAppUpdaterService();
+            Version currentLocalVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-            DateTime lastCheck = _userConfigService.GetConfig().LastSelfUpdateCheck;
-            DateTime checkThreshold = DateTime.UtcNow.Add(-1 * _config.GetValue<TimeSpan>("selfUpdate:refreshCooldown"));
+            Version latestVersion = await appUpdaterService.GetLatestVersion();
+            _log.LogInformation($"Latest available version is [{latestVersion}]");
 
-            _log.LogInformation($"Checking for app updates with last_check [{lastCheck}], checkThreshold [{checkThreshold}]");
-
-            //Check Refresh cooldown, Ratelimit 
-            if (lastCheck <= checkThreshold && GithubRatelimitService.Instance.CanCall())
+            if (latestVersion != null &&
+                !(latestVersion.Major == 0 && latestVersion.Minor == 0 && latestVersion.Build == 0 && latestVersion.Revision == 0))
             {
-                Version latestVersion = await appUpdaterService.GetLatestVersion();
-                _log.LogInformation($"Latest available version is [{latestVersion}]");
+                _userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.UtcNow;
+                _userConfigService.Store();
 
-                if (latestVersion != null)
+                if (latestVersion > currentLocalVersion)
                 {
-                    _userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.UtcNow;
                     _userConfigService.GetConfig().LatestVersion = latestVersion;
                     _userConfigService.Store();
-
-                    return latestVersion != currentVersion;
+                    return true;
                 }
             }
 
+
             Version storedVersion = _userConfigService.GetConfig().LatestVersion;
             _log.LogInformation($"Checking against stored version [{storedVersion}]");
-            return storedVersion.Build != 0 && storedVersion.Revision != 0 && storedVersion != currentVersion;
+            return storedVersion.Build != 0 && storedVersion.Revision != 0 && storedVersion > currentLocalVersion;
         }
 
         /// <summary>
@@ -163,6 +157,10 @@ namespace Gw2_AddonHelper.UI
         /// <returns></returns>
         private async Task InitializeUi()
         {
+            List<Addon> lstAddons = null;
+            VersionContainer versionContainer = null;
+            AddonListSource addonListSource = AddonListSource.Undefined;
+
             try
             {
                 _viewModel.UiState = Enums.UiState.Loading;
@@ -171,12 +169,30 @@ namespace Gw2_AddonHelper.UI
                 {
                     IAddonGameStateService addonGameStateService = App.ServiceProvider.GetService<IAddonGameStateService>();
 
-                    List<Addon> lstAddons = await LoadAddons();
-                    VersionContainer versionContainer = await App.AddonListService.GetVersions();
+                    (lstAddons, versionContainer, addonListSource) = await GetInformationFromSourceService();
 
-                    List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons, versionContainer)).OrderByDescending(x => x.SortKey).ToList();
-                    _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
-                    _viewModel.UiState = Enums.UiState.AddonList;
+                    if (lstAddons != null &&
+                       lstAddons.Count > 0 &&
+                       versionContainer != null &&
+                       versionContainer.Versions != null &&
+                       addonListSource != AddonListSource.Undefined)
+                    {
+
+                        List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons, versionContainer)).OrderByDescending(x => x.SortKey).ToList();
+                        _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
+                        _viewModel.AddonListSource = addonListSource;
+                        _viewModel.AddonSourceServiceName = _lastUsedService.GetType().Name;
+                        _viewModel.AddonVersionsCrawlTime = await _lastUsedService.GetListTimestamp();
+                        _viewModel.FilterText = string.Empty;
+                        _viewModel.UiState = Enums.UiState.AddonList;
+
+                    }
+                    else
+                    {
+                        _viewModel.UiState = Enums.UiState.Error;
+                        _viewModel.ErrorMessageText = Localization.Localization.AddonSourcesEmptyDescription;
+                        _viewModel.ErrorTitleText = Localization.Localization.AddonSourcesEmptyTitle;
+                    }
                 }
                 else
                 {
@@ -194,14 +210,38 @@ namespace Gw2_AddonHelper.UI
         /// Loads addons from either repo mirror or github
         /// </summary>
         /// <returns></returns>
-        private async Task<List<Addon>> LoadAddons()
+        private async Task<(List<Addon>, VersionContainer, AddonListSource)> GetInformationFromSourceService()
         {
-            List<Addon> addons = new List<Addon>();
+            List<Addon> lstAddons = null;
+            VersionContainer versionContainer = null;
+            AddonListSource addonListSource = AddonListSource.Undefined;
 
-            addons = await App.AddonListService.GetAddonsAsync();
-            _viewModel.AddonListSource = App.AddonListService.GetListSource();
+            IAddonSourceService[] addonSourceServices = AddonSourceServicesHelper.GetAddonSourceServices().ToArray();
+            foreach (IAddonSourceService service in addonSourceServices)
+            {
+                try
+                {
+                    if (await service.IsAvailable())
+                    {
+                        lstAddons = await service.GetAddonsAsync();
+                        versionContainer = await service.GetVersions();
+                        addonListSource = await service.GetSource();
 
-            return addons;
+                        if (lstAddons != null && versionContainer != null)
+                        {
+                            _lastUsedService = service;
+                            lstAddons = lstAddons.OrderBy(x => x.Sort).ThenBy(x => x.AddonName).ToList();
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.LogCritical(ex, $"Failed to load from {service.GetType().Name}");
+                }
+            }
+
+            return (lstAddons, versionContainer, addonListSource);
         }
 
         /// <summary>
@@ -830,7 +870,7 @@ namespace Gw2_AddonHelper.UI
 
                 List<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled ||
                                                                                              x.InstallState == InstallState.InstalledDisabled).ToList();
-                VersionContainer versionContainer = await App.AddonListService.GetVersions();
+                VersionContainer versionContainer = await _lastUsedService.GetVersions();
 
                 IEnumerable<AddonContainer> updateableAddons = await addonGameStateService.GetUpdateableAddons(installedAddons, versionContainer);
 
@@ -904,7 +944,7 @@ namespace Gw2_AddonHelper.UI
             try
             {
                 List<AddonContainer> affectedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == e.InstallState).ToList();
-                if(affectedAddons.Count > 0)
+                if (affectedAddons.Count > 0)
                 {
                     switch (e.AddonBatchAction)
                     {
@@ -926,6 +966,40 @@ namespace Gw2_AddonHelper.UI
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
                 _log.LogCritical(ex, nameof(OnAddonListBatchAction));
+            }
+        }
+
+        private void OnTextBlockBugreportMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            string url = _config.GetValue<string>("about:bugreportUrl");
+            try
+            {
+                Uri uri = new Uri(url);
+                uri.OpenWeb();
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, nameof(OnTextBlockLegalNoticeIconsMouseLeftButtonDown));
+            }
+        }
+
+        private void OnAddonListSearch(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                string searchTerm = ((TextBox)sender).Text.ToUpper();
+                foreach (AddonContainer container in _viewModel.AddonContainers)
+                {
+                    container.Visible = container.Addon.AddonName.ToUpper().Contains(searchTerm) ||
+                                        container.Addon.Developer.ToUpper().Contains(searchTerm) ||
+                                        //container.Addon.Description.ToUpper().Contains(searchTerm) ||
+                                        container.Addon.Website.AbsolutePath.ToUpper().Contains(searchTerm);
+                }
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿using Gw2_AddonHelper.Model.UserConfig;
-using Gw2_AddonHelper.Services.Interfaces;
+﻿using Gw2_AddonHelper.Services.Interfaces;
+using Gw2_AddonHelper.Services.UserConfigServices.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Services
+namespace Gw2_AddonHelper.Services.UserConfigServices
 {
     public class JsonUserConfigService : IUserConfigService
     {

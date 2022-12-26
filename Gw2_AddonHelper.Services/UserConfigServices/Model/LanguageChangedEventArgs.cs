@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Model.UserConfig
+namespace Gw2_AddonHelper.Services.UserConfigServices.Model
 {
     public class LanguageChangedEventArgs : EventArgs
     {
@@ -13,11 +13,11 @@ namespace Gw2_AddonHelper.Model.UserConfig
 
         public CultureInfo Culture
         {
-            get => _culture; 
-            set => _culture = value; 
+            get => _culture;
+            set => _culture = value;
         }
 
-        public LanguageChangedEventArgs(CultureInfo cultureInfo) 
+        public LanguageChangedEventArgs(CultureInfo cultureInfo)
             => _culture = cultureInfo;
     }
 }

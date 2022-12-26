@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Model.UserConfig
+namespace Gw2_AddonHelper.Services.UserConfigServices.Model
 {
     public class UserConfig : PropertyLoader<UserConfig>, IPropertyLoader, INotifyPropertyChanged
     {

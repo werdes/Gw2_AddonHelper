@@ -39,6 +39,8 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         public event EventHandler<AddonEventArgs> AddonEnable;
         public event EventHandler<AddonEventArgs> AddonDisable;
         public event EventHandler<AddonListBatchActionEventArgs> AddonBatchAction;
+        public event EventHandler<TextChangedEventArgs> Search;
+
 
         public AddonListPane()
         {
@@ -60,7 +62,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         protected void OnAddonBatchEnableClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Enable, sender, e);
         protected void OnAddonBatchDisableClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Disable, sender, e);
         protected void OnAddonBatchUninstallClick(object sender, RoutedEventArgs e) => HandleBatchAction(Common.Model.AddonBatchAction.Uninstall, sender, e);
-
+        protected void OnSearchTextChanged(object sender, TextChangedEventArgs e) => Search?.Invoke(sender, e);
 
         /// <summary>
         /// Shortcut to Install State group 
@@ -128,5 +130,6 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
                 UiError?.Invoke(this, new UiErrorEventArgs(ex, Localization.Localization.UncategorizedError));
             }
         }
+
     }
 }

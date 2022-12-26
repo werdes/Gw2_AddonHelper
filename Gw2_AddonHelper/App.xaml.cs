@@ -1,5 +1,4 @@
-﻿using Gw2_AddonHelper.Model.UserConfig;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SourceChord.FluentWPF;
@@ -13,6 +12,10 @@ using Gw2_AddonHelper.Services.Interfaces;
 using Octokit;
 using System.Threading.Tasks;
 using Gw2_AddonHelper.Common.Model;
+using Gw2_AddonHelper.Services.AppUpdaterServices;
+using Gw2_AddonHelper.Services.UserConfigServices;
+using Gw2_AddonHelper.Services.AddonGameStateServices;
+using Gw2_AddonHelper.Services.AddonSourceServices;
 
 namespace Gw2_AddonHelper
 {
@@ -22,8 +25,6 @@ namespace Gw2_AddonHelper
     public partial class App : System.Windows.Application
     {
         public static ServiceProvider ServiceProvider { get; private set; }
-        public static IAddonListService AddonListService { get; private set; }
-
         private ILogger<App> _log;
 
         /// <summary>
@@ -32,17 +33,25 @@ namespace Gw2_AddonHelper
         /// </summary>
         public App()
         {
-            ServiceCollection services = new ServiceCollection();
-            ConfigureServices(services);
+            try
+            {
+                ServiceCollection services = new ServiceCollection();
+                ConfigureServices(services);
 
-            ServiceProvider = services.BuildServiceProvider();
-            AddonLib.Lib.ServiceProvider = ServiceProvider;
-            Services.Lib.ServiceProvider = ServiceProvider;
-            Common.Lib.ServiceProvider = ServiceProvider;
+                ServiceProvider = services.BuildServiceProvider();
+                AddonLib.Lib.ServiceProvider = ServiceProvider;
+                Services.Lib.ServiceProvider = ServiceProvider;
+                Common.Lib.ServiceProvider = ServiceProvider;
 
-            _log = ServiceProvider.GetService<ILogger<App>>();
+                _log = ServiceProvider.GetService<ILogger<App>>();
 
-            ResourceDictionaryEx.GlobalTheme = ElementTheme.Dark;
+                ResourceDictionaryEx.GlobalTheme = ElementTheme.Dark;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Critical error occured", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+            }
         }
 
         /// <summary>
@@ -64,30 +73,6 @@ namespace Gw2_AddonHelper
             mainWindow.Show();
         }
 
-        /// <summary>
-        /// Predetermines which type of list provider to use
-        /// </summary>
-        /// <returns></returns>
-        public static async Task<(AddonListSource, DateTime)> DetermineListProvider()
-        {
-            IConfiguration configuration = ServiceProvider.GetService<IConfiguration>();
-            DateTime minCrawlTime = DateTime.UtcNow - configuration.GetValue<TimeSpan>("repositoryMirrorAddonList:maxAge");
-            AddonListSource addonListSource = AddonListSource.RepositoryMirror;
-
-            //Try first with repo mirror service
-            AddonListService = ServiceProvider.GetService<Services.RepositoryMirrorAddonListService>();
-            DateTime crawlTime = await AddonListService.LoadVersions();
-
-            if (crawlTime < minCrawlTime)
-            {
-                AddonListService = ServiceProvider.GetService<Services.GithubAddonListService>();
-                crawlTime = await AddonListService.LoadVersions();
-                addonListSource = AddonListSource.GitHub;
-            }
-
-            await AddonListService.Load();
-            return (addonListSource, crawlTime);
-        }
 
         /// <summary>
         /// Check and create necessary Directories
@@ -95,12 +80,12 @@ namespace Gw2_AddonHelper
         private void InitializeEnvironment(IConfiguration config)
         {
             List<string> lstDirs = new List<string>();
-            lstDirs.Add(Path.GetDirectoryName(config["addonsFile"]));
             lstDirs.Add(Path.GetDirectoryName(config["userConfig"]));
             lstDirs.Add(Path.GetDirectoryName(config["githubRatelimitFile"]));
-            lstDirs.Add(Path.GetDirectoryName(config["githubAddonList:filePath"]));
             lstDirs.Add(Path.GetDirectoryName(config["selfUpdate:updaterDirectory"]));
             lstDirs.Add(Path.GetDirectoryName(config["selfUpdate:updaterAssetDirectory"]));
+            lstDirs.Add(Path.GetDirectoryName(config["addonSourceServices:localFile:addonsPath"]));
+            lstDirs.Add(Path.GetDirectoryName(config["addonSourceServices:localFile:versionsPath"]));
 
             try
             {
@@ -141,11 +126,8 @@ namespace Gw2_AddonHelper
 
             services.AddSingleton(configuration);
             services.AddSingleton(gitHubClient);
-            services.AddSingleton<IAddonGameStateService, Services.AddonGameStateService>();
-            services.AddSingleton<IUserConfigService, Services.JsonUserConfigService>();
-            services.AddSingleton<IAppUpdaterService, Services.AddonHelperAppUpdateService>();
-            services.AddSingleton<Services.GithubAddonListService>();
-            services.AddSingleton<Services.RepositoryMirrorAddonListService>();
+            services.AddSingleton<IAddonGameStateService, AddonGameStateService>();
+            services.AddSingleton<IUserConfigService, JsonUserConfigService>();
 
             services.AddTransient<UI.MainWindow>();
         }

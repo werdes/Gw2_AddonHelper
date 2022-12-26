@@ -43,32 +43,52 @@
         </Grid.RowDefinitions>
 
         <!-- Shortcuts-->
-        <ScrollViewer Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Margin="10">
-            <ItemsControl ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}, Path=Groups}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" fluent:PointerTracker.Enabled="True"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Tag="{Binding Name}" Click="OnButtonInstallStateShortcutClick" Margin="0,0,5,0" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000">
-                            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                <TextBlock>
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0} ({1} {2})">
-                                            <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
-                                            <Binding Path="ItemCount" />
-                                            <Binding Path="ItemCount" Converter="{StaticResource NumberToAddonListGroupAddonQuantityFormConverter}"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <Grid Grid.Column="0" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <ScrollViewer  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Margin="10">
+                <ItemsControl ItemsSource="{Binding Source={StaticResource AddonContainersByInstallState}, Path=Groups}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" fluent:PointerTracker.Enabled="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Tag="{Binding Name}" Click="OnButtonInstallStateShortcutClick" Margin="0,0,5,0" Padding="5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Background="#33000000">
+                                <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1} {2})">
+                                                <Binding Path="Name" Converter="{StaticResource InstallStateToDescriptionConverter}"/>
+                                                <Binding Path="ItemCount" />
+                                                <Binding Path="ItemCount" Converter="{StaticResource NumberToAddonListGroupAddonQuantityFormConverter}"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <TextBox Grid.Column="1" Margin="10,10,27,10" Style="{StaticResource TextBoxRevealStyle}" x:Name="textboxSearch" Text="{Binding FilterText}" Background="#B2111111" BorderThickness="0" Foreground="White" TextChanged="OnSearchTextChanged" />
+            <TextBlock Padding="6,0,0,0" Grid.Column="1" IsHitTestVisible="False" Text="{Binding Source={StaticResource Localization}, Path=AddonListFilterText}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=textboxSearch}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
 
         <!-- Main List-->
         <ScrollViewer Grid.Row="1" x:Name="scrollviewerAddonListAddonItems" VerticalScrollBarVisibility="Auto" Margin="10">
@@ -115,7 +135,7 @@
                 </ItemsControl.GroupStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <controls:AddonListItem AddonContainer="{Binding}" ShowActions="true" Open="OnAddonListItemOpen" Install="OnAddonListItemInstall" Remove="OnAddonListItemRemove" Enable="OnAddonListItemEnable" Disable="OnAddonListItemDisable"></controls:AddonListItem>
+                        <controls:AddonListItem AddonContainer="{Binding}" ShowActions="true" Open="OnAddonListItemOpen" Install="OnAddonListItemInstall" Remove="OnAddonListItemRemove" Enable="OnAddonListItemEnable" Disable="OnAddonListItemDisable" Visibility="{Binding Path=Visible, Converter={StaticResource BooleanToVisibilityConverter}}"></controls:AddonListItem>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

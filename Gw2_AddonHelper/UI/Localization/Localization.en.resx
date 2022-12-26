@@ -123,14 +123,26 @@
   <data name="AboutHeaderText" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="AddonListFilterText" xml:space="preserve">
+    <value>Filter</value>
+  </data>
   <data name="AddonListGroupAddonPlural" xml:space="preserve">
     <value>addons</value>
   </data>
   <data name="AddonListGroupAddonSingular" xml:space="preserve">
     <value>addon</value>
   </data>
+  <data name="AddonSourcesEmptyDescription" xml:space="preserve">
+    <value>None of the addon sources contains addons or all of them are unavailable.</value>
+  </data>
+  <data name="AddonSourcesEmptyTitle" xml:space="preserve">
+    <value>No addons found</value>
+  </data>
   <data name="AddonTitleBy" xml:space="preserve">
     <value>by</value>
+  </data>
+  <data name="BugreportsNotice" xml:space="preserve">
+    <value>Bugreports and requests are handled via GitHub issues (click here)</value>
   </data>
   <data name="ButtonAboutText" xml:space="preserve">
     <value>About</value>

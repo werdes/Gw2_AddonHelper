@@ -12,13 +12,20 @@ namespace Gw2_AddonHelper.Common.Model.AddonList
         public VersionContainer()
         {
             Versions = new Dictionary<string, string>();
+            FileHashes = new Dictionary<string, Dictionary<string, string>>();
             CrawlTime = DateTime.MinValue;
         }
 
         [JsonProperty("versions")]
         public Dictionary<string, string> Versions { get; set; }
 
+        [JsonProperty("file_hashes")]
+        public Dictionary<string, Dictionary<string, string>> FileHashes { get; set; }
+
         [JsonProperty("time")]
         public DateTime CrawlTime { get; set; }
+
+        [JsonProperty("source")]
+        public AddonListSource Source { get; set; }
     }
 }

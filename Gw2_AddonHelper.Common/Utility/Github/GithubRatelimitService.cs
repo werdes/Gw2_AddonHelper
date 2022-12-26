@@ -68,6 +68,18 @@ namespace Gw2_AddonHelper.Common.Utility.Github
         }
 
         /// <summary>
+        /// Register all possible calls (error mitigation)
+        /// </summary>
+        public void Saturate()
+        {
+            while(_callTimes.Count < _maxCallsPerHour)
+            {
+                _callTimes.Enqueue(DateTime.UtcNow);
+            }
+            Store();
+        }
+
+        /// <summary>
         /// Waits for the queue
         /// </summary>
         public async Task Wait()

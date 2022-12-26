@@ -1,6 +1,5 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
-using Gw2_AddonHelper.Model.UserConfig;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -8,6 +7,8 @@ using System.Runtime.CompilerServices;
 using Gw2_AddonHelper.Model.UI;
 using System;
 using Gw2_AddonHelper.Common.Model;
+using Gw2_AddonHelper.Services.UserConfigServices.Model;
+using Gw2_AddonHelper.Common.Model.AddonList;
 
 namespace Gw2_AddonHelper.Model.UI
 {
@@ -21,7 +22,7 @@ namespace Gw2_AddonHelper.Model.UI
         private ObservableCollection<CultureInfo> _availableCultures;
         private ObservableCollection<AddonConflict> _addonConflicts;
         private ObservableCollection<AddonInstallProgress> _addonInstallProgresses;
-        private UserConfig.UserConfig _userConfig;
+        private UserConfig _userConfig;
         private Version _version;
         private Enums.UiState _uiState;
         private string _errorMessageText;
@@ -30,6 +31,8 @@ namespace Gw2_AddonHelper.Model.UI
         private bool _installerProgressCancelEnabled;
         private AddonListSource _addonListSource;
         private DateTime _addonListCrawlTime;
+        private string _addonSourceServiceName;
+        private string _filterText;
 
         public MainWindowViewModel()
         {
@@ -99,7 +102,7 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
-        public UserConfig.UserConfig UserConfig
+        public UserConfig UserConfig
         {
             get => _userConfig;
             set
@@ -169,6 +172,16 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
+        public string AddonSourceServiceName
+        {
+            get => _addonSourceServiceName;
+            set
+            {
+                _addonSourceServiceName = value;
+                Notify();
+            }
+        }
+
         public DateTime AddonVersionsCrawlTime
         {
             get => _addonListCrawlTime;
@@ -178,5 +191,17 @@ namespace Gw2_AddonHelper.Model.UI
                 Notify();
             }
         }
+
+        public string FilterText
+        {
+            get => _filterText;
+            set
+            {
+                _filterText = value;
+                Notify();
+            }
+        }
+
+
     }
 }

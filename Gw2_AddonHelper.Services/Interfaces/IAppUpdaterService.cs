@@ -10,5 +10,7 @@ namespace Gw2_AddonHelper.Services.Interfaces
     {
         public Task<Version> GetLatestVersion();
         public Task Update();
+        public Task<bool> IsAvailable();
+        int GetHierarchy();
     }
 }

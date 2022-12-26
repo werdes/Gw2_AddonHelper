@@ -1,6 +1,4 @@
-﻿using Gw2_AddonHelper.AddonLib.Model;
-using Gw2_AddonHelper.AddonLib.Model.AddonList;
-using Gw2_AddonHelper.AddonLib.Model.Exceptions;
+﻿using Gw2_AddonHelper.AddonLib.Model.Exceptions;
 using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor;
@@ -18,7 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Services
+namespace Gw2_AddonHelper.Services.AddonGameStateServices
 {
     public class AddonGameStateService : IAddonGameStateService
     {
@@ -170,14 +168,31 @@ namespace Gw2_AddonHelper.Services
         {
             bool updateAvailable = true;
 
+            _log.LogInformation($"Checking [{addonContainer.Addon.AddonId}] for updates");
+
+            if(addonContainer.Addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating))
+            {
+                return false;
+            }
+
             if (addonContainer.InstallState == InstallState.InstalledDisabled ||
                 addonContainer.InstallState == InstallState.InstalledEnabled)
             {
+                _log.LogDebug($"Addon [{addonContainer.Addon.AddonId}] is [{addonContainer.InstallState}]");
                 IAddonDownloader addonDownloader = AddonDownloaderFactory.GetDownloader(addonContainer.Addon);
                 IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
+                _log.LogDebug($"Installer for [{addonContainer.Addon.AddonId}] is [{addonInstaller.GetType().Name}]");
+                _log.LogDebug($"Downloader for [{addonContainer.Addon.AddonId}] is [{addonDownloader.GetType().Name}]");
+
                 string installedVersion = addonInstaller.GetInstalledVersion();
-                updateAvailable = await addonDownloader.GetLatestVersion() != installedVersion;
+                string latestVersion = await addonDownloader.GetLatestVersion();
+
+                _log.LogDebug($"Installed version for [{addonContainer.Addon.AddonId}] is [{installedVersion}]");
+                _log.LogDebug($"Latest version for [{addonContainer.Addon.AddonId}] is [{latestVersion}]");
+
+                updateAvailable = !string.IsNullOrEmpty(latestVersion) &&
+                                  latestVersion != installedVersion;
             }
 
             return updateAvailable;
@@ -191,15 +206,10 @@ namespace Gw2_AddonHelper.Services
         public async Task<IEnumerable<AddonContainer>> GetUpdateableAddons(IEnumerable<AddonContainer> installedAddons, VersionContainer versions)
         {
             List<AddonContainer> addonContainers = new List<AddonContainer>();
-            DateTime minCrawlTime = DateTime.UtcNow - _config.GetValue<TimeSpan>("quickUpdateCheck:maxAge");
-
             List<AddonContainer> quickVersionedAddons = new List<AddonContainer>();
             List<AddonContainer> fullVersionedAddons = new List<AddonContainer>();
 
-            if (versions.CrawlTime >= minCrawlTime)
-            {
-                quickVersionedAddons.AddRange(installedAddons.Where(x => versions.Versions.ContainsKey(x.Addon.AddonId)));
-            }
+            quickVersionedAddons.AddRange(installedAddons.Where(x => versions.Versions.ContainsKey(x.Addon.AddonId)));
             fullVersionedAddons = installedAddons.Where(x => !quickVersionedAddons.Contains(x)).ToList();
 
             // Addons that are available in the quick update service will be checked against that
@@ -211,7 +221,8 @@ namespace Gw2_AddonHelper.Services
                     IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                     string installedVersion = addonInstaller.GetInstalledVersion();
 
-                    if (addonInstaller.GetInstalledVersion() != versions.Versions[addonContainer.Addon.AddonId])
+                    if (addonInstaller.GetInstalledVersion() != versions.Versions[addonContainer.Addon.AddonId] &&
+                        !addonContainer.Addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating))
                     {
                         addonContainers.Add(addonContainer);
                     }
@@ -221,7 +232,7 @@ namespace Gw2_AddonHelper.Services
             //Addons not available in the quick update service will be checked by traditional means
             foreach (AddonContainer addonContainer in fullVersionedAddons)
             {
-                if(await CheckAddonForUpdate(addonContainer))
+                if (await CheckAddonForUpdate(addonContainer))
                 {
                     addonContainers.Add(addonContainer);
                 }

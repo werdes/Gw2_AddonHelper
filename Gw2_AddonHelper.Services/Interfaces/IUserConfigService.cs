@@ -1,4 +1,4 @@
-﻿using Gw2_AddonHelper.Model.UserConfig;
+﻿using Gw2_AddonHelper.Services.UserConfigServices.Model;
 
 namespace Gw2_AddonHelper.Services.Interfaces
 {

@@ -14,21 +14,29 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Services
+namespace Gw2_AddonHelper.Services.AppUpdaterServices
 {
-    public class AddonHelperAppUpdateService : IAppUpdaterService
+    public class GithubAppUpdateService : IAppUpdaterService
     {
         private const string ZIP_MIME = "application/x-zip-compressed";
+        private const int HIERARCHY = 2;
 
         private GitHubClient _gitHubClient;
         private IConfiguration _config;
-        private ILogger<AddonHelperAppUpdateService> _log;
+        private ILogger<GithubAppUpdateService> _log;
+        private IUserConfigService _userConfig;
 
-        public AddonHelperAppUpdateService()
+        public GithubAppUpdateService()
         {
+            _userConfig = Lib.ServiceProvider.GetService<IUserConfigService>();
             _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>();
             _config = Lib.ServiceProvider.GetService<IConfiguration>();
-            _log = Lib.ServiceProvider.GetService<ILogger<AddonHelperAppUpdateService>>();
+            _log = Lib.ServiceProvider.GetService<ILogger<GithubAppUpdateService>>();
+        }
+
+        public int GetHierarchy()
+        {
+            return HIERARCHY;
         }
 
 
@@ -41,7 +49,7 @@ namespace Gw2_AddonHelper.Services
             if (GithubRatelimitService.Instance.CanCall())
             {
 
-                Uri repoUrl = _config.GetValue<Uri>("selfUpdate:repoReleaseUrl");
+                Uri repoUrl = _config.GetValue<Uri>("selfUpdate:updaters:github:repoReleaseUrl");
                 _log.LogInformation($"Getting latest app version from [{repoUrl}]");
                 try
                 {
@@ -62,65 +70,91 @@ namespace Gw2_AddonHelper.Services
         }
 
         /// <summary>
+        /// Returns wether the service implementation can be used for self update
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsAvailable()
+        {
+            DateTime lastCheck = _userConfig.GetConfig().LastSelfUpdateCheck;
+            DateTime checkThreshold = DateTime.UtcNow.Add(-1 * _config.GetValue<TimeSpan>("selfUpdate:updaters:github:refreshCooldown"));
+
+            _log.LogInformation($"Github app updater probed, with last_check [{lastCheck}], checkThreshold [{checkThreshold}]");
+            return lastCheck <= checkThreshold && GithubRatelimitService.Instance.CanCall();
+        }
+
+        /// <summary>
         /// Updates the launcher
         /// </summary>
         /// <returns></returns>
         public async Task Update()
         {
-            if (GithubRatelimitService.Instance.CanCall())
+            Uri repoUrl = _config.GetValue<Uri>("selfUpdate:updaters:github:repoReleaseUrl");
+            try
             {
-                Uri repoUrl = _config.GetValue<Uri>("selfUpdate:repoReleaseUrl");
-                try
+                _log.LogInformation($"Getting app update from [{repoUrl}]");
+
+                if (GithubRatelimitService.Instance.CanCall())
                 {
-                    _log.LogInformation($"Getting app update from [{repoUrl}]");
                     Release githubRelease = (await _gitHubClient.Connection.Get<Release>(repoUrl, TimeSpan.FromSeconds(30))).Body;
                     GithubRatelimitService.Instance.RegisterCall();
 
                     Version version = new Version(githubRelease.TagName);
                     Uri assetUri = new Uri(githubRelease.Assets.Where(x => x.ContentType == ZIP_MIME).First().BrowserDownloadUrl);
 
-                    string outputFileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterAssetDirectory"), $"{version}.zip");
-                    outputFileName = Path.GetFullPath(outputFileName);
-
-                    if (!File.Exists(outputFileName))
+                    if (assetUri != null)
                     {
-                        byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
-                        await File.WriteAllBytesAsync(outputFileName, buffer);
-                        _log.LogInformation($"Stored update archive with [{buffer.Length}] bytes to [{outputFileName}]");
+                        string outputFileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterAssetDirectory"), $"{version}.zip");
+                        outputFileName = Path.GetFullPath(outputFileName);
+
+                        if (!File.Exists(outputFileName))
+                        {
+                            byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
+                            await File.WriteAllBytesAsync(outputFileName, buffer);
+                            _log.LogInformation($"Stored update archive with [{buffer.Length}] bytes to [{outputFileName}]");
+                        }
+
+                        if (await SelfUpdateUpdater(outputFileName))
+                        {
+                            int currentProcessId = Process.GetCurrentProcess().Id;
+                            string extractionDirectory = Environment.CurrentDirectory;
+                            string callerPath = Environment.GetCommandLineArgs().First();
+
+                            //Reset stored version and version check timestamp
+                            IUserConfigService userConfigService = Lib.ServiceProvider.GetService<IUserConfigService>();
+                            userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.MinValue;
+                            userConfigService.GetConfig().LatestVersion = new Version();
+                            userConfigService.Store();
+
+                            Process process = new Process();
+                            process.StartInfo.ArgumentList.Add(callerPath);
+                            process.StartInfo.ArgumentList.Add(currentProcessId.ToString());
+                            process.StartInfo.ArgumentList.Add(outputFileName);
+                            process.StartInfo.ArgumentList.Add(extractionDirectory);
+
+                            process.StartInfo.WorkingDirectory = _config.GetValue<string>("selfUpdate:updaterDirectory");
+                            process.StartInfo.FileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterDirectory"),
+                                                                      _config.GetValue<string>("selfUpdate:executable"));
+
+                            process.Start();
+
+                            _log.LogInformation("Shutdown for application update");
+                            _log.LogObject(process.StartInfo);
+                        }
                     }
-
-                    if (await SelfUpdateUpdater(outputFileName))
+                    else
                     {
-                        int currentProcessId = Process.GetCurrentProcess().Id;
-                        string extractionDirectory = Environment.CurrentDirectory;
-                        string callerPath = Environment.GetCommandLineArgs().First();
-
-                        //Reset stored version and version check timestamp
-                        IUserConfigService userConfigService = Lib.ServiceProvider.GetService<IUserConfigService>();
-                        userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.MinValue;
-                        userConfigService.GetConfig().LatestVersion = new Version();
-                        userConfigService.Store();
-
-                        Process process = new Process();
-                        process.StartInfo.ArgumentList.Add(callerPath);
-                        process.StartInfo.ArgumentList.Add(currentProcessId.ToString());
-                        process.StartInfo.ArgumentList.Add(outputFileName);
-                        process.StartInfo.ArgumentList.Add(extractionDirectory);
-
-                        process.StartInfo.WorkingDirectory = _config.GetValue<string>("selfUpdate:updaterDirectory");
-                        process.StartInfo.FileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterDirectory"),
-                                                                  _config.GetValue<string>("selfUpdate:executable"));
-
-                        process.Start();
-
-                        _log.LogInformation("Shutdown for application update");
-                        _log.LogObject(process.StartInfo);
+                        _log.LogWarning("Asset Uri not found:");
+                        _log.LogObject(githubRelease.Assets.Select(x => $"{x.Name}: {x.BrowserDownloadUrl}"));
                     }
                 }
-                catch (Exception ex) when (ex is NotFoundException or ArgumentNullException)
+                else
                 {
-                    _log.LogWarning($"No version found for [{repoUrl}]");
+                    _log.LogWarning("Cannot call github due to ratelimit");
                 }
+            }
+            catch (Exception ex) when (ex is NotFoundException or ArgumentNullException)
+            {
+                _log.LogWarning($"No version found for [{repoUrl}]");
             }
         }
 
@@ -164,7 +198,7 @@ namespace Gw2_AddonHelper.Services
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 success = false;
                 _log.LogCritical(ex, "SelfUpdate Updater");

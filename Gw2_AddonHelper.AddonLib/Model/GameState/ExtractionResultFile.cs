@@ -19,7 +19,8 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
             get => _fileName;
             set
             {
-                _fileName = value; Notify();
+                _fileName = value; 
+                Notify();
             }
         }
 
@@ -29,7 +30,8 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
             get => _relativePath;
             set
             {
-                _relativePath = value; Notify();
+                _relativePath = value; 
+                Notify();
             }
         }
 
@@ -39,7 +41,8 @@ namespace Gw2_AddonHelper.AddonLib.Model.GameState
             get => _fileContent;
             set
             {
-                _fileContent = value; Notify();
+                _fileContent = value; 
+                Notify();
             }
         }
     }

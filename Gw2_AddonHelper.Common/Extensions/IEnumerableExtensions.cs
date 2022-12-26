@@ -29,5 +29,21 @@ namespace Gw2_AddonHelper.Common.Extensions
                 }
             }
         }
+
+        public static void AddRangeIfNotNull<T>(this List<T> source, IEnumerable<T> values)
+        {
+            if(values != null)
+            {
+                values.ForEach(x => source.Add(x));
+            }
+        }
+
+        public static void InsertIfNotContains<T>(this List<T> source, int index, T item)
+        {
+            if(!source.Contains(item))
+            {
+                source.Insert(index, item);
+            }
+        }
     }
 }

@@ -25,11 +25,14 @@
 
             <TextBlock TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeArenanet}" />
             <TextBlock Cursor="Hand" MouseLeftButtonDown="OnTextBlockLegalNoticeIconsMouseLeftButtonDown" TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=LegalNoticeIcons}" />
+
+            <TextBlock Cursor="Hand" MouseLeftButtonDown="OnTextBlockBugreportsMouseLeftButtonDown" TextWrapping="Wrap" Margin="15" FontFamily="Segoe UI Light" TextOptions.TextRenderingMode="ClearType" FontSize="14" Foreground="White" Text="{Binding Source={StaticResource Localization}, Path=BugreportsNotice}" />
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10,10,60,10">
             <controls:VersionNumberLabel Foreground="White" Opacity=".5" FontSize="12"/>
             <Label Padding="0" Foreground="White" Opacity=".5" FontSize="12" Content="{Binding AddonListSource}" />
+            <Label Padding="0" Foreground="White" Opacity=".5" FontSize="12" Content="{Binding AddonSourceServiceName}" />
             <Label Padding="0" Foreground="White" Opacity=".5" FontSize="12" Content="{Binding AddonVersionsCrawlTime, Converter={StaticResource DateTimeToStringFormatter}}" />
         </StackPanel>
 

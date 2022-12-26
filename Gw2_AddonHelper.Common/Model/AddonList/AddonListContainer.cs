@@ -1,12 +1,12 @@
-﻿using Gw2_AddonHelper.Common.Model.AddonList;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gw2_AddonHelper.Common.Model
+namespace Gw2_AddonHelper.Common.Model.AddonList
 {
     public class AddonListContainer
     {
@@ -24,5 +24,9 @@ namespace Gw2_AddonHelper.Common.Model
 
         [JsonProperty("repository_version")]
         public string RepositoryVersion { get; set; }
+
+        [JsonProperty("source")]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        public AddonListSource Source { get; set; }
     }
 }

@@ -23,6 +23,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
     {
         public event RoutedEventHandler BackClick;
         public event MouseButtonEventHandler LegalNoticeIconsClick;
+        public event MouseButtonEventHandler BugreportsClick;
 
         public AboutPane()
         {
@@ -32,5 +33,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
 
         protected void OnButtonAboutBackClick(object sender, RoutedEventArgs e) => BackClick?.Invoke(sender, e);
         protected void OnTextBlockLegalNoticeIconsMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => LegalNoticeIconsClick?.Invoke(sender, e);
+        protected void OnTextBlockBugreportsMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => BugreportsClick?.Invoke(sender, e);
+
     }
 }

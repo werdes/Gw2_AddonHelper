@@ -17,12 +17,28 @@ namespace Gw2_AddonHelper.Common.Extensions
 
             foreach (var item in items) obsCollection.Add(item);
         }
+        public static void AddRangeIfNotNull<T>(this ObservableCollection<T> source, IEnumerable<T> values)
+        {
+            if (values != null)
+            {
+                values.ForEach(x => source.Add(x));
+            }
+        }
+
 
         public static void ForEach<T>(this IEnumerable<T> obsCollection, Action<T> action)
         {
             foreach (var obj in obsCollection)
             {
                 action(obj);
+            }
+        }
+
+        public static void InsertIfNotContains<T>(this ObservableCollection<T> source, int index, T item)
+        {
+            if (!source.Contains(item))
+            {
+                source.Insert(index, item);
             }
         }
     }

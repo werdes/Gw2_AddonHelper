@@ -93,7 +93,11 @@ namespace Gw2_AddonHelper.Common.Model
 
     public enum AddonListSource
     {
+        [EnumMember(Value = "undefined")]
+        Undefined = 0,
+        [EnumMember(Value = "repository_mirror")]
         RepositoryMirror,
+        [EnumMember(Value = "github")]
         GitHub
     }
 
