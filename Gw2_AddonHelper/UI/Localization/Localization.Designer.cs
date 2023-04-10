@@ -133,6 +133,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {AppUpdateAvailable} ähnelt.
+        /// </summary>
+        public static string AppUpdateAvailable {
+            get {
+                return ResourceManager.GetString("AppUpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {BugreportsNotice} ähnelt.
         /// </summary>
         public static string BugreportsNotice {
@@ -651,6 +660,42 @@ namespace Gw2_AddonHelper.UI.Localization {
         public static string UncategorizedError {
             get {
                 return ResourceManager.GetString("UncategorizedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {UpdateAvailablePaneButtonAppUpdateText} ähnelt.
+        /// </summary>
+        public static string UpdateAvailablePaneButtonAppUpdateText {
+            get {
+                return ResourceManager.GetString("UpdateAvailablePaneButtonAppUpdateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {UpdateAvailablePaneButtonSkipText} ähnelt.
+        /// </summary>
+        public static string UpdateAvailablePaneButtonSkipText {
+            get {
+                return ResourceManager.GetString("UpdateAvailablePaneButtonSkipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {UpdateAvailablePaneNotesHeader} ähnelt.
+        /// </summary>
+        public static string UpdateAvailablePaneNotesHeader {
+            get {
+                return ResourceManager.GetString("UpdateAvailablePaneNotesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {UpdateAvailablePaneVersionHeader} ähnelt.
+        /// </summary>
+        public static string UpdateAvailablePaneVersionHeader {
+            get {
+                return ResourceManager.GetString("UpdateAvailablePaneVersionHeader", resourceCulture);
             }
         }
         

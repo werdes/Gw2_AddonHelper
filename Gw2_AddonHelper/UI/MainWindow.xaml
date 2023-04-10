@@ -66,7 +66,7 @@
                 </LinearGradientBrush>
             </Border.OpacityMask>
             <Border.Background>
-                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom_eod.png" Stretch="Uniform" Opacity="0.4">
+                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom_eod.png" Stretch="UniformToFill" Opacity="0.4">
                 </ImageBrush>
             </Border.Background>
         </Border>
@@ -81,6 +81,12 @@
 
                 <!-- Loading Panel -->
                 <panes:LoadingPane x:Name="loadingPane" Visibility="Visible" />
+
+                
+                <!-- App Update Available Panel-->
+                <panes:UpdateAvailablePane x:Name="updateAvailablePane" Visibility="Collapsed"
+                                           AppUpdateClick="OnButtonAppUpdateClick"
+                                           SkipClick="OnButtonSkipUpdateClick"/>
 
 
                 <!-- Error Screen Panel -->

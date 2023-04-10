@@ -17,9 +17,9 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
             return int.MaxValue;
         }
 
-        public async Task<Version> GetLatestVersion()
+        public async Task<(Version, string)> GetLatestVersion()
         {
-            return new Version(0, 0, 0, 0);
+            return (new Version(0, 0, 0, 0), string.Empty);
         }
 
         public async Task<bool> IsAvailable()

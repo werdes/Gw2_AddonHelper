@@ -141,6 +141,9 @@
   <data name="AddonTitleBy" xml:space="preserve">
     <value>von</value>
   </data>
+  <data name="AppUpdateAvailable" xml:space="preserve">
+    <value>Update verfügbar</value>
+  </data>
   <data name="BugreportsNotice" xml:space="preserve">
     <value>Fehler-Reports und Anfragen über GitHub Issues (hier klicken)</value>
   </data>
@@ -323,6 +326,18 @@
   </data>
   <data name="UncategorizedError" xml:space="preserve">
     <value>Unspezifizerter Fehler</value>
+  </data>
+  <data name="UpdateAvailablePaneButtonAppUpdateText" xml:space="preserve">
+    <value>Update herunterladen und installieren</value>
+  </data>
+  <data name="UpdateAvailablePaneButtonSkipText" xml:space="preserve">
+    <value>Update überspringen</value>
+  </data>
+  <data name="UpdateAvailablePaneNotesHeader" xml:space="preserve">
+    <value>Anmerkungen: </value>
+  </data>
+  <data name="UpdateAvailablePaneVersionHeader" xml:space="preserve">
+    <value>Neue Version: </value>
   </data>
   <data name="WelcomeFindGameExecutableText" xml:space="preserve">
     <value>Das Wichtigste zuerst: Bitte suche unten deinen Guild Wars 2 Launcher. Die Datei heißt 'gw2-64.exe', du findest sie in deinem Guild Wars 2 Installationsordner.</value>

@@ -201,8 +201,6 @@ namespace Gw2_AddonHelper.Services.AddonSourceServices
                 _config.GetValue<string>("addonSourceServices:github:repositoryOwner"),
                 _config.GetValue<string>("addonSourceServices:github:repositoryName"),
                 _config.GetValue<string>("addonSourceServices:github:repositoryBranch"));
-            _userConfigService.GetConfig().LastGithubCheck = DateTime.UtcNow;
-            _userConfigService.Store();
             GithubRatelimitService.Instance.RegisterCall();
         }
 

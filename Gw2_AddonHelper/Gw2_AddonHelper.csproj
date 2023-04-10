@@ -43,6 +43,7 @@
     <None Remove="UI\Resources\Images\icon-plugin.png" />
     <None Remove="UI\Resources\Images\icon-remove.png" />
     <None Remove="UI\Resources\Images\icon-settings.png" />
+    <None Remove="UI\Resources\Images\icon-skip.png" />
     <None Remove="UI\Resources\Images\icon-unchecked.png" />
     <None Remove="UI\Resources\Images\icon-update.png" />
     <None Remove="UI\Resources\Images\icon-update2.png" />
@@ -52,13 +53,13 @@
 
   <ItemGroup>
     <PackageReference Include="FluentWPF" Version="0.10.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="5.0.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Octokit" Version="2.0.1" />
-    <PackageReference Include="YamlDotNet" Version="12.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="6.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Octokit" Version="5.0.3" />
+    <PackageReference Include="YamlDotNet" Version="13.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,6 +90,7 @@
     <Resource Include="UI\Resources\Images\icon-plugin.png" />
     <Resource Include="UI\Resources\Images\icon-remove.png" />
     <Resource Include="UI\Resources\Images\icon-settings.png" />
+    <Resource Include="UI\Resources\Images\icon-skip.png" />
     <Resource Include="UI\Resources\Images\icon-unchecked.png" />
     <Resource Include="UI\Resources\Images\icon-update.png" />
     <Resource Include="UI\Resources\Images\icon-update2.png" />
@@ -96,6 +98,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="UI\Controls\Panes\UpdateAvailablePane.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="UI\Localization\Localization.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -129,6 +134,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Controls\Panes\UpdateAvailablePane.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Localization\Localization.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

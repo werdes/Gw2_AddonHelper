@@ -41,7 +41,7 @@ namespace Gw2_AddonHelper.UI.Controls
         public static readonly DependencyProperty OtherVersionsOrientationProperty =
             DependencyProperty.RegisterAttached(nameof(OtherVersionsOrientation), typeof(Orientation), typeof(MultiLanguageLabel), new PropertyMetadata(Orientation.Horizontal));
         public static readonly DependencyProperty OtherVersionsPaddingProperty =
-           DependencyProperty.RegisterAttached(nameof(OtherVersionsPadding), typeof(Thickness), typeof(MultiLanguageLabel), new PropertyMetadata(new Thickness(0,0,0,0)));
+           DependencyProperty.RegisterAttached(nameof(OtherVersionsPadding), typeof(Thickness), typeof(MultiLanguageLabel), new PropertyMetadata(new Thickness(0, 0, 0, 0)));
         public static readonly DependencyProperty OtherVersionsMarginProperty =
            DependencyProperty.RegisterAttached(nameof(OtherVersionsMargin), typeof(Thickness), typeof(MultiLanguageLabel), new PropertyMetadata(new Thickness(0, 0, 0, 0)));
         public static readonly DependencyProperty ReducedFontSizeFactorProperty =
@@ -84,7 +84,7 @@ namespace Gw2_AddonHelper.UI.Controls
             get => (double)GetValue(ReducedFontSizeFactorProperty);
             set => SetValue(ReducedFontSizeFactorProperty, value);
         }
-        
+
 
         public List<string> OtherVersions
         {
@@ -116,9 +116,13 @@ namespace Gw2_AddonHelper.UI.Controls
 
         private void OnControlLoaded(object sender, RoutedEventArgs e)
         {
-            _config = App.ServiceProvider.GetService<IConfiguration>();
+            try
+            {
+                _config = App.ServiceProvider.GetService<IConfiguration>();
+            }
+            catch { }
 
-            bool showInvariantCulture = _config.GetValue<bool>("showInvariantCulture");
+            bool showInvariantCulture = _config?.GetValue<bool>("showInvariantCulture") ?? false;
             Dictionary<string, string> languageVersions = LocalizationProvider.GetLocalized(Key, showInvariantCulture);
 
             EnglishVersion = languageVersions[DEFAULT_LANGUAGE_CODE];

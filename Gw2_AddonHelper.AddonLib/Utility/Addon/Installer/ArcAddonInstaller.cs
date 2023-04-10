@@ -127,7 +127,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// Installs the addon to the configured arcdps folder
         /// </summary>
         /// <param name="manifest"></param>
-        public async Task<bool> Install(ExtractionResult manifest, DownloadResult download)
+        public override async Task<bool> Install(ExtractionResult manifest, DownloadResult download)
         {
             string gamePath = Path.GetDirectoryName(_gamePath);
             string relativePath = GetInstallationBaseDirectory();

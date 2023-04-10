@@ -9,6 +9,7 @@ using System;
 using Gw2_AddonHelper.Common.Model;
 using Gw2_AddonHelper.Services.UserConfigServices.Model;
 using Gw2_AddonHelper.Common.Model.AddonList;
+using Gw2_AddonHelper.Common.Model.SelfUpdate;
 
 namespace Gw2_AddonHelper.Model.UI
 {
@@ -33,6 +34,7 @@ namespace Gw2_AddonHelper.Model.UI
         private DateTime _addonListCrawlTime;
         private string _addonSourceServiceName;
         private string _filterText;
+        private SelfUpdateLocalFile _selfUpdateLocalFile;
 
         public MainWindowViewModel()
         {
@@ -202,6 +204,14 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
-
+        public SelfUpdateLocalFile SelfUpdateLocalFile
+        {
+            get => _selfUpdateLocalFile; 
+            set
+            {
+                _selfUpdateLocalFile = value;
+                Notify();
+            }
+        }
     }
 }

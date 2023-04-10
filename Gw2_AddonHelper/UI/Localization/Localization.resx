@@ -141,6 +141,9 @@
   <data name="AddonTitleBy" xml:space="preserve">
     <value>{AddonTitleBy}</value>
   </data>
+  <data name="AppUpdateAvailable" xml:space="preserve">
+    <value>{AppUpdateAvailable}</value>
+  </data>
   <data name="BugreportsNotice" xml:space="preserve">
     <value>{BugreportsNotice}</value>
   </data>
@@ -314,6 +317,18 @@
   </data>
   <data name="UncategorizedError" xml:space="preserve">
     <value>{UncategorizedError}</value>
+  </data>
+  <data name="UpdateAvailablePaneButtonAppUpdateText" xml:space="preserve">
+    <value>{UpdateAvailablePaneButtonAppUpdateText}</value>
+  </data>
+  <data name="UpdateAvailablePaneButtonSkipText" xml:space="preserve">
+    <value>{UpdateAvailablePaneButtonSkipText}</value>
+  </data>
+  <data name="UpdateAvailablePaneNotesHeader" xml:space="preserve">
+    <value>{UpdateAvailablePaneNotesHeader}</value>
+  </data>
+  <data name="UpdateAvailablePaneVersionHeader" xml:space="preserve">
+    <value>{UpdateAvailablePaneVersionHeader}</value>
   </data>
   <data name="WelcomeFindGameExecutableText" xml:space="preserve">
     <value>{WelcomeFindGameExecutableText}</value>

@@ -24,6 +24,7 @@ using Gw2_AddonHelper.Services.UserConfigServices.Model;
 using Gw2_AddonHelper.Services.AddonSourceServices;
 using Gw2_AddonHelper.Services.AppUpdaterServices;
 using System.Windows.Controls;
+using Gw2_AddonHelper.Common.Model.SelfUpdate;
 
 namespace Gw2_AddonHelper.UI
 {
@@ -71,9 +72,13 @@ namespace Gw2_AddonHelper.UI
             try
             {
                 _viewModel.AvailableCultures = new ObservableCollection<CultureInfo>(await LoadAvailableLanguages());
-                _viewModel.AppUpdateAvailable = await CheckAppUpdateAvailable();
+                (_viewModel.AppUpdateAvailable, _viewModel.SelfUpdateLocalFile) = await CheckAppUpdateAvailable();
 
-                if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
+                if (_viewModel.AppUpdateAvailable && !_userConfigService.GetConfig().VersionSkipFlags.Contains(_viewModel.SelfUpdateLocalFile.Version))
+                {
+                    _viewModel.UiState = Enums.UiState.UpdateAvailable;
+                } 
+                else if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
                 {
                     await InitializeUi();
                 }
@@ -95,32 +100,30 @@ namespace Gw2_AddonHelper.UI
         /// Checks, if an update for this application is available
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> CheckAppUpdateAvailable()
+        private async Task<(bool, SelfUpdateLocalFile)> CheckAppUpdateAvailable()
         {
             IAppUpdaterService appUpdaterService = await AppUpdaterServicesHelper.GetAppUpdaterService();
             Version currentLocalVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-            Version latestVersion = await appUpdaterService.GetLatestVersion();
-            _log.LogInformation($"Latest available version is [{latestVersion}]");
+            Version latestVersion = null;
+            string notes = null;
+            
+            (latestVersion, notes) = await appUpdaterService.GetLatestVersion();
+            _log.LogInformation($"Latest available version is [{latestVersion}] from [{appUpdaterService.GetType().Name}]");
 
             if (latestVersion != null &&
                 !(latestVersion.Major == 0 && latestVersion.Minor == 0 && latestVersion.Build == 0 && latestVersion.Revision == 0))
             {
-                _userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.UtcNow;
-                _userConfigService.Store();
-
                 if (latestVersion > currentLocalVersion)
                 {
-                    _userConfigService.GetConfig().LatestVersion = latestVersion;
-                    _userConfigService.Store();
-                    return true;
+                    return (true, new SelfUpdateLocalFile()
+                    {
+                        Notes = notes,
+                        Version = latestVersion.ToString()
+                    });
                 }
             }
-
-
-            Version storedVersion = _userConfigService.GetConfig().LatestVersion;
-            _log.LogInformation($"Checking against stored version [{storedVersion}]");
-            return storedVersion.Build != 0 && storedVersion.Revision != 0 && storedVersion > currentLocalVersion;
+            return (false, null);
         }
 
         /// <summary>
@@ -922,7 +925,7 @@ namespace Gw2_AddonHelper.UI
         {
             try
             {
-                IAppUpdaterService appUpdaterService = App.ServiceProvider.GetService<IAppUpdaterService>();
+                IAppUpdaterService appUpdaterService = await AppUpdaterServicesHelper.GetAppUpdaterService();
                 await appUpdaterService.Update();
 
                 Application.Current.Shutdown();
@@ -996,6 +999,30 @@ namespace Gw2_AddonHelper.UI
                                         //container.Addon.Description.ToUpper().Contains(searchTerm) ||
                                         container.Addon.Website.AbsolutePath.ToUpper().Contains(searchTerm);
                 }
+            }
+            catch (Exception ex)
+            {
+                SetUiError(ex, Localization.Localization.UncategorizedError);
+            }
+        }
+
+        /// <summary>
+        /// Adds the Skip-Flag to user-config
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnButtonSkipUpdateClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_viewModel.SelfUpdateLocalFile != null &&
+                   !string.IsNullOrEmpty(_viewModel.SelfUpdateLocalFile.Version)) {
+                    UserConfig userConfig = _userConfigService.GetConfig();
+                    userConfig.VersionSkipFlags.Add(_viewModel.SelfUpdateLocalFile.Version);
+                    _userConfigService.Store();
+                }
+
+                await InitializeUi();
             }
             catch (Exception ex)
             {

@@ -9,10 +9,12 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
 {
     public static class AppUpdaterServicesHelper
     {
+        private static IAppUpdaterService _appUpdaterService;
         private static List<IAppUpdaterService> GetAppUpdaterServices()
         {
             List<IAppUpdaterService> appUpdaterServices = new List<IAppUpdaterService>();
 
+            appUpdaterServices.Add(new LocalFileAppUpdaterService());
             appUpdaterServices.Add(new GithubAppUpdateService());
             appUpdaterServices.Add(new DummyAppUpdaterService());
 
@@ -22,20 +24,22 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
 
         public static async Task<IAppUpdaterService> GetAppUpdaterService()
         {
-            List<IAppUpdaterService> appUpdaterServices = GetAppUpdaterServices();
-            IAppUpdaterService availableService = null;
-
-            foreach (IAppUpdaterService appUpdaterService in appUpdaterServices)
+            if (_appUpdaterService == null)
             {
-                if(await appUpdaterService.IsAvailable())
+                List<IAppUpdaterService> appUpdaterServices = GetAppUpdaterServices();
+
+                foreach (IAppUpdaterService appUpdaterService in appUpdaterServices)
                 {
-                    availableService = appUpdaterService;
-                    break;
+                    if (await appUpdaterService.IsAvailable())
+                    {
+                        _appUpdaterService = appUpdaterService;
+                        break;
+                    }
                 }
+
+                return _appUpdaterService;
             }
-
-            return availableService;
-
+            else return _appUpdaterService;
         }
     }
 }

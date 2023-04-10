@@ -1,7 +1,12 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
+using Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader;
+using Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor;
+using Gw2_AddonHelper.Common.Extensions;
+using Gw2_AddonHelper.Common.Model.AddonList;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +31,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 
         public abstract string GetInstallationBaseDirectory();
         public abstract string GetInstallationEntrypointFile();
+        public abstract Task<bool> Install(ExtractionResult extraction, DownloadResult download);
 
         /// <summary>
         /// Disables an addon by renaming the central dll file
@@ -113,6 +119,69 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
             }
 
             return version;
+        }
+
+        /// <summary>
+        /// Tries to determine the Version by comparing it to a list of hashes from the version list
+        /// </summary>
+        /// <param name="versions"></param>
+        public void TryDetermineVersionFromService(VersionContainer versions)
+        {
+            string baseDir = GetInstallationBaseDirectory();
+            string gamePath = Path.GetDirectoryName(_gamePath);
+
+            Dictionary<string, string> addonHashes = null;
+
+            if (versions.FileHashes.TryGetValue(_addon.AddonId, out addonHashes))
+            {
+                bool allHashesMatch = true;
+                foreach (string relativePath in addonHashes.Keys)
+                {
+                    string filePath = Path.Combine(gamePath, baseDir, relativePath);
+                    if (File.Exists(filePath))
+                    {
+                        string hash = File.ReadAllBytes(filePath).GetMd5Hash();
+                        if (hash != addonHashes[relativePath])
+                        {
+                            allHashesMatch = false;
+                        }
+                    }
+                    else
+                    {
+                        // -> File from hash list doesn't exist, so maybe it was added in a new version?
+                        allHashesMatch = false;
+                    }
+                }
+
+                if (allHashesMatch)
+                {
+                    string versionFilePath = GetInstallationVersionFile();
+                    string version = null;
+
+                    if (versions.Versions.TryGetValue(_addon.AddonId, out version))
+                    {
+                        File.WriteAllText(versionFilePath, version, Encoding.UTF8);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the selected addon
+        ///  normally just Download->Extract->Install
+        /// </summary>
+        /// <param name="addonDownloader"></param>
+        /// <param name="addonExtractor"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> Update(IAddonDownloader addonDownloader, IAddonExtractor addonExtractor)
+        {
+            _log.LogInformation($"Updating [{_addon.AddonId}]");
+            DownloadResult downloadResult = await addonDownloader.Download();
+            ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, downloadResult.Version);
+
+            bool updateResult = await this.Install(extractionResult, downloadResult);
+
+            return updateResult;
         }
 
         /// <summary>

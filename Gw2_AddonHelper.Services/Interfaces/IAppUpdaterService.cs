@@ -8,7 +8,7 @@ namespace Gw2_AddonHelper.Services.Interfaces
 {
     public interface IAppUpdaterService
     {
-        public Task<Version> GetLatestVersion();
+        public Task<(Version, string)> GetLatestVersion();
         public Task Update();
         public Task<bool> IsAvailable();
         int GetHierarchy();

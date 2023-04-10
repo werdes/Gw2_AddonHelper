@@ -138,16 +138,11 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
                 addonContainer.InstallState = enableResult ? InstallState.InstalledEnabled : InstallState.InstalledDisabled;
             }
 
-            _log.LogInformation($"Updating [{addonContainer.Addon.AddonId}]");
-
             IAddonDownloader addonDownloader = AddonDownloaderFactory.GetDownloader(addonContainer.Addon);
             IAddonExtractor addonExtractor = AddonExtractorFactory.GetExtractor(addonContainer.Addon);
             IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
 
-            DownloadResult downloadResult = await addonDownloader.Download();
-            ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, downloadResult.Version);
-
-            bool installResult = await addonInstaller.Install(extractionResult, downloadResult);
+            bool updateResult = await addonInstaller.Update(addonDownloader, addonExtractor);
 
             if (enableBeforeUpdate)
             {
@@ -155,7 +150,7 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
                 addonContainer.InstallState = disableResult ? InstallState.InstalledDisabled : InstallState.InstalledEnabled;
             }
 
-            return enableResult && disableResult && installResult;
+            return enableResult && disableResult && updateResult;
         }
 
         /// <summary>
@@ -186,6 +181,12 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
                 _log.LogDebug($"Downloader for [{addonContainer.Addon.AddonId}] is [{addonDownloader.GetType().Name}]");
 
                 string installedVersion = addonInstaller.GetInstalledVersion();
+                if(string.IsNullOrEmpty(installedVersion))
+                {
+                    // installed Version empty = no version file, try to get by hash comparison
+                    
+                }
+
                 string latestVersion = await addonDownloader.GetLatestVersion();
 
                 _log.LogDebug($"Installed version for [{addonContainer.Addon.AddonId}] is [{installedVersion}]");
@@ -220,6 +221,13 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
                 {
                     IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addonContainer.Addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                     string installedVersion = addonInstaller.GetInstalledVersion();
+
+                    if (string.IsNullOrEmpty(installedVersion))
+                    {
+                        // installed Version empty = no version file, try to get by hash comparison
+                        addonInstaller.TryDetermineVersionFromService(versions);
+                        installedVersion = addonInstaller.GetInstalledVersion();
+                    }
 
                     if (addonInstaller.GetInstalledVersion() != versions.Versions[addonContainer.Addon.AddonId] &&
                         !addonContainer.Addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating))
@@ -283,14 +291,25 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
             {
                 AddonContainer container = GetAddonContainer(addon);
 
+
+
                 if (container.InstallState == InstallState.InstalledDisabled ||
                     container.InstallState == InstallState.InstalledEnabled)
                 {
                     if (versions.Versions.ContainsKey(addon.AddonId))
                     {
                         IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon, _userConfigService.GetConfig().GameLocation.LocalPath);
+                        string installedVersion = addonInstaller.GetInstalledVersion();
+
+                        if (string.IsNullOrEmpty(installedVersion))
+                        {
+                            // installed Version empty = no version file, try to get by hash comparison
+                            addonInstaller.TryDetermineVersionFromService(versions);
+                            installedVersion = addonInstaller.GetInstalledVersion();
+                        }
+
                         container.QuickUpdateAvailable = !addon.AdditionalFlags.Contains(AddonFlag.SelfUpdating) &&
-                                                         addonInstaller.GetInstalledVersion() != versions.Versions[addon.AddonId];
+                                                         installedVersion != versions.Versions[addon.AddonId];
                     }
                 }
                 addonContainers.Add(container);

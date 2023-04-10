@@ -19,7 +19,8 @@ namespace Gw2_AddonHelper.Model.UI
             Settings,
             Error,
             Conflicts,
-            About
+            About,
+            UpdateAvailable
         }
 
     }

@@ -1,5 +1,7 @@
 ﻿using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.AddonLib.Model.Installer;
+using Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader;
+using Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,7 +29,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// <returns></returns>
         public override string GetInstallationBaseDirectory()
         {
-            return _configFiles.First().Directory;
+            return String.Empty; // _configFiles.First().Directory;
         }
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         public override string GetInstallationEntrypointFile()
         {
             string dir = GetInstallationBaseDirectory();
-            string file = _configFiles.First().FileName;
+            string file = _configFiles.First(x => x.Key == Common.Model.AddonLoaderFileKey.Loader).FileName;
             return Path.Combine(dir, file);
         }
 
@@ -46,7 +48,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
         /// Installs the extracted file to the install location
         /// </summary>
         /// <param name="extraction"></param>
-        public async Task<bool> Install(ExtractionResult extraction, DownloadResult download)
+        public override async Task<bool> Install(ExtractionResult extraction, DownloadResult download)
         {
             bool installed = false;
             string gamePath = Path.GetDirectoryName(_gamePath);
@@ -97,6 +99,10 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
                         await Task.Run(() => File.Delete(installFile));
                         _log.LogInformation($"Removed for [{_addon.AddonId}]:  {installFile}");
                     }
+                    else
+                    {
+                        _log.LogInformation($"[{installFile}] is not present");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -105,6 +111,24 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
                 }
             }
             return removed;
+        }
+
+        /// <summary>
+        /// Special case for Loader addon: Remove old version first
+        /// </summary>
+        /// <param name="addonDownloader"></param>
+        /// <param name="addonExtractor"></param>
+        /// <returns></returns>
+        public override async Task<bool> Update(IAddonDownloader addonDownloader, IAddonExtractor addonExtractor)
+        {
+            _log.LogInformation($"Updating [{_addon.AddonId}] with Uninstall");
+            DownloadResult downloadResult = await addonDownloader.Download();
+            ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, downloadResult.Version);
+
+            bool updateResult = await this.Remove() && 
+                                await this.Install(extractionResult, downloadResult);
+
+            return updateResult;
         }
 
         /// <summary>

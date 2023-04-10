@@ -16,22 +16,16 @@ using System.Threading.Tasks;
 
 namespace Gw2_AddonHelper.Services.AppUpdaterServices
 {
-    public class GithubAppUpdateService : IAppUpdaterService
+    public class GithubAppUpdateService : BaseAppUpdaterService, IAppUpdaterService
     {
         private const string ZIP_MIME = "application/x-zip-compressed";
         private const int HIERARCHY = 2;
 
         private GitHubClient _gitHubClient;
-        private IConfiguration _config;
-        private ILogger<GithubAppUpdateService> _log;
-        private IUserConfigService _userConfig;
 
-        public GithubAppUpdateService()
+        public GithubAppUpdateService() : base()
         {
-            _userConfig = Lib.ServiceProvider.GetService<IUserConfigService>();
             _gitHubClient = Lib.ServiceProvider.GetService<GitHubClient>();
-            _config = Lib.ServiceProvider.GetService<IConfiguration>();
-            _log = Lib.ServiceProvider.GetService<ILogger<GithubAppUpdateService>>();
         }
 
         public int GetHierarchy()
@@ -43,8 +37,8 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
         /// <summary>
         /// Checks if an update to the application is available
         /// </summary>
-        /// <returns></returns>
-        public async Task<Version> GetLatestVersion()
+        /// <returns>Version and Notes</returns>
+        public async Task<(Version, string)> GetLatestVersion()
         {
             if (GithubRatelimitService.Instance.CanCall())
             {
@@ -57,16 +51,20 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
                     GithubRatelimitService.Instance.RegisterCall();
 
                     Version version = new Version(githubRelease.TagName);
+                    Uri assetUri = new Uri(githubRelease.Assets.Where(x => x.ContentType == ZIP_MIME).First().BrowserDownloadUrl);
+                    string notes = githubRelease.Body;
 
                     _log.LogInformation($"Latest app version is [{version}]");
-                    return version;
+
+                    await StoreFile(assetUri, version.ToString(), notes);
+                    return (version, githubRelease.Body);
                 }
                 catch (Exception ex) when (ex is NotFoundException or ArgumentNullException)
                 {
                     _log.LogWarning($"No version found for [{repoUrl}]");
                 }
             }
-            return null;
+            return (null, null);
         }
 
         /// <summary>
@@ -75,11 +73,8 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
         /// <returns></returns>
         public async Task<bool> IsAvailable()
         {
-            DateTime lastCheck = _userConfig.GetConfig().LastSelfUpdateCheck;
-            DateTime checkThreshold = DateTime.UtcNow.Add(-1 * _config.GetValue<TimeSpan>("selfUpdate:updaters:github:refreshCooldown"));
-
-            _log.LogInformation($"Github app updater probed, with last_check [{lastCheck}], checkThreshold [{checkThreshold}]");
-            return lastCheck <= checkThreshold && GithubRatelimitService.Instance.CanCall();
+            _log.LogInformation($"Github app updater probed");
+            return GithubRatelimitService.Instance.CanCall();
         }
 
         /// <summary>
@@ -104,42 +99,7 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
                     if (assetUri != null)
                     {
                         string outputFileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterAssetDirectory"), $"{version}.zip");
-                        outputFileName = Path.GetFullPath(outputFileName);
-
-                        if (!File.Exists(outputFileName))
-                        {
-                            byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
-                            await File.WriteAllBytesAsync(outputFileName, buffer);
-                            _log.LogInformation($"Stored update archive with [{buffer.Length}] bytes to [{outputFileName}]");
-                        }
-
-                        if (await SelfUpdateUpdater(outputFileName))
-                        {
-                            int currentProcessId = Process.GetCurrentProcess().Id;
-                            string extractionDirectory = Environment.CurrentDirectory;
-                            string callerPath = Environment.GetCommandLineArgs().First();
-
-                            //Reset stored version and version check timestamp
-                            IUserConfigService userConfigService = Lib.ServiceProvider.GetService<IUserConfigService>();
-                            userConfigService.GetConfig().LastSelfUpdateCheck = DateTime.MinValue;
-                            userConfigService.GetConfig().LatestVersion = new Version();
-                            userConfigService.Store();
-
-                            Process process = new Process();
-                            process.StartInfo.ArgumentList.Add(callerPath);
-                            process.StartInfo.ArgumentList.Add(currentProcessId.ToString());
-                            process.StartInfo.ArgumentList.Add(outputFileName);
-                            process.StartInfo.ArgumentList.Add(extractionDirectory);
-
-                            process.StartInfo.WorkingDirectory = _config.GetValue<string>("selfUpdate:updaterDirectory");
-                            process.StartInfo.FileName = Path.Combine(_config.GetValue<string>("selfUpdate:updaterDirectory"),
-                                                                      _config.GetValue<string>("selfUpdate:executable"));
-
-                            process.Start();
-
-                            _log.LogInformation("Shutdown for application update");
-                            _log.LogObject(process.StartInfo);
-                        }
+                        await UpdateInternal(version, assetUri, outputFileName);
                     }
                     else
                     {
@@ -159,52 +119,16 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
         }
 
         /// <summary>
-        /// Updates the self updater from archive if available
+        /// Downloads Asset with GithubClient
         /// </summary>
-        /// <param name="zipPath"></param>
+        /// <param name="assetUri"></param>
         /// <returns></returns>
-        private async Task<bool> SelfUpdateUpdater(string zipPath)
+        /// <exception cref="NotImplementedException"></exception>
+        protected override async Task<byte[]> Download(Uri assetUri)
         {
-            bool success = true;
-            List<UpdatePath> updatePaths = _config.GetSection("selfUpdate:updatePaths").Get<List<UpdatePath>>();
-
-            try
-            {
-                _log.LogInformation($"Updating self updater");
-                using (FileStream zipStream = File.OpenRead(zipPath))
-                {
-                    using (ZipArchive zipArchive = new ZipArchive(zipStream))
-                    {
-                        List<ZipArchiveEntry> zipEntryFiles = zipArchive.Entries.Where(x => x.IsFile()).ToList();
-                        foreach (ZipArchiveEntry entry in zipEntryFiles)
-                        {
-                            string relativeInternalPath = Path.GetDirectoryName(entry.FullName);
-                            UpdatePath updatePath = updatePaths.Where(x => x.ZipPath == relativeInternalPath).FirstOrDefault();
-
-                            if (updatePath != null)
-                            {
-                                // internal path is allowed
-                                string outputPath = entry.FullName.Replace(relativeInternalPath, updatePath.FileSystemPath);
-                                string outputDirectory = Path.GetDirectoryName(outputPath);
-                                if (!Directory.Exists(outputDirectory))
-                                {
-                                    Directory.CreateDirectory(outputDirectory);
-                                }
-
-                                _log.LogInformation($"Extracting self updater to [{outputPath}]");
-                                await Task.Run(() => entry.ExtractToFile(outputPath, true));
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                success = false;
-                _log.LogCritical(ex, "SelfUpdate Updater");
-            }
-
-            return success;
+            byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
+            return buffer;
         }
+
     }
 }

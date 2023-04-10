@@ -25,10 +25,9 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
 
         private Uri _gameLocation;
         private CultureInfo _lang;
-        private DateTime _lastGithubCheck;
-        private DateTime _lastSelfUpdateCheck;
-        private Version _latestVersion;
         private ObservableCollection<UiFlag> _uiFlags;
+        private ObservableCollection<string> _versionSkipFlags;
+
 
         public UserConfig()
         {
@@ -36,9 +35,8 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
 
             _gameLocation = new Uri(config.GetValue<string>("defaultValues:gamePath"));
             _lang = CultureInfo.GetCultureInfo(config.GetValue<string>("defaultValues:language"));
-            _lastGithubCheck = DateTime.MinValue;
-            _latestVersion = new Version();
             _uiFlags = new ObservableCollection<UiFlag>();
+            _versionSkipFlags = new ObservableCollection<string>();
         }
 
         [JsonProperty("game_location")]
@@ -64,39 +62,6 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
             }
         }
 
-        [JsonProperty("last_github_check")]
-        public DateTime LastGithubCheck
-        {
-            get => _lastGithubCheck;
-            set
-            {
-                _lastGithubCheck = value;
-                Notify();
-            }
-        }
-
-        [JsonProperty("last_self_update_check")]
-        public DateTime LastSelfUpdateCheck
-        {
-            get => _lastSelfUpdateCheck;
-            set
-            {
-                _lastSelfUpdateCheck = value;
-                Notify();
-            }
-        }
-
-        [JsonProperty("latest_version")]
-        public Version LatestVersion
-        {
-            get => _latestVersion;
-            set
-            {
-                _latestVersion = value;
-                Notify();
-            }
-        }
-
         [JsonProperty("ui_flags", ItemConverterType = typeof(StringEnumConverter))]
         public ObservableCollection<UiFlag> UiFlags
         {
@@ -104,6 +69,17 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
             set
             {
                 _uiFlags = value;
+                Notify();
+            }
+        }
+
+        [JsonProperty("version_skip_flags")]
+        public ObservableCollection<string> VersionSkipFlags
+        {
+            get => _versionSkipFlags;
+            set
+            {
+                _versionSkipFlags = value;
                 Notify();
             }
         }

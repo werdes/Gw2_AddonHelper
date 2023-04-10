@@ -115,6 +115,8 @@ namespace Gw2_AddonHelper.Common.Model
         [EnumMember(Value = "dx11")]
         DX11,
         [EnumMember(Value = "dxgi")]
-        DXGI
+        DXGI,
+        [EnumMember(Value = "loader")]
+        Loader
     }
 }
