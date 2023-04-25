@@ -20,6 +20,10 @@
         <converters:ProgressToProgressbarBrushConverter x:Key="ProgressToProgressbarBrushConverter" />
     </Window.Resources>
     <Grid Background="{Binding Progress, Converter={StaticResource ProgressToProgressbarBrushConverter}}">
-        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding ProgressText}" Foreground="White" FontFamily="Segoe UI Light" FontSize="14" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="13*"/>
+            <ColumnDefinition Width="12*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding ProgressText}" Foreground="White" FontFamily="Segoe UI Light" FontSize="14" Margin="150,0,0,0" />
     </Grid>
 </fluent:AcrylicWindow>

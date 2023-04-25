@@ -116,6 +116,10 @@ namespace Gw2_AddonHelper.Common.Model
         DX11,
         [EnumMember(Value = "dxgi")]
         DXGI,
+        [EnumMember(Value = "dxgi_cef")]
+        DXGI_CEF,
+        [EnumMember(Value = "dxgi_bin64")]
+        DXGI_BIN64,
         [EnumMember(Value = "loader")]
         Loader
     }

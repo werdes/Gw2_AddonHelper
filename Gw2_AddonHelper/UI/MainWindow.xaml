@@ -46,6 +46,11 @@
             </Setter>
         </Style>
 
+        <!--<Style TargetType="TextBlock">
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+        </Style>-->
+
         <!-- UIState Pane -->
         <Style TargetType="controls:UiStatePane">
             <Setter Property="Template">
@@ -66,7 +71,7 @@
                 </LinearGradientBrush>
             </Border.OpacityMask>
             <Border.Background>
-                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom_eod.png" Stretch="UniformToFill" Opacity="0.4">
+                <ImageBrush AlignmentY="Bottom" ImageSource="/UI/Resources/Images/bottom_eod2.png" Stretch="UniformToFill" Opacity="0.5">
                 </ImageBrush>
             </Border.Background>
         </Border>

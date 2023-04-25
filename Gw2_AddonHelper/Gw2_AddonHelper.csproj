@@ -25,6 +25,7 @@
     <None Remove="UI\Resources\Images\app.png" />
     <None Remove="UI\Resources\Images\bottom.png" />
     <None Remove="UI\Resources\Images\bottom_eod.png" />
+    <None Remove="UI\Resources\Images\bottom_eod2.png" />
     <None Remove="UI\Resources\Images\icon-appupdate.png" />
     <None Remove="UI\Resources\Images\icon-back.png" />
     <None Remove="UI\Resources\Images\icon-checked.png" />
@@ -72,6 +73,7 @@
     <Resource Include="UI\Resources\Images\app.png" />
     <Resource Include="UI\Resources\Images\bottom.png" />
     <Resource Include="UI\Resources\Images\bottom_eod.png" />
+    <Resource Include="UI\Resources\Images\bottom_eod2.png" />
     <Resource Include="UI\Resources\Images\icon-appupdate.png" />
     <Resource Include="UI\Resources\Images\icon-back.png" />
     <Resource Include="UI\Resources\Images\icon-checked.png" />

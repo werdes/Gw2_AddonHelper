@@ -1003,6 +1003,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, nameof(OnAddonListSearch));
             }
         }
 
@@ -1027,6 +1028,7 @@ namespace Gw2_AddonHelper.UI
             catch (Exception ex)
             {
                 SetUiError(ex, Localization.Localization.UncategorizedError);
+                _log.LogCritical(ex, nameof(OnButtonSkipUpdateClick));
             }
         }
     }
