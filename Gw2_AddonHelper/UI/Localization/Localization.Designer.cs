@@ -142,6 +142,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {AppUpdateDownloading} ähnelt.
+        /// </summary>
+        public static string AppUpdateDownloading {
+            get {
+                return ResourceManager.GetString("AppUpdateDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {BugreportsNotice} ähnelt.
         /// </summary>
         public static string BugreportsNotice {

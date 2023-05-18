@@ -1,4 +1,4 @@
-﻿<controls:UiStatePane x:Class="Gw2_AddonHelper.UI.Controls.Panes.UpdateAvailablePane"
+﻿<controls:UiStatePane x:Class="Gw2_AddonHelper.UI.Controls.Panes.AppUpdateAvailablePane"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <controls:MultiLanguageLabel Margin="10,0,0,0" MainOrientation="Horizontal" OtherVersionsOrientation="Horizontal" FontFamily="Segoe UI Light" Key="AppUpdateAvailable" FontSize="48" ReducedFontSizeFactor="0.60"  Foreground="White" OtherVersionsMargin="10,0,0,3"/>
+            <controls:MultiLanguageLabel Margin="10,0,0,0" MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="AppUpdateAvailable" FontSize="48" ReducedFontSizeFactor="0.60"  Foreground="White" OtherVersionsMargin="10,0,0,3"/>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Grid Margin="20,10,0,0">
                     <Grid.ColumnDefinitions>
@@ -40,14 +40,16 @@
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="10,0,15,15">
             <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update2.png" />
-                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonAppUpdateText}"/>
+                    <Image Height="16" Width="16" Margin="5,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-install.png" />
+                    <!--<TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonAppUpdateText}"/>-->
+                    <controls:MultiLanguageLabel MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="UpdateAvailablePaneButtonAppUpdateText" FontSize="14" ReducedFontSizeFactor="0.9"  Foreground="White" />
                 </StackPanel>
             </Button>
             <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSkipClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-skip.png" />
-                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonSkipText}"/>
+                    <Image Height="16" Width="16" Margin="5,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-skip.png" />
+                    <!--<TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonSkipText}"/>-->
+                    <controls:MultiLanguageLabel MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="UpdateAvailablePaneButtonSkipText" FontSize="14" ReducedFontSizeFactor="0.9"  Foreground="White" />
                 </StackPanel>
             </Button>
         </StackPanel>

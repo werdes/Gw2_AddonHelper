@@ -16,6 +16,7 @@ using Gw2_AddonHelper.Services.AppUpdaterServices;
 using Gw2_AddonHelper.Services.UserConfigServices;
 using Gw2_AddonHelper.Services.AddonGameStateServices;
 using Gw2_AddonHelper.Services.AddonSourceServices;
+using System.Net.Http;
 
 namespace Gw2_AddonHelper
 {

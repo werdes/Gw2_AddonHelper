@@ -19,15 +19,15 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
     /// <summary>
     /// Interaktionslogik für LoadingPane.xaml
     /// </summary>
-    public partial class UpdateAvailablePane : UiStatePane
+    public partial class AppUpdateAvailablePane : UiStatePane
     {
         public event RoutedEventHandler AppUpdateClick;
         public event RoutedEventHandler SkipClick;
 
-        public UpdateAvailablePane()
+        public AppUpdateAvailablePane()
         {
             InitializeComponent();
-            UiState = Enums.UiState.UpdateAvailable;
+            UiState = Enums.UiState.AppUpdateAvailable;
         }
 
         protected void OnButtonAppUpdateClick(object sender, RoutedEventArgs e) => AppUpdateClick?.Invoke(sender, e);

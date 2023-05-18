@@ -12,6 +12,8 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
     /// </summary>
     internal class DummyAppUpdaterService : IAppUpdaterService
     {
+        public event EventHandler<AppUpdateDownloadEventArgs> UpdateProgress;
+
         public int GetHierarchy()
         {
             return int.MaxValue;

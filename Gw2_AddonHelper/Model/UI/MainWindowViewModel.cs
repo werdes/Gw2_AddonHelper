@@ -35,6 +35,9 @@ namespace Gw2_AddonHelper.Model.UI
         private string _addonSourceServiceName;
         private string _filterText;
         private SelfUpdateLocalFile _selfUpdateLocalFile;
+        private double _appUpdateDownloadProgress;
+        private bool _appUpdateDownloadWaiting;
+
 
         public MainWindowViewModel()
         {
@@ -42,6 +45,9 @@ namespace Gw2_AddonHelper.Model.UI
             _addonInstallActions = new ObservableCollection<AddonInstallAction>();
             _addonConflicts = new ObservableCollection<AddonConflict>();
             _addonInstallProgresses = new ObservableCollection<AddonInstallProgress>();
+
+            _appUpdateDownloadWaiting = true;
+            _appUpdateDownloadProgress = 0;
         }
 
         public ObservableCollection<AddonContainer> AddonContainers
@@ -213,5 +219,36 @@ namespace Gw2_AddonHelper.Model.UI
                 Notify();
             }
         }
+
+        public double AppUpdateDownloadProgress
+        {
+            get => _appUpdateDownloadProgress;
+            set
+            {
+                _appUpdateDownloadProgress = value;
+                Notify();
+                Notify(nameof(AppUpdateDownloadProgressText));
+            }
+        }
+        public string AppUpdateDownloadProgressText
+        {
+            get
+            {
+                if (_appUpdateDownloadWaiting) return "Waiting...";
+                return $"{(AppUpdateDownloadProgress * 100):n2} %";
+            }
+        }
+
+        public bool AppUpdateDownloadWaiting
+        {
+            get => _appUpdateDownloadWaiting;
+            set
+            {
+                _appUpdateDownloadWaiting = value;
+                Notify();
+                Notify(nameof(AppUpdateDownloadProgressText));
+            }
+        }
+
     }
 }

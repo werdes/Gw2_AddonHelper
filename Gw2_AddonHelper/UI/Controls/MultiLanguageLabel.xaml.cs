@@ -28,8 +28,6 @@ namespace Gw2_AddonHelper.UI.Controls
         public event PropertyChangedEventHandler PropertyChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public const string DEFAULT_LANGUAGE_CODE = "eng";
-
         private IConfiguration _config;
         private string _englishVersion;
         private List<string> _otherVersions;
@@ -97,7 +95,7 @@ namespace Gw2_AddonHelper.UI.Controls
         }
 
 
-        public string EnglishVersion
+        public string DefaultVersion
         {
             get => _englishVersion;
             set
@@ -124,9 +122,10 @@ namespace Gw2_AddonHelper.UI.Controls
 
             bool showInvariantCulture = _config?.GetValue<bool>("showInvariantCulture") ?? false;
             Dictionary<string, string> languageVersions = LocalizationProvider.GetLocalized(Key, showInvariantCulture);
+            string defaultLanguageCode = _config?.GetValue<string>("defaultMultiLanguageCode") ?? "eng";
 
-            EnglishVersion = languageVersions[DEFAULT_LANGUAGE_CODE];
-            OtherVersions = languageVersions.Where(x => x.Key != DEFAULT_LANGUAGE_CODE).Select(x => x.Value).ToList();
+            DefaultVersion = languageVersions[defaultLanguageCode];
+            OtherVersions = languageVersions.Where(x => x.Key != defaultLanguageCode).Select(x => x.Value).ToList();
         }
     }
 }

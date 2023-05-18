@@ -20,8 +20,8 @@ namespace Gw2_AddonHelper.Model.UI
             Error,
             Conflicts,
             About,
-            UpdateAvailable
+            AppUpdateAvailable,
+            AppUpdateDownloading
         }
-
     }
 }

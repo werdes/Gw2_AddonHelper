@@ -89,9 +89,12 @@
 
                 
                 <!-- App Update Available Panel-->
-                <panes:UpdateAvailablePane x:Name="updateAvailablePane" Visibility="Collapsed"
+                <panes:AppUpdateAvailablePane x:Name="appUpdateAvailablePane" Visibility="Collapsed"
                                            AppUpdateClick="OnButtonAppUpdateClick"
                                            SkipClick="OnButtonSkipUpdateClick"/>
+                
+                <!-- App Update Available Panel-->
+                <panes:AppUpdateDownloadingPane x:Name="appUpdateDownloadingPane" Visibility="Collapsed"/>
 
 
                 <!-- Error Screen Panel -->

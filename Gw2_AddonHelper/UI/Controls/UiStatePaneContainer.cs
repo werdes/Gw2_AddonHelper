@@ -44,7 +44,7 @@ namespace Gw2_AddonHelper.UI.Controls
         }
 
         /// <summary>
-        /// Handler for the DProp Value Changed event, sets visibility of the appropriate pane
+        /// Handler for the DProp AppUpdateDownloadValue Changed event, sets visibility of the appropriate pane
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

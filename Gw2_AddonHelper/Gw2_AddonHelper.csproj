@@ -100,7 +100,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="UI\Controls\Panes\UpdateAvailablePane.xaml.cs">
+    <Compile Update="UI\Controls\Panes\AppUpdateDownloadingPane.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="UI\Controls\Panes\AppUpdateAvailablePane.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="UI\Localization\Localization.Designer.cs">
@@ -136,7 +139,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="UI\Controls\Panes\UpdateAvailablePane.xaml">
+    <Page Update="UI\Controls\Panes\AppUpdateDownloadingPane.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UI\Controls\Panes\AppUpdateAvailablePane.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

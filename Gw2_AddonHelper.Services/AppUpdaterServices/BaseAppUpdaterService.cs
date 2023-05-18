@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,15 +22,34 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
         protected IConfiguration _config;
         protected ILogger<GithubAppUpdateService> _log;
         protected IUserConfigService _userConfig;
+        private HttpClient _httpClient;
+        private IProgress<double> _downloadProgress;
+
+        public event EventHandler<AppUpdateDownloadEventArgs> UpdateProgress;
 
         public BaseAppUpdaterService()
         {
             _config = Lib.ServiceProvider.GetService<IConfiguration>();
             _userConfig = Lib.ServiceProvider.GetService<IUserConfigService>();
             _log = Lib.ServiceProvider.GetService<ILogger<GithubAppUpdateService>>();
+
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " +
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
+            _httpClient.Timeout = TimeSpan.FromMinutes(5);
+
+            _downloadProgress = new Progress<double>(x => UpdateProgress?.Invoke(this, new AppUpdateDownloadEventArgs(x)));
         }
 
-        protected abstract Task<byte[]> Download(Uri assetUri);
+        protected async Task<byte[]> Download(Uri assetUri)
+        {
+            using(MemoryStream downloadStream = new MemoryStream())
+            {
+                await _httpClient.DownloadAsync(assetUri, downloadStream, _downloadProgress);
+                return downloadStream.ToArray();
+            }
+        }
 
         protected async Task StoreFile(Uri uri, string version, string notes)
         {
@@ -46,15 +66,22 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
             await File.WriteAllTextAsync(filePath, localFileJson, Encoding.UTF8);
         }
 
+        /// <summary>
+        /// Calls the download, unpacks and updates first the Self-Updater and then calls it
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="assetUri"></param>
+        /// <param name="outputFileName"></param>
+        /// <returns></returns>
         protected async Task UpdateInternal(Version version, Uri assetUri, string outputFileName)
         {
-            
+
             outputFileName = Path.GetFullPath(outputFileName);
 
             if (!File.Exists(outputFileName))
             {
                 byte[] buffer = await Download(assetUri);
-                
+
                 await File.WriteAllBytesAsync(outputFileName, buffer);
                 _log.LogInformation($"Stored update archive with [{buffer.Length}] bytes to [{outputFileName}]");
             }

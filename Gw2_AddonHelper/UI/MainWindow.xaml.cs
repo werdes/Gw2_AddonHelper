@@ -76,7 +76,7 @@ namespace Gw2_AddonHelper.UI
 
                 if (_viewModel.AppUpdateAvailable && !_userConfigService.GetConfig().VersionSkipFlags.Contains(_viewModel.SelfUpdateLocalFile.Version))
                 {
-                    _viewModel.UiState = Enums.UiState.UpdateAvailable;
+                    _viewModel.UiState = Enums.UiState.AppUpdateAvailable;
                 } 
                 else if (_userConfigService.GetConfig().UiFlags.Contains(UiFlag.WelcomeScreenDismissed))
                 {
@@ -103,6 +103,9 @@ namespace Gw2_AddonHelper.UI
         private async Task<(bool, SelfUpdateLocalFile)> CheckAppUpdateAvailable()
         {
             IAppUpdaterService appUpdaterService = await AppUpdaterServicesHelper.GetAppUpdaterService();
+            appUpdaterService.UpdateProgress -= OnAppUpdaterService_UpdateProgress;
+            appUpdaterService.UpdateProgress += OnAppUpdaterService_UpdateProgress;
+
             Version currentLocalVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
             Version latestVersion = null;
@@ -124,6 +127,17 @@ namespace Gw2_AddonHelper.UI
                 }
             }
             return (false, null);
+        }
+
+        /// <summary>
+        /// Writes App-Update progress to UI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void OnAppUpdaterService_UpdateProgress(object sender, AppUpdateDownloadEventArgs e)
+        {
+            this._viewModel.AppUpdateDownloadProgress = e.Progress;
         }
 
         /// <summary>
@@ -926,8 +940,14 @@ namespace Gw2_AddonHelper.UI
             try
             {
                 IAppUpdaterService appUpdaterService = await AppUpdaterServicesHelper.GetAppUpdaterService();
+                appUpdaterService.UpdateProgress -= OnAppUpdaterService_UpdateProgress;
+                appUpdaterService.UpdateProgress += OnAppUpdaterService_UpdateProgress;
+                
+                _viewModel.UiState = Enums.UiState.AppUpdateDownloading;
+                _viewModel.AppUpdateDownloadWaiting = false;
                 await appUpdaterService.Update();
 
+                _viewModel.AppUpdateDownloadWaiting = true;
                 Application.Current.Shutdown();
             }
             catch (Exception ex)

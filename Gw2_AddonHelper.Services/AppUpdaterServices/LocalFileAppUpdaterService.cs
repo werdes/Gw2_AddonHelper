@@ -14,6 +14,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -134,18 +135,5 @@ namespace Gw2_AddonHelper.Services.AppUpdaterServices
                 _log.LogWarning($"No version found from local file [{_cachePath}]");
             }
         }
-
-        /// <summary>
-        /// Downloads Asset with GithubClient
-        /// </summary>
-        /// <param name="assetUri"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        protected override async Task<byte[]> Download(Uri assetUri)
-        {
-            byte[] buffer = (await _gitHubClient.Connection.Get<byte[]>(assetUri, TimeSpan.FromSeconds(30))).Body;
-            return buffer;
-        }
-
     }
 }

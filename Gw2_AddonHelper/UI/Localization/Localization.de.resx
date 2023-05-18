@@ -144,6 +144,9 @@
   <data name="AppUpdateAvailable" xml:space="preserve">
     <value>Update verfügbar</value>
   </data>
+  <data name="AppUpdateDownloading" xml:space="preserve">
+    <value>Herunterladen...</value>
+  </data>
   <data name="BugreportsNotice" xml:space="preserve">
     <value>Fehler-Reports und Anfragen über GitHub Issues (hier klicken)</value>
   </data>
