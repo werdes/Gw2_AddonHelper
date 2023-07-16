@@ -24,7 +24,8 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" VerticalAlignment="Top" Content="{Binding Source={StaticResource Localization}, Path=SettingsGamePathText}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="16" Foreground="White"></Label>
@@ -58,6 +59,10 @@
                 </ComboBox>
                 <Label Content="{Binding Source={StaticResource Localization}, Path=SettingsLanguageDescription}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="11" Foreground="White" Opacity=".5"></Label>
             </StackPanel>
+
+            <Label Grid.Row="2" VerticalAlignment="Top" Content="{Binding Source={StaticResource Localization}, Path=SettingsThemeText}" FontFamily="Segoe UI Light" Margin="0,0,10,0" TextOptions.TextRenderingMode="ClearType" FontSize="16" Foreground="White"></Label>
+
+            <controls:ThemeSelector Grid.Row="2" Grid.Column="1" ThemeChanged="OnThemeSelectorThemeChanged"></controls:ThemeSelector>
 
         </Grid>
 

@@ -21,12 +21,14 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<LanguageChangedEventArgs> LanguageChanged;
+        public event EventHandler<ThemeChangedEventArgs> ThemeChanged;
         protected void Notify([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private Uri _gameLocation;
         private CultureInfo _lang;
         private ObservableCollection<UiFlag> _uiFlags;
         private ObservableCollection<string> _versionSkipFlags;
+        private UiTheme _theme;
 
 
         public UserConfig()
@@ -35,6 +37,7 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
 
             _gameLocation = new Uri(config.GetValue<string>("defaultValues:gamePath"));
             _lang = CultureInfo.GetCultureInfo(config.GetValue<string>("defaultValues:language"));
+            _theme = config.GetValue<UiTheme>("defaultValues:ui_theme");
             _uiFlags = new ObservableCollection<UiFlag>();
             _versionSkipFlags = new ObservableCollection<string>();
         }
@@ -83,5 +86,18 @@ namespace Gw2_AddonHelper.Services.UserConfigServices.Model
                 Notify();
             }
         }
+
+        [JsonProperty("ui_theme")]
+        public UiTheme Theme
+        {
+            get => _theme;
+            set
+            {
+                _theme = value;
+                Notify();
+                ThemeChanged?.Invoke(this, new ThemeChangedEventArgs(_theme));
+            }
+        }
+
     }
 }

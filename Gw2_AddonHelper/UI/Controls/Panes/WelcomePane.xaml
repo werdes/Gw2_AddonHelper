@@ -56,10 +56,11 @@
 
         <!--Buttons-->
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="10,0,15,15">
-            <Button Margin="0,0,0,0" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonContinueClick">
+            <Button  Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonContinueClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                     <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-enable.png" />
-                    <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonWelcomeStartText}"/>
+                    <!--<TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonWelcomeStartText}"/>-->
+                    <controls:MultiLanguageLabel MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="ButtonWelcomeStartText" FontSize="14" ReducedFontSizeFactor="0.9"  Foreground="White" />
                 </StackPanel>
             </Button>
             <controls:VersionNumberLabel Foreground="White" Opacity=".5" Margin="10,10,60,10" FontSize="12"/>

@@ -315,6 +315,9 @@
   <data name="SettingsLanguageText" xml:space="preserve">
     <value>{SettingsLanguageText}</value>
   </data>
+  <data name="SettingsThemeText" xml:space="preserve">
+    <value>{SettingsThemeText}</value>
+  </data>
   <data name="UiErrorWarning" xml:space="preserve">
     <value>{UiErrorWarning}</value>
   </data>

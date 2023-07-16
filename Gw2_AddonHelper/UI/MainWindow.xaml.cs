@@ -25,6 +25,7 @@ using Gw2_AddonHelper.Services.AddonSourceServices;
 using Gw2_AddonHelper.Services.AppUpdaterServices;
 using System.Windows.Controls;
 using Gw2_AddonHelper.Common.Model.SelfUpdate;
+using Gw2_AddonHelper.UI.Resources.Themes;
 
 namespace Gw2_AddonHelper.UI
 {
@@ -49,7 +50,9 @@ namespace Gw2_AddonHelper.UI
             _viewModel.UiState = Enums.UiState.Loading;
             _viewModel.UserConfig = userConfigService.GetConfig();
             _viewModel.UserConfig.LanguageChanged += OnUserConfigLanguageChanged;
+            _viewModel.UserConfig.ThemeChanged += OnUserConfigThemeChanged;
             _viewModel.Version = Assembly.GetExecutingAssembly().GetName().Version;
+            _viewModel.Theme = ThemeHelper.GetTheme(_viewModel.UserConfig.Theme);
 
             _log = log;
             _config = config;
@@ -59,6 +62,7 @@ namespace Gw2_AddonHelper.UI
             LocalizationProvider.ChangeCulture(_viewModel.UserConfig.Language);
             DataContext = _viewModel;
         }
+
 
         /// <summary>
         /// Window loaded event
@@ -393,6 +397,31 @@ namespace Gw2_AddonHelper.UI
                 SetUiError(ex, Localization.Localization.OpenAddonError + e.AddonContainer?.Addon?.AddonName);
                 _log.LogCritical(ex, $"Opening directory for [{e.AddonContainer?.Addon?.AddonId}]");
             }
+        }
+
+        /// <summary>
+        /// User Theme change
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void OnUserConfigThemeChanged(object sender, ThemeChangedEventArgs e)
+        {
+            if (e.Theme != UiTheme.Undefined)
+            {
+                _viewModel.Theme = ThemeHelper.GetTheme(e.Theme);
+            }
+        }
+
+        /// <summary>
+        /// Change Usersettings Theme
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSettingsThemeChanged(object sender, ThemeChangedEventArgs e)
+        {
+            UserConfig userConfig = _userConfigService.GetConfig();
+            userConfig.Theme = e.Theme;
         }
 
         /// <summary>
@@ -1050,6 +1079,11 @@ namespace Gw2_AddonHelper.UI
                 SetUiError(ex, Localization.Localization.UncategorizedError);
                 _log.LogCritical(ex, nameof(OnButtonSkipUpdateClick));
             }
+        }
+
+        private void settingsPane_ThemeChanged(object sender, ThemeChangedEventArgs e)
+        {
+
         }
     }
 }

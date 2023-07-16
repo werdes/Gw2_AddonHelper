@@ -655,6 +655,15 @@ namespace Gw2_AddonHelper.UI.Localization {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {SettingsThemeText} ähnelt.
+        /// </summary>
+        public static string SettingsThemeText {
+            get {
+                return ResourceManager.GetString("SettingsThemeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {UiErrorWarning} ähnelt.
         /// </summary>
         public static string UiErrorWarning {

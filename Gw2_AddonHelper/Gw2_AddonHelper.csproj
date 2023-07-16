@@ -50,6 +50,7 @@
     <None Remove="UI\Resources\Images\icon-update2.png" />
     <None Remove="UI\Resources\Images\icon-warning.png" />
     <None Remove="UI\Resources\Images\left_eod.png" />
+    <None Remove="UI\Resources\Themes\SOTOCity\SOTOCity.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,9 +72,9 @@
   <ItemGroup>
     <Resource Include="UI\Resources\app.ico" />
     <Resource Include="UI\Resources\Images\app.png" />
-    <Resource Include="UI\Resources\Images\bottom.png" />
-    <Resource Include="UI\Resources\Images\bottom_eod.png" />
-    <Resource Include="UI\Resources\Images\bottom_eod2.png" />
+    <Resource Include="UI\Resources\Themes\POFCrystal\POFCrystal.png" />
+    <Resource Include="UI\Resources\Themes\EODJade\EODJade.png" />
+    <Resource Include="UI\Resources\Themes\EODTemple\EODTemple.png" />
     <Resource Include="UI\Resources\Images\icon-appupdate.png" />
     <Resource Include="UI\Resources\Images\icon-back.png" />
     <Resource Include="UI\Resources\Images\icon-checked.png" />
@@ -97,6 +98,7 @@
     <Resource Include="UI\Resources\Images\icon-update.png" />
     <Resource Include="UI\Resources\Images\icon-update2.png" />
     <Resource Include="UI\Resources\Images\icon-warning.png" />
+    <Resource Include="UI\Resources\Themes\SOTOCity\SOTOCity.png" />
   </ItemGroup>
 
   <ItemGroup>

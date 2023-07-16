@@ -1,4 +1,5 @@
 ﻿using Gw2_AddonHelper.Model.UI;
+using Gw2_AddonHelper.Services.UserConfigServices.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         public event RoutedEventHandler SaveClick;
         public event RoutedEventHandler CancelClick;
         public event RoutedEventHandler FindExecutableClick;
+        public event EventHandler<ThemeChangedEventArgs> ThemeChanged;
 
         public SettingsPane()
         {
@@ -34,5 +36,6 @@ namespace Gw2_AddonHelper.UI.Controls.Panes
         protected void OnButtonSettingsSaveClick(object sender, RoutedEventArgs e) => SaveClick?.Invoke(sender, e);
         protected void OnButtonSettingsCancelClick(object sender, RoutedEventArgs e) => CancelClick?.Invoke(sender, e);
         protected void OnButtonSettingsFindExecutableClick(object sender, RoutedEventArgs e) => FindExecutableClick?.Invoke(sender, e);
+        private void OnThemeSelectorThemeChanged(object sender, ThemeChangedEventArgs e) => ThemeChanged?.Invoke(sender, e);
     }
 }

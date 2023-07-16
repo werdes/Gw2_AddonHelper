@@ -123,4 +123,17 @@ namespace Gw2_AddonHelper.Common.Model
         [EnumMember(Value = "loader")]
         Loader
     }
+
+    public enum UiTheme
+    {
+        Undefined = 0,
+        [EnumMember(Value = "eod_jade")]
+        EODJade,
+        [EnumMember(Value = "eod_temple")]
+        EODTemple,
+        [EnumMember(Value = "pof_crystal")]
+        POFCrystal,
+        [EnumMember(Value = "soto_city")]
+        SOTOCity,
+    }
 }

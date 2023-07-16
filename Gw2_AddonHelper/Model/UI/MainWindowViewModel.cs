@@ -37,7 +37,7 @@ namespace Gw2_AddonHelper.Model.UI
         private SelfUpdateLocalFile _selfUpdateLocalFile;
         private double _appUpdateDownloadProgress;
         private bool _appUpdateDownloadWaiting;
-
+        private Theme _theme;
 
         public MainWindowViewModel()
         {
@@ -212,7 +212,7 @@ namespace Gw2_AddonHelper.Model.UI
 
         public SelfUpdateLocalFile SelfUpdateLocalFile
         {
-            get => _selfUpdateLocalFile; 
+            get => _selfUpdateLocalFile;
             set
             {
                 _selfUpdateLocalFile = value;
@@ -250,5 +250,14 @@ namespace Gw2_AddonHelper.Model.UI
             }
         }
 
+        public Theme Theme
+        {
+            get => _theme;
+            set
+            {
+                _theme = value;
+                Notify();
+            }
+        }
     }
 }

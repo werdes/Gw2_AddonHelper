@@ -324,6 +324,9 @@
   <data name="SettingsLanguageText" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="SettingsThemeText" xml:space="preserve">
+    <value>Farbschema</value>
+  </data>
   <data name="UiErrorWarning" xml:space="preserve">
     <value>Ein Fehler ist aufgetreten</value>
   </data>
