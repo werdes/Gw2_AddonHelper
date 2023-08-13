@@ -26,35 +26,13 @@
     <None Remove="UI\Resources\Images\bottom.png" />
     <None Remove="UI\Resources\Images\bottom_eod.png" />
     <None Remove="UI\Resources\Images\bottom_eod2.png" />
-    <None Remove="UI\Resources\Images\icon-appupdate.png" />
-    <None Remove="UI\Resources\Images\icon-back.png" />
-    <None Remove="UI\Resources\Images\icon-checked.png" />
-    <None Remove="UI\Resources\Images\icon-conflict.png" />
-    <None Remove="UI\Resources\Images\icon-copy-to-clipboard.png" />
-    <None Remove="UI\Resources\Images\icon-disable.png" />
-    <None Remove="UI\Resources\Images\icon-enable.png" />
-    <None Remove="UI\Resources\Images\icon-external-link.png" />
-    <None Remove="UI\Resources\Images\icon-info.png" />
-    <None Remove="UI\Resources\Images\icon-install.png" />
-    <None Remove="UI\Resources\Images\icon-installer-completed.png" />
-    <None Remove="UI\Resources\Images\icon-installer-error.png" />
-    <None Remove="UI\Resources\Images\icon-installer-installing.png" />
-    <None Remove="UI\Resources\Images\icon-installer-waiting.png" />
-    <None Remove="UI\Resources\Images\icon-open.png" />
-    <None Remove="UI\Resources\Images\icon-plugin.png" />
-    <None Remove="UI\Resources\Images\icon-remove.png" />
-    <None Remove="UI\Resources\Images\icon-settings.png" />
-    <None Remove="UI\Resources\Images\icon-skip.png" />
-    <None Remove="UI\Resources\Images\icon-unchecked.png" />
-    <None Remove="UI\Resources\Images\icon-update.png" />
-    <None Remove="UI\Resources\Images\icon-update2.png" />
-    <None Remove="UI\Resources\Images\icon-warning.png" />
     <None Remove="UI\Resources\Images\left_eod.png" />
     <None Remove="UI\Resources\Themes\SOTOCity\SOTOCity.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentWPF" Version="0.10.2" />
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
@@ -75,29 +53,6 @@
     <Resource Include="UI\Resources\Themes\POFCrystal\POFCrystal.png" />
     <Resource Include="UI\Resources\Themes\EODJade\EODJade.png" />
     <Resource Include="UI\Resources\Themes\EODTemple\EODTemple.png" />
-    <Resource Include="UI\Resources\Images\icon-appupdate.png" />
-    <Resource Include="UI\Resources\Images\icon-back.png" />
-    <Resource Include="UI\Resources\Images\icon-checked.png" />
-    <Resource Include="UI\Resources\Images\icon-conflict.png" />
-    <Resource Include="UI\Resources\Images\icon-copy-to-clipboard.png" />
-    <Resource Include="UI\Resources\Images\icon-disable.png" />
-    <Resource Include="UI\Resources\Images\icon-enable.png" />
-    <Resource Include="UI\Resources\Images\icon-external-link.png" />
-    <Resource Include="UI\Resources\Images\icon-info.png" />
-    <Resource Include="UI\Resources\Images\icon-install.png" />
-    <Resource Include="UI\Resources\Images\icon-installer-completed.png" />
-    <Resource Include="UI\Resources\Images\icon-installer-error.png" />
-    <Resource Include="UI\Resources\Images\icon-installer-installing.png" />
-    <Resource Include="UI\Resources\Images\icon-installer-waiting.png" />
-    <Resource Include="UI\Resources\Images\icon-open.png" />
-    <Resource Include="UI\Resources\Images\icon-plugin.png" />
-    <Resource Include="UI\Resources\Images\icon-remove.png" />
-    <Resource Include="UI\Resources\Images\icon-settings.png" />
-    <Resource Include="UI\Resources\Images\icon-skip.png" />
-    <Resource Include="UI\Resources\Images\icon-unchecked.png" />
-    <Resource Include="UI\Resources\Images\icon-update.png" />
-    <Resource Include="UI\Resources\Images\icon-update2.png" />
-    <Resource Include="UI\Resources\Images\icon-warning.png" />
     <Resource Include="UI\Resources\Themes\SOTOCity\SOTOCity.png" />
   </ItemGroup>
 

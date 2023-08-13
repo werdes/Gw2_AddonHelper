@@ -295,7 +295,7 @@
     <value>NCSOFT, the interlocking NC logo, ArenaNet, Guild Wars, Guild Wars Factions, Guild Wars Nightfall, Guild Wars: Eye of the North, Guild Wars 2, and all associated logos and designs are trademarks or registered trademarks of NCSOFT Corporation. All other trademarks are the property of their respective owners.</value>
   </data>
   <data name="LegalNoticeIcons" xml:space="preserve">
-    <value>Icons kindly provided by icons8.com.</value>
+    <value>Icons: Font Awesome by Dave Gandy - http://fontawesome.io</value>
   </data>
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>

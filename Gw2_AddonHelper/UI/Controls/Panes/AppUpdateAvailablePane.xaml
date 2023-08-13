@@ -4,6 +4,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI.Controls.Panes"
+                      xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
@@ -40,14 +41,14 @@
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="10,0,15,15">
             <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="5,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-install.png" />
+                    <fa:FontAwesome Foreground="{Binding DataContext.Theme.AccentColor, Converter={StaticResource ColorToSolidColorBrushConverter}, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" FontSize="16" Margin="5,1,10,0" MinWidth="16" VerticalAlignment="Center" Icon="Download" />
                     <!--<TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonAppUpdateText}"/>-->
                     <controls:MultiLanguageLabel MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="UpdateAvailablePaneButtonAppUpdateText" FontSize="14" ReducedFontSizeFactor="0.9"  Foreground="White" />
                 </StackPanel>
             </Button>
             <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSkipClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="5,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-skip.png" />
+                    <fa:FontAwesome Foreground="{Binding DataContext.Theme.AccentColor, Converter={StaticResource ColorToSolidColorBrushConverter}, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" FontSize="16" Margin="5,1,10,0" MinWidth="16" VerticalAlignment="Center" Icon="AngleDoubleRight" />
                     <!--<TextBlock Text="{Binding Source={StaticResource Localization}, Path=UpdateAvailablePaneButtonSkipText}"/>-->
                     <controls:MultiLanguageLabel MainOrientation="Vertical" OtherVersionsOrientation="Vertical" FontFamily="Segoe UI Light" Key="UpdateAvailablePaneButtonSkipText" FontSize="14" ReducedFontSizeFactor="0.9"  Foreground="White" />
                 </StackPanel>

@@ -14,7 +14,7 @@ namespace Gw2_AddonHelper.UI.Resources.Themes.SOTOCity
 
         public Color GetAccentColor()
         {
-            return Colors.Gold;
+            return Color.FromRgb(195, 161, 77);
         }
 
         public string GetBackgroundImagePath()

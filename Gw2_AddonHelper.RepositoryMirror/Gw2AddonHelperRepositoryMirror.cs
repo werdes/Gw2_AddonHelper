@@ -85,16 +85,23 @@ namespace Gw2_AddonHelper.UpdateCheck
                             !previousRunAddonFound ||
                             !previousVersionContainer.FileHashes.ContainsKey(addon.AddonId))
                         {
-                            DownloadResult downloadResult = await downloader.Download();
-
-                            IAddonExtractor addonExtractor = AddonExtractorFactory.GetExtractor(addon);
-                            ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, version);
-
-                            versionContainer.FileHashes.Add(addon.AddonId, new Dictionary<string, string>());
-                            foreach (ExtractionResultFile extractedFile in extractionResult.AddonFiles)
+                            try
                             {
-                                string fullRelativePath = Path.Combine(extractedFile.RelativePath, extractedFile.FileName);
-                                versionContainer.FileHashes[addon.AddonId].Add(fullRelativePath, extractedFile.FileContent.GetMd5Hash());
+                                DownloadResult downloadResult = await downloader.Download();
+
+                                IAddonExtractor addonExtractor = AddonExtractorFactory.GetExtractor(addon);
+                                ExtractionResult extractionResult = await addonExtractor.Extract(downloadResult, version);
+
+                                versionContainer.FileHashes.Add(addon.AddonId, new Dictionary<string, string>());
+                                foreach (ExtractionResultFile extractedFile in extractionResult.AddonFiles)
+                                {
+                                    string fullRelativePath = Path.Combine(extractedFile.RelativePath, extractedFile.FileName);
+                                    versionContainer.FileHashes[addon.AddonId].Add(fullRelativePath, extractedFile.FileContent.GetMd5Hash());
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                _log.LogCritical($"{addon.AddonId}: {ex}");
                             }
                         }
                         else if (previousVersionContainer.FileHashes.TryGetValue(addon.AddonId, out oldHashes))

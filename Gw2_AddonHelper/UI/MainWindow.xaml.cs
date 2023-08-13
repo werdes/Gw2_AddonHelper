@@ -622,8 +622,8 @@ namespace Gw2_AddonHelper.UI
             HashSet<AddonContainer> enableableAddons = requiredAddons.Where(x => x.InstallState == InstallState.InstalledDisabled).ToHashSet();
 
 
-            List<AddonContainer> installedAddons = installableAddons.ToList();
-            installedAddons.AddRange(enableableAddons);
+            List<AddonContainer> installedAddons = _viewModel.AddonContainers.Where(x => x.InstallState == InstallState.InstalledEnabled || x.InstallState == InstallState.InstalledDisabled).ToList();
+            //installedAddons.AddRange(enableableAddons);
 
 
             IEnumerable<AddonConflict> addonConflicts = await addonGameStateService.CheckConflicts(installedAddons, installableAddons);

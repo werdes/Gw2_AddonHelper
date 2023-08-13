@@ -4,6 +4,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI.Controls.Panes"
+                      xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
@@ -156,7 +157,7 @@
                         </MultiBinding>
                     </Button.IsEnabled>
                     <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-update.png" />
+                        <fa:FontAwesome FontSize="18" Foreground="White" MinWidth="16" Margin="0,0,10,0" VerticalAlignment="Center" Icon="Refresh" />
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AddonListSourceToUpdateButtonTextConverter}">
@@ -169,7 +170,7 @@
                 </Button>
                 <Button Margin="0,0,0,5" Padding="10" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonSettingsClick">
                     <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-settings.png" />
+                        <fa:FontAwesome FontSize="18" Foreground="White" MinWidth="16" Margin="0,0,10,0" VerticalAlignment="Center" Icon="Cogs" />
                         <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonSettingsText}"/>
                     </StackPanel>
                 </Button>
@@ -177,13 +178,13 @@
             <StackPanel Grid.Row="1" fluent:PointerTracker.Enabled="True" Margin="0,10,10,20">
                 <Button Visibility="{Binding AppUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,5" Height="50" VerticalAlignment="Bottom" Padding="10,3,10,3" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAppUpdateClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-appupdate.png" />
+                        <fa:FontAwesome FontSize="18" Foreground="White" MinWidth="16" Margin="0,0,10,0"  VerticalAlignment="Center" Icon="Wrench" />
                         <TextBlock MaxWidth="140" TextWrapping="Wrap" Text="{Binding Source={StaticResource Localization}, Path=ButtonAppUpdateText}"/>
                     </StackPanel>
                 </Button>
                 <Button Margin="0,0,0,5" Height="30" VerticalAlignment="Bottom" Padding="10,5,10,5" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutClick">
                     <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                        <Image Height="16" Width="16" Margin="0,1,10,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-info.png" />
+                        <fa:FontAwesome FontSize="18" Foreground="White" MinWidth="16" VerticalAlignment="Center" Margin="0,0,10,0" Icon="Info" />
                         <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonAboutText}"/>
                     </StackPanel>
                 </Button>

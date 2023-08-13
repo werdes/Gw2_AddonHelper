@@ -35,7 +35,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader
                     Release githubRelease = (await _gitHubClient.Connection.Get<Release>(_addon.HostUrl, TimeSpan.FromSeconds(30))).Body;
                     GithubRatelimitService.Instance.RegisterCall();
 
-                    if (githubRelease != null)
+                    if (githubRelease != null && githubRelease.Assets != null && githubRelease.Assets.Count > 0)
                     {
                         string downloadUrl = githubRelease.Assets.First().BrowserDownloadUrl;
                         byte[] fileContent = await WebClient.DownloadDataTaskAsync(downloadUrl);

@@ -6,6 +6,7 @@
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI.Controls.Panes"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
+                      xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
                       mc:Ignorable="d" 
                       d:DesignHeight="450" d:DesignWidth="800">
@@ -64,13 +65,15 @@
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="1" FlowDirection="RightToLeft" Margin="0,0,5,5">
             <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonInstallerInstallClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-enable.png" />
+                    <fa:FontAwesome Foreground="{Binding DataContext.Theme.AccentColor, Converter={StaticResource ColorToSolidColorBrushConverter}, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" FontSize="16" Margin="0,1,5,0" MinWidth="16" VerticalAlignment="Center" Icon="Check" />
+
                     <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonApplyText}"/>
                 </StackPanel>
             </Button>
             <Button Margin="10,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonInstallerCancelClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-disable.png" />
+                    <fa:FontAwesome Foreground="{Binding DataContext.Theme.AccentColor, Converter={StaticResource ColorToSolidColorBrushConverter}, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" FontSize="16" Margin="0,1,5,0" MinWidth="16" VerticalAlignment="Center" Icon="Times" />
+
                     <TextBlock Text="{Binding Source={StaticResource Localization}, Path=ButtonCancelText}"/>
                 </StackPanel>
             </Button>

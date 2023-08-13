@@ -295,7 +295,7 @@
     <value>NCSOFT, das ineinandergreifende NC-Logo, ArenaNet, Guild Wars, Guild Wars Factions, Guild Wars Nightfall, Guild Wars: Eye of the North, Guild Wars 2, Heart of Thorns und alle zugehörigen Logos und Designs sind Warenzeichen oder eingetragene Warenzeichen der NCSOFT Corporation. Alle anderen Warenzeichen sind das Eigentum ihrer jeweiligen Besitzer.</value>
   </data>
   <data name="LegalNoticeIcons" xml:space="preserve">
-    <value>Icons freundlicherweise von icons8.com bereitgestellt.</value>
+    <value>Icons: Font Awesome by Dave Gandy - http://fontawesome.io</value>
   </data>
   <data name="Loading" xml:space="preserve">
     <value>Laden...</value>

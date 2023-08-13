@@ -90,12 +90,12 @@
                 <!-- Loading Panel -->
                 <panes:LoadingPane x:Name="loadingPane" Visibility="Visible" />
 
-                
+
                 <!-- App Update Available Panel-->
                 <panes:AppUpdateAvailablePane x:Name="appUpdateAvailablePane" Visibility="Collapsed"
                                            AppUpdateClick="OnButtonAppUpdateClick"
                                            SkipClick="OnButtonSkipUpdateClick"/>
-                
+
                 <!-- App Update Available Panel-->
                 <panes:AppUpdateDownloadingPane x:Name="appUpdateDownloadingPane" Visibility="Collapsed"/>
 

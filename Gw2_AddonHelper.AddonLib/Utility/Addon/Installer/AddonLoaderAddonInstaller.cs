@@ -159,7 +159,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
                     else
                     {
                         _log.LogWarning($"Cannot disable [{installationFile}] for [{_addon.AddonId}]: File doesn't exist");
-                        allFilesDisabled = false;
+                        //allFilesDisabled = false;
                     }
                 }
                 catch (Exception ex)

@@ -15,7 +15,7 @@ namespace Gw2_AddonHelper.UI.Resources.Themes.POFCrystal
 
         public Color GetAccentColor()
         {
-            return Colors.MediumPurple;
+            return Color.FromRgb(180, 36, 132) * 1.3F;
         }
 
         public string GetBackgroundImagePath()

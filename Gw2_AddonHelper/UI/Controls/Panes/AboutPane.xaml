@@ -4,6 +4,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                       xmlns:local="clr-namespace:Gw2_AddonHelper.UI.Controls.Panes"
+                      xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:controls="clr-namespace:Gw2_AddonHelper.UI.Controls"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:converters="clr-namespace:Gw2_AddonHelper.UI.Converters"
@@ -40,7 +41,7 @@
         <StackPanel fluent:PointerTracker.Enabled="True" Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft" Margin="0,0,5,5">
             <Button Margin="0,0,0,0" Padding="4" Style="{StaticResource ButtonRevealStyle}" Cursor="Hand" HorizontalContentAlignment="Left" Click="OnButtonAboutBackClick">
                 <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Image Height="16" Width="16" Margin="0,1,5,0" RenderOptions.BitmapScalingMode="HighQuality" Source="/UI/Resources/Images/icon-back.png" />
+                    <fa:FontAwesome Margin="0,3,5,2" Icon="ChevronLeft" />
                     <TextBlock Text="{Binding Source={StaticResource Localization}, Path=AboutButtonBackText}"/>
                 </StackPanel>
             </Button>
