@@ -198,7 +198,6 @@ namespace Gw2_AddonHelper.UI
                        versionContainer.Versions != null &&
                        addonListSource != AddonListSource.Undefined)
                     {
-
                         List<AddonContainer> containers = (await addonGameStateService.GetAddonContainers(lstAddons, versionContainer)).OrderByDescending(x => x.SortKey).ToList();
                         _viewModel.AddonContainers = new ObservableCollection<AddonContainer>(containers);
                         _viewModel.AddonListSource = addonListSource;
@@ -1021,6 +1020,11 @@ namespace Gw2_AddonHelper.UI
             }
         }
 
+        /// <summary>
+        /// Bugreport click -> open repo issues URL
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTextBlockBugreportMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             string url = _config.GetValue<string>("about:bugreportUrl");
@@ -1036,6 +1040,11 @@ namespace Gw2_AddonHelper.UI
             }
         }
 
+        /// <summary>
+        /// Filter list on type
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAddonListSearch(object sender, TextChangedEventArgs e)
         {
             try
@@ -1079,11 +1088,6 @@ namespace Gw2_AddonHelper.UI
                 SetUiError(ex, Localization.Localization.UncategorizedError);
                 _log.LogCritical(ex, nameof(OnButtonSkipUpdateClick));
             }
-        }
-
-        private void settingsPane_ThemeChanged(object sender, ThemeChangedEventArgs e)
-        {
-
         }
     }
 }

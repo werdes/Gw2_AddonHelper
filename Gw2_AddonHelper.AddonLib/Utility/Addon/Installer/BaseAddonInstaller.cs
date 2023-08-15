@@ -160,6 +160,7 @@ namespace Gw2_AddonHelper.AddonLib.Utility.Addon.Installer
 
                     if (versions.Versions.TryGetValue(_addon.AddonId, out version))
                     {
+                        _log.LogInformation($"All hashes match for [{_addon.AddonId}], service version {version} => create new version file");
                         File.WriteAllText(versionFilePath, version, Encoding.UTF8);
                     }
                 }

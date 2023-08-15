@@ -3,6 +3,7 @@ using Gw2_AddonHelper.AddonLib.Model.GameState;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Downloader;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Extractor;
 using Gw2_AddonHelper.AddonLib.Utility.Addon.Installer;
+using Gw2_AddonHelper.Common.Extensions;
 using Gw2_AddonHelper.Common.Model;
 using Gw2_AddonHelper.Common.Model.AddonList;
 using Gw2_AddonHelper.Services.Interfaces;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Gw2_AddonHelper.Services.AddonGameStateServices
@@ -291,8 +293,6 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
             {
                 AddonContainer container = GetAddonContainer(addon);
 
-
-
                 if (container.InstallState == InstallState.InstalledDisabled ||
                     container.InstallState == InstallState.InstalledEnabled)
                 {
@@ -301,9 +301,13 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
                         IAddonInstaller addonInstaller = AddonInstallerFactory.GetInstaller(addon, _userConfigService.GetConfig().GameLocation.LocalPath);
                         string installedVersion = addonInstaller.GetInstalledVersion();
 
-                        if (string.IsNullOrEmpty(installedVersion))
+                        // installed Version empty = no version file, try to get by hash comparison
+                        //  OR
+                        // installed version doesn't match the latest version -> maybe the addon was self-updated
+                        // -> Check, if all files match the reported hashes, if so update the installed version file
+                        if (string.IsNullOrEmpty(installedVersion) ||
+                            installedVersion != versions.Versions[addon.AddonId])
                         {
-                            // installed Version empty = no version file, try to get by hash comparison
                             addonInstaller.TryDetermineVersionFromService(versions);
                             installedVersion = addonInstaller.GetInstalledVersion();
                         }
@@ -398,5 +402,6 @@ namespace Gw2_AddonHelper.Services.AddonGameStateServices
 
             return conflicts;
         }
+
     }
 }
